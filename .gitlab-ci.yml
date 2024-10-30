@@ -1,0 +1,20 @@
+stages:
+  - compile_pdf
+
+compile_pdf:
+  stage: compile_pdf
+  image: fbe-dockerreg.rwu.de/adm-iki/systems/gitlab-runner-docker-latex:master
+  tags:
+    - latex
+  script:
+    - cd doc/documentation/ && latexmk -pdf Doku.tex
+  only:
+    changes:
+      - doc/documentation/*
+  artifacts:
+    name: "Proposal"
+    expire_in: 4 weeks
+    when: on_success
+    name: "Documentation.pdf"
+    paths:
+      - doc/documentation/Doku.pdf
