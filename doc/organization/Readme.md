@@ -3,13 +3,17 @@
 ## Projektmanagement
 Scrum
     Treffen:
+
         Mittwoch: Mittagspause.
+
         Wochenende(Samstag/Sonntag).
 
 
 ## Branchingstrategie
 Feature-Branching.
+
 Branch.
+
     feature/kurze-ticket-beschreibung-ticket-nummer
 
 ## Programmiersprachen
