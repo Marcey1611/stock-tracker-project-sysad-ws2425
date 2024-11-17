@@ -101,7 +101,7 @@ source/**/celerybeat-schedule
 source/**/*.sage.py
 
 # Environments
-source/**/.env
+# source/**/.env Because we need the .env file in the repo
 source/**/.venv
 source/**/env/
 source/**/venv/
