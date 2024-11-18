@@ -1,0 +1,3 @@
+fastapi
+uvicorn           # ASGI-Server für FastAPI
+pydantic
