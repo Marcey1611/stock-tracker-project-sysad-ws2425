@@ -44,16 +44,3 @@ try:
         print("E-Mail erfolgreich gesendet!")
 except Exception as e:
     print(f"Fehler beim Senden der E-Mail: {e}")
-
-# Alternativ
-'''
-import yagmail
-
-yag = yagmail.SMTP("sysad.stock.tracker@gmail.com", "faqhiz-Hygtid-4hiqma")
-yag.send(
-    to="sysad.stock.tracker@gmail.com",
-    subject="Hallo von Python",
-    contents="Das ist eine Test-E-Mail mit yagmail.",
-    attachments="Test-Anhang.jpg"
-)
-'''
