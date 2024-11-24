@@ -7,6 +7,6 @@ services:
       - "8000:8000"
     environment:
       SMTP_SERVER: smtp.gmail.com
-      SMTP_PORT: 587 # oder 25 oder 465
-      SMTP_USER: sysad.project.ws2425@gmail.com
-      SMTP_PASSWORD: SysAdProjectWs2425
+      SMTP_PORT: 587
+      SMTP_USER: sysad.stock.tracker@gmail.com
+      SMTP_PASSWORD: goczmulgrxsbfesa
