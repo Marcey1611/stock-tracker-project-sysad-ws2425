@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS Products (
 
 CREATE TABLE IF NOT EXISTS StockLog (
     ProductID INTEGER REFERENCES Products(ProductID),
-    SystemTimeIN TIME,
-    SystemTimeOUT TIME
+    SystemTimeIN TIMESTAMP,     --auf TIMESTAMP anstelle TIME
+    SystemTimeOUT TIMESTAMP     --auf TIMESTAMP anstelle TIME
 );

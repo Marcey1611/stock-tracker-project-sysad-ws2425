@@ -4,6 +4,6 @@ services:
   db_service:
     build: .
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
-      - DATABASE_URL=sqlite:///./test.db   # Dummy-Datenbank-URL für Entwicklung
+      DATABASE_URL: "postgresql://myuser:mypassword@db:5431/mydatabase"
