@@ -2,8 +2,15 @@ version: '3.8'
 
 services:
   db_service:
-    build: .
-    ports:
-      - "8001:8000"
+    build: 
+      context: .
+
     environment:
-      DATABASE_URL: "postgresql://myuser:mypassword@db:5431/mydatabase"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+
+    networks:
+      - stockTrackerDockerNetwork
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db

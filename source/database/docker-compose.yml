@@ -3,7 +3,7 @@ version: '3.9'
 services:
   db:
     build: .
-    container_name: stock_tracker_postgres_db_main
+    container_name: stock_tracker_postgres_db
     environment:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
@@ -13,6 +13,36 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5433:5433"
+
+  detectionservice:
+    build:
+      context: .
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase  
+    networks:
+      - stockTrackerDockerNetwork
+    depends_on:
+      - db
+
+  db_service:
+    build:
+      context: .
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase  
+    networks:
+      - stockTrackerDockerNetwork
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+networks:
+  stockTrackerDockerNetwork:
+    driver: bridge
 
 volumes:
   pgdata:

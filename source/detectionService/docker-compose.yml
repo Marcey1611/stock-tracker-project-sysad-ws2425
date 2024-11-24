@@ -1,28 +1,11 @@
 version: '3.9'
 services:
-  db:
-    build: .
-    container_name: stock_tracker_postgres_db
-    
-    environment:
-      POSTGRES_USER: myuseruser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydatabase
-    ports:
-      - "5431:5431"
-    volumes:
-      - db_data:/var/lib/postgresql/data
-
-  detection-service:
-    build:
-      context: .
-    container_name: detection_service
-    depends_on:
-      - db
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: "postgresql://myuser:mypassword@db:5431/mydatabase"
-
-volumes:
-  db_data:
+  detectionservice:
+  build:
+    context: .
+  environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"  
+  networks:
+    - stockTrackerDockerNetwork
+  depends_on:
+    - db-service
