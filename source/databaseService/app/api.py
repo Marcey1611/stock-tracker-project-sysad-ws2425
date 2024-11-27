@@ -10,3 +10,6 @@ app = FastAPI()
 @app.get("/testConnection")
 def testConnectionToMailingService():
     return mailingTrigger.triggerMail(1, "Product")
+@app.get("/testErrorConnection")
+def testErrorConnectionToMailingService():
+    return mailingTrigger.triggerErrorMail("ERROR!")
