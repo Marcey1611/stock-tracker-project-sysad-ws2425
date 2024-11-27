@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-import bf
+from ..control import bf
 
 app = FastAPI()
 

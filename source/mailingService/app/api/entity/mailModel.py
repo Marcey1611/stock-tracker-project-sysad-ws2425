@@ -1,4 +1,3 @@
-
 class Mail:
     def __init__(self, productId, productName):
         self.productId = productId
