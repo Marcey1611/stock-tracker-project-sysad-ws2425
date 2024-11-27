@@ -394,3 +394,6 @@ doc/**/*-tags.tex
 
 # standalone packages
 doc/**/*.sta
+
+# mac generated files for meta datat
+.DS_Store
