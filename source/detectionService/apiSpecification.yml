@@ -1,0 +1,104 @@
+openapi: 3.0.3
+
+info:
+  title: Detection Service API
+  description: This is the API-Specification for the Detection-Service
+  version: 1.0.0
+
+#It follows some examples to show you how an api spec works
+
+paths:
+  /users:
+    get:
+      summary: Liste aller Benutzer abrufen
+      description: Gibt eine Liste aller registrierten Benutzer zurück.
+      responses:
+        '200':
+          description: Erfolgreiche Antwort
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Serverfehler
+    post:
+      summary: Neuen Benutzer erstellen
+      description: Erstellt einen neuen Benutzer mit den angegebenen Daten.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '201':
+          description: Benutzer erfolgreich erstellt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Ungültige Eingabe
+        '500':
+          description: Serverfehler
+
+  /users/{userId}:
+    get:
+      summary: Einzelnen Benutzer abrufen
+      description: Gibt die Details eines spezifischen Benutzers zurück.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: Die ID des Benutzers
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Erfolgreiche Antwort
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Benutzer nicht gefunden
+        '500':
+          description: Serverfehler
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "12345"
+        name:
+          type: string
+          example: "Max Mustermann"
+        email:
+          type: string
+          format: email
+          example: "max.mustermann@example.com"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-11-27T12:00:00Z"
+    NewUser:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          example: "Max Mustermann"
+        email:
+          type: string
+          format: email
+          example: "max.mustermann@example.com"
+
+
+  
