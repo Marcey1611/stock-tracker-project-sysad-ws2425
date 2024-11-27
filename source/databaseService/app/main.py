@@ -1,9 +1,5 @@
-# app/main.py
-from fastapi import FastAPI
+from api import app
+import uvicorn
 
-app = FastAPI()
-
-# Platzhalter-Interface
-@app.get("/")
-def read_root():
-    return {"message": "SysAdmin-Project-SS24/25"}
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
