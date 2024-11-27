@@ -3,7 +3,16 @@ from fastapi import FastAPI, Request
 app = FastAPI()
 
 @app.post("/sendMail")
-async def receive_string(request: Request):
-    data = await request.json()
-    received_data = data.get("data", "No data received")
-    return {"message": f"App 2 received: {received_data}"}
+async def sendMailPostInterface(request: Request):
+    try:
+        data = await request.json()
+        return {
+            "status": "success",
+            "received_data": data
+        }
+        #TODO Call method to send mail.
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
