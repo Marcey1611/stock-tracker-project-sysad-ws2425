@@ -1,18 +1,12 @@
 from fastapi import FastAPI, Request
+import bf
 
 app = FastAPI()
 
 @app.post("/sendMail")
 async def sendMailPostInterface(request: Request):
-    try:
-        data = await request.json()
-        return {
-            "status": "success",
-            "received_data": data
-        }
-        #TODO Call method to send mail.
-    except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e)
-        }
+    return await bf.prepareMailingData(request)
+
+@app.post("/sendErrorMail")
+async def sendErrorMailPostInterface(request: Request):
+    return await bf.prepareMailingData(request)

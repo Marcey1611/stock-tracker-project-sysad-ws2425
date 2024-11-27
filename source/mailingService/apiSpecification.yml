@@ -1,0 +1,30 @@
+openapi: 3.0.3
+
+info:
+  title: Mailing-Service API
+  description: This is the API-Specification for the Mailing-Service
+  version: 1.0.0
+
+#It follows some examples to show you how an api spec works
+
+paths:
+  /sendMail:
+    post:
+      summary: Send Mail
+      description: Post data which should be sent with the email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - productId
+                - productName
+              properties:
+                productId:
+                  type: integer
+                  example: 1
+                productName:
+                  type: string
+                  example: Product
