@@ -12,8 +12,8 @@ async def prepareMailingData(sentData):
         #TODO Call method to send mail as return value.
         mailResponseSuccess = MailResponse(Status.SUCCESS, "Successfully send mail") #something like this should the called method return
         return mailResponseSuccess.__dict__ #later this would be a method call
-    except Exception as e:
-        mailResponseError = MailResponse(Status.ERROR, e) #something like this should the called method return
+    except Exception as exception:
+        mailResponseError = MailResponse(Status.ERROR, exception) #something like this should the called method return
         return mailResponseError.__dict__ #later this would be a method call
 
 async def prepareErrorMailingData(sentData):
@@ -22,8 +22,8 @@ async def prepareErrorMailingData(sentData):
         mailErrorModel = MailError(data["errorMessage"])
                 
         #TODO Call method to send mail as return value.
-        mailResponseSuccess = MailResponse(Status.SUCCESS, "Successfull send error mail") #something like this should the called method return
-        return mailResponseSuccess.__dict__ #later this would be a method call
+        mailErrorResponse = MailResponse(Status.SUCCESS, "Successfull send error mail") #something like this should the called method return
+        return mailErrorResponse.__dict__ #later this would be a method call
     except Exception as exception:
-        mailResponseError = MailResponse(Status.ERROR, "ERROR") #something like this should the called method return
-        return mailResponseError.__dict__ #later this would be a method call
+        mailErrorResponseError = MailResponse(Status.ERROR, exception) #something like this should the called method return
+        return mailErrorResponseError.__dict__ #later this would be a method call

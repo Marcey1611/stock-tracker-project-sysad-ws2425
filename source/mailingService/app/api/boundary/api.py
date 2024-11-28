@@ -9,4 +9,4 @@ async def sendMailPostInterface(request: Request):
 
 @app.post("/sendErrorMail")
 async def sendErrorMailPostInterface(request: Request):
-    return await bf.prepareMailingData(request)
+    return await bf.prepareErrorMailingData(request)

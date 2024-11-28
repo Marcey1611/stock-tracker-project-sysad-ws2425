@@ -5,14 +5,14 @@ def triggerMail(testProductId, testProductName):
                "productName": testProductName}
     try:
         response = requests.post("http://mailing-service:8000/sendMail", json=payload)
-        return {"status": "successfully tested connection between database- and mailing-service", "response": response.json()}
-    except requests.exceptions.RequestException as e:
-        return {"status": "error", "message": str(e)}
+        return {"response": response.json()}
+    except requests.exceptions.RequestException as exception:
+        return {"status": "error", "message": str(exception)}
     
 def triggerErrorMail(errorMessage):
     payload = {"errorMessage": errorMessage}
     try:
         response = requests.post("http://mailing-service:8000/sendErrorMail", json=payload)
         return {"response": response.json()}
-    except requests.exceptions.RequestException as e:
-        return {"status": "error", "message": str(e)}
+    except requests.exceptions.RequestException as exception:
+        return {"status": "error", "message": str(exception)}
