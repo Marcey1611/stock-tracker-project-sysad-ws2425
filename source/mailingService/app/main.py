@@ -44,3 +44,9 @@ try:
         print("E-Mail erfolgreich gesendet!")
 except Exception as e:
     print(f"Fehler beim Senden der E-Mail: {e}")
+
+#from api.boundary.api import app
+#import uvicorn
+
+#if __name__ == "__main__":
+#    uvicorn.run(app, host="0.0.0.0", port=8000)
