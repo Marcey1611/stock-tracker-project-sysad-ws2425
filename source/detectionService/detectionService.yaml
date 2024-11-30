@@ -1,0 +1,54 @@
+openapi: "3.0.2"
+info:
+  title: API Title
+  version: "1.0"
+servers:
+  - url: http://detectionService/v1
+paths:
+  /feed:
+    get:
+      summary: Live-Video-Feed abrufen
+      description: Gibt einen Live-Videostream zurück.
+      operationId: getVideoFeed
+      tags:
+        - Video
+      responses:
+        '200':
+          description: Erfolgreiches Video-Streaming
+          content:
+            multipart/x-mixed-replace:
+              schema:
+                type: string
+                format: binary
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /track:
+    get:
+      summary: YOLO-Detektionsstream abrufen
+      description: Gibt einen Videostream mit Echtzeit-YOLO-Detektion zurück.
+      operationId: getYoloTrack
+      tags:
+        - Video
+      responses:
+        '200':
+          description: Erfolgreiches Video-Streaming mit Detektion
+          content:
+            multipart/x-mixed-replace:
+              schema:
+                type: string
+                format: binary
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  responses:
+    InternalError:
+      description: Interner Serverfehler
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
