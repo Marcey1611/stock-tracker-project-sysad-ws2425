@@ -7,14 +7,14 @@ servers:
 paths:
   /feed:
     get:
-      summary: Live-Video-Feed abrufen
-      description: Gibt einen Live-Videostream zurück.
+      summary: Access to the Live-Video-Feed
+      description: Returns the Live-Videostream
       operationId: getVideoFeed
       tags:
         - Video
       responses:
         '200':
-          description: Erfolgreiches Video-Streaming
+          description: Successful Video-Stream
           content:
             multipart/x-mixed-replace:
               schema:
@@ -25,14 +25,14 @@ paths:
 
   /track:
     get:
-      summary: YOLO-Detektionsstream abrufen
-      description: Gibt einen Videostream mit Echtzeit-YOLO-Detektion zurück.
+      summary: Access to the YOLO-Detektionsstream
+      description: Returns the Realtime-YOLO-Detektion.
       operationId: getYoloTrack
       tags:
         - Video
       responses:
         '200':
-          description: Erfolgreiches Video-Streaming mit Detektion
+          description: Successful Video-Stream
           content:
             multipart/x-mixed-replace:
               schema:
