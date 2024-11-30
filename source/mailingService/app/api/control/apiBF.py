@@ -1,20 +1,22 @@
-from ..entity.mailModel import Mail
-from ..entity.mailErrorModel import MailError
-from ..entity.mailResponseModel import MailResponse
-from ..entity.mailResponseStatusEnum import Status
+from businessModule.control.mailSendingService import MailSendingService
+from api.entity.mailModel import Mail
+from api.entity.mailErrorModel import MailError
+from api.entity.mailResponseModel import MailResponse
+from api.entity.mailResponseStatusEnum import Status
 import json
 
 async def prepareMailingData(sentData):
     try:
         data = await sentData.json()
         mailModel = Mail(data["productId"], data["productName"])
-                
-        #TODO Call method to send mail as return value.
-        mailResponseSuccess = MailResponse(Status.SUCCESS, "Successfully send mail") #something like this should the called method return
+        mailSendingService = MailSendingService(mailModel["productName"], mailModel["productId"], None)
+        mailSendingService.sendMail
+        mailResponseSuccess = MailResponse(Status.SUCCESS, "Successfully send mail")
         return mailResponseSuccess.__dict__ #later this would be a method call
     except Exception as exception:
         mailResponseError = MailResponse(Status.ERROR, exception) #something like this should the called method return
-        return mailResponseError.__dict__ #later this would be a method call
+        #return mailResponseError.__dict__ #later this would be a method call
+        return {"response": "error apiBF send Mail"}
 
 async def prepareErrorMailingData(sentData):
     try:

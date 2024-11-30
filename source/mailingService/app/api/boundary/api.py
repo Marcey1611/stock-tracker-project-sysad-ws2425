@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Request
-from ..control import bf
+from ..control import apiBF
 
 app = FastAPI()
 
 @app.post("/sendMail")
 async def sendMailPostInterface(request: Request):
-    return await bf.prepareMailingData(request)
+    return await apiBF.prepareMailingData(request)
 
 @app.post("/sendErrorMail")
 async def sendErrorMailPostInterface(request: Request):
-    return await bf.prepareErrorMailingData(request)
+    return await apiBF.prepareErrorMailingData(request)
