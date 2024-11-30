@@ -1,0 +1,72 @@
+openapi: 3.0.3
+
+info:
+  title: Mailing-Service API
+  description: This is the API-Specification for the Mailing-Service
+  version: 1.0.0
+
+paths:
+  /sendMail:
+    post:
+      summary: Interface for sending an email
+      description: Interface for sending an email with the given data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Mail'
+      response:
+        description: Response of the mailing service
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailResponse'
+  /sendErrorMail:
+    post:
+      summary: Send error mail
+      description: Send mail with an error message if the detection service for example couldnt detect the product or the database service couldnt save it
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorMail'
+      response:
+        description: Response of the mailing service
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailResponse'
+               
+components:
+  schemas:
+    Mail:
+      type: object
+      required:
+        - productId
+        - productName
+      properties:
+        productId:
+          type: integer
+          example: 123
+        productName:
+          type: string
+          example: "Product XYZ"
+    ErrorMail:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Couldnt detect the product
+    MailResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer #enum value for http status code
+          example: success
+        message:
+          type: string
+          example: "Message sent successfully"
