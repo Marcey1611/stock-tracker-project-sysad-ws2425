@@ -5,98 +5,142 @@ info:
   description: This is the API-Specification for the Database-Service
   version: 1.0.0
 
-#It follows some examples to show you how an api spec works
-
 paths:
-  /users:
-    get:
-      summary: Liste aller Benutzer abrufen
-      description: Gibt eine Liste aller registrierten Benutzer zurück.
-      responses:
-        '200':
-          description: Erfolgreiche Antwort
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
-        '500':
-          description: Serverfehler
+  /addItem:
     post:
-      summary: Neuen Benutzer erstellen
-      description: Erstellt einen neuen Benutzer mit den angegebenen Daten.
+      summary: Add new item
+      description: Create a new item in the database, create product when item does not have existing product-type.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewUser'
+              $ref: '#/components/schemas/StockLog'
       responses:
-        '201':
-          description: Benutzer erfolgreich erstellt
+        '2XX':
+          description: Succesfully added item
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          description: Ungültige Eingabe
-        '500':
-          description: Serverfehler
-
-  /users/{userId}:
+                $ref: '#/components/schemas/StockLogResponse'
+        '3XX':
+          description: Succesfully added item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockLogResponse'
+        '4XX':
+          description: Client Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockLogResponse'
+        '5XX':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockLogResponse'
+  /deleteItem:
+    post:
+      summary: Mark item as removed
+      description: If an item was removed, set SystemOutTime, this marks the item as removed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockLog'
+      responses:
+        '2XX':
+          description: Successfully removed item 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockLogResponse'
+        '3XX':
+          description: Successfully removed item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockLogResponse'
+        '4XX':
+          description: Client Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockLogResponse'
+        '5XX':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockLogResponse'
+  /getNextId:
     get:
-      summary: Einzelnen Benutzer abrufen
-      description: Gibt die Details eines spezifischen Benutzers zurück.
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          description: Die ID des Benutzers
-          schema:
-            type: string
+      summary: Return next id
+      description: Return the next available id.
       responses:
-        '200':
-          description: Erfolgreiche Antwort
+        '2XX':
+          description: Next id was returned
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '404':
-          description: Benutzer nicht gefunden
-        '500':
-          description: Serverfehler
-
+                $ref: '#/components/schemas/GetNextIdResponse'
+        '3XX':
+          description: Next id was returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetNextIdResponse'
+        '4XX':
+          description: Client Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetNextIdResponse'
+        '5XX':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetNextIdResponse'
+    
 components:
   schemas:
-    User:
-      type: object
-      properties:
-        id:
-          type: string
-          example: "12345"
-        name:
-          type: string
-          example: "Max Mustermann"
-        email:
-          type: string
-          format: email
-          example: "max.mustermann@example.com"
-        createdAt:
-          type: string
-          format: date-time
-          example: "2024-11-27T12:00:00Z"
-    NewUser:
+    StockLog:
       type: object
       required:
-        - name
-        - email
+        - id
+        - classId
+        - SystemInTime
+        - SystemOutTime
       properties:
-        name:
-          type: string
-          example: "Max Mustermann"
-        email:
-          type: string
-          format: email
-          example: "max.mustermann@example.com"
-
+        id:
+          type: integer
+          example: 123
+        classId:
+          type: integer
+          example: 123
+        SystemInTime:
+          type: object
+          example: "DD.MM.YYYY hh:mm:ss"
+        SystemOutTime:
+          type: object
+          example: "DD.MM.YYYY hh:mm:ss"
+    StockLogResponse:
+      type: object
+      required:
+        - responseMessage
+      properties:
+        message:
+          type: string # enum 
+          example: "Id already exists"
+    GetNextIdResponse:
+      type: object
+      required:
+        - nextId
+      properties:
+        message:
+          type: integer
+          example: 22
