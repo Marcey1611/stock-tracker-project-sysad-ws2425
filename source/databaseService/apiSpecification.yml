@@ -23,12 +23,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockLogResponse'
-        '3XX':
-          description: Succesfully added item
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StockLogResponse'
         '4XX':
           description: Client Error
           content:
@@ -58,12 +52,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockLogResponse'
-        '3XX':
-          description: Successfully removed item
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StockLogResponse'
         '4XX':
           description: Client Error
           content:
@@ -82,12 +70,6 @@ paths:
       description: Return the next available id.
       responses:
         '2XX':
-          description: Next id was returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetNextIdResponse'
-        '3XX':
           description: Next id was returned
           content:
             application/json:
@@ -130,17 +112,19 @@ components:
           example: "DD.MM.YYYY hh:mm:ss"
     StockLogResponse:
       type: object
-      required:
-        - responseMessage
       properties:
+        statusCode:
+          type: integer #enum value for http status code
+          example: badRequest
         message:
-          type: string # enum 
+          type: string 
           example: "Id already exists"
     GetNextIdResponse:
       type: object
-      required:
-        - nextId
       properties:
+        statusCode:
+          type: integer #enum value for http status code
+          example: success
         message:
           type: integer
           example: 22
