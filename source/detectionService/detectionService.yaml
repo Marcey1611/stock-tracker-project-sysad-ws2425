@@ -1,9 +1,9 @@
 openapi: "3.0.2"
 info:
-  title: API Title
+  title: detectionService
   version: "1.0"
 servers:
-  - url: http://detectionService/v1
+  - url: http://detectionService/
 paths:
   /feed:
     get:
