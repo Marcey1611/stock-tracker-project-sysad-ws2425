@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-import mailingTrigger
 import requests
 
 app = FastAPI()
@@ -9,7 +8,20 @@ app = FastAPI()
 #later this code shpuld be called from the interface where the data cames from the detection-service
 @app.get("/testConnection")
 def testConnectionToMailingService():
-    return mailingTrigger.triggerMail(1, "Product")
+    payload = {"productId": 1,
+               "productName": "testProductName",
+               "productPicture": "Test-Anhang.jpg"}
+    try:
+        response = requests.post("http://mailing-service:8000/sendMail", json=payload)
+        return {"response": response.json()}
+    except requests.exceptions.RequestException as exception:
+        return {"status": "error", "message": str(exception)}
+    
 @app.get("/testErrorConnection")
 def testErrorConnectionToMailingService():
-    return mailingTrigger.triggerErrorMail("ERROR!")
+    payload = {"errorMessage": "errorMessage"}
+    try:
+        response = requests.post("http://mailing-service:8000/sendErrorMail", json=payload)
+        return {"response": response.json()}
+    except requests.exceptions.RequestException as exception:
+        return {"status": "error", "message": str(exception)}
