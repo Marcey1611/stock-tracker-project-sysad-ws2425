@@ -100,7 +100,7 @@ def yolo_detection():
                         #restModels[added_object]=reqData
                         #sendAddToDatabaseService(reqData)
 
-                        #hier bitte die ADD funktion aufrufen
+                        #hier bitte die ADD funktion aufrufen und neuer thread und env wenn aleine.
 
             if removed_objects:
                 #reqData = DeleteRequest.fromAddRequest(restModels[removed_objects])

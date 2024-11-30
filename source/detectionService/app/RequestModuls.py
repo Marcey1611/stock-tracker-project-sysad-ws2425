@@ -4,7 +4,7 @@ class AddRequest:
     def __init__(self,cls_id):
         self.id=getNextId()
         self.cls_id=cls_id
-        self.systemInTime=time()
+        self.systemInTime=time() #ToBeChanged
 
     def toJson(self):
         return {
@@ -28,3 +28,5 @@ class DeleteRequest:
             "cls_id":self.cls_id,
             "self.systemInTime":self.systemOutTime
         }
+# entferne noch die methoden
+# nur getter setter und constuctor
