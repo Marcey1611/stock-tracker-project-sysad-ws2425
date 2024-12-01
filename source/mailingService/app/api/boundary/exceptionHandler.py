@@ -17,7 +17,7 @@ def register_exception_handlers(app: FastAPI):
     async def badRequestExceptionHandler(request, exception: InternalErrorException):
         return response(exception.detail, exception.status_code)
 
-def response(detail: str, statusCode: int = 200):
+def response(detail: str, statusCode: int):
     return JSONResponse(
             status_code=statusCode,
             content={"message": detail, "statusCode": statusCode}
