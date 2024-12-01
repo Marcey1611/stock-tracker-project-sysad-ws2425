@@ -3,9 +3,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
-from bm.entity.Product import Product
-from bm.errorHandling.mailSendingException import MailSendingException
 import logging
+
+from entity.models.Product import Product
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
@@ -17,7 +17,6 @@ class MailSendingService:
         self.senderEmail = "sysad.stock.tracker@gmail.com"
         self.receiverEmail = "sysad.stock.tracker@gmail.com"
         self.password = "tihs holh clyi dlai"
-        
 
     def sendMail(self, product: Product):
         subject, body, productPicture = self.setMailData(product)
