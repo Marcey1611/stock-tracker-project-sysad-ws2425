@@ -10,7 +10,7 @@ from dataService import sendDeleteToDatabaseService
 
 
 # Load the YOLO11 model
-model = YOLO("bestS.pt")
+model = YOLO("best.pt")
 
 def yolo_detection():
     track_history = defaultdict(lambda: [])
@@ -31,7 +31,7 @@ def yolo_detection():
         if success:
             annotated_frame = frame.copy()
 
-            results = model.track(frame, persist=True, conf=0.5, iou=0.7, verbose=False,device="cpu")
+            results = model.track(frame,conf=0.4,persist=True, verbose=True,imgsz=1088)
             current_track_ids = set()
 
             # Wenn es erkannte Boxen gibt

@@ -1,7 +1,5 @@
 import requests
 
-from source.detectionService.app.RequestModuls import AddRequest
-
 url="http://DataBaseService" #ToBeChanged
 
 headers = {
