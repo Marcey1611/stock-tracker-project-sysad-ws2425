@@ -2,6 +2,11 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 from entity.exceptions import BadRequestException, InternalErrorException
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
 
 def register_exception_handlers(app: FastAPI):
 
@@ -18,6 +23,7 @@ def register_exception_handlers(app: FastAPI):
         return response(exception.detail, exception.status_code)
 
 def response(detail: str, statusCode: int):
+    
     return JSONResponse(
             status_code=statusCode,
             content={"message": detail, "statusCode": statusCode}

@@ -5,7 +5,9 @@ from email.mime.base import MIMEBase
 from email import encoders
 import logging
 
-from entity.models.Product import Product
+from entity.models.MailData import MailData
+from entity.exceptions import BadRequestException
+from entity.enums import Action
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
@@ -18,27 +20,26 @@ class MailSendingService:
         self.receiverEmail = "sysad.stock.tracker@gmail.com"
         self.password = "tihs holh clyi dlai"
 
-    def sendMail(self, product: Product):
-        subject, body, productPicture = self.setMailData(product)
+    def sendMail(self, mailData: MailData):
+        subject, body, productPicture = self.setMailData(mailData)
         message = self.configMessage(subject, body)
-        message = self.attachAttachment(message, productPicture)
-        self.sendingEMail(message)
-
-    def sendErrorMail(self, errorMessage: str):
-        subject, body = self.setErrorMailData(errorMessage)
-        message = self.configMessage(subject, body)
+        if len(mailData.productPicture) > 0:
+            message = self.attachAttachment(message, productPicture)
         self.sendingEMail(message)
         
-    def setMailData(self, product: Product):
+    def setMailData(self, mailData: MailData):
         subject = "Successfully Detection"
-        body = f"Following product was detected: Product-ID: {product.productId}, Product-Name: {product.productName}"
-        productPicture = product.productPicture
+        if mailData.action == Action.ADDED:
+            body = f"Following product was detected and added: Product-ID: {mailData.productId}, Product-Name: {mailData.productName}"
+        elif mailData.action == Action.DELETED:
+            body = f"Following product was detected and deleted: Product-ID: {mailData.productId}, Product-Name: {mailData.productName}"
+        elif mailData.action == Action.ERROR:
+            body = f"Something went wrong during detecting, adding or deleting the product with the Product-ID: {mailData.productId} and Product-Name: {mailData.productName}. Error-Message: {mailData.errorMessage}"
+        else:
+            self.logger.error(f"Invalid Action: {mailData.action.value}")
+            raise BadRequestException()
+        productPicture = mailData.productPicture
         return subject, body, productPicture
-    
-    def setErrorMailData(self, errorMessage: str):
-        subject = "Product Detection Error"
-        body = f"Something went wrong during detect the product. Error-Message: {errorMessage}"
-        return subject, body
     
     def configMessage(self, subject: str, body: str):
         message = MIMEMultipart()
