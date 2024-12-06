@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from starlette.responses import StreamingResponse
 from cam import generate_frames
-from detection import yolo_detection
+from detectionService import yolo_detection
 
 router = APIRouter()
 
