@@ -1,0 +1,36 @@
+@startuml
+
+node detection {
+    component camera
+    component detectionService {
+        portout saveProductOUT
+    }
+}
+node database {
+    database postgresDatabase
+    component databaseService{
+        portin saveProductIN
+        portin getDataIN
+        portout sendMailOUT
+    }
+}
+node mail {
+    component mailService{
+        portin sendMailIN
+    }
+}
+node appWebsite {
+    component flutterApp {
+        portout getDataOUT
+    }
+}
+
+camera -down-> detectionService
+saveProductOUT -down-> saveProductIN
+getDataOUT -down-> getDataIN
+sendMailOUT -down-> sendMailIN
+databaseService -left-> postgresDatabase
+
+note top of database: Possible implementation as docker-network, \nwith the docker-instances 'databaseService' and 'postgresDatabase'.
+
+@enduml
