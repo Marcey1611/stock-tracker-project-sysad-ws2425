@@ -2,8 +2,7 @@ version: '3.9'
 
 services:
   mailing-service:
-    build: 
-      context: .
+    build: .
     container_name: mailingServiceContainer
     ports:
       - "8002:8000"
@@ -11,7 +10,7 @@ services:
       SMTP_SERVER: smtp.gmail.com
       SMTP_PORT: 587
       SMTP_USER: sysad.stock.tracker@gmail.com
-      SMTP_PASSWORD: goczmulgrxsbfesa
+      SMTP_PASSWORD: qlddayafyvqszzlt
     networks:
       - stockTrackerDockerNetwork
 

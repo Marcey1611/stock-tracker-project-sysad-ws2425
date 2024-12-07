@@ -1,12 +1,31 @@
-from fastapi import FastAPI, Request
-from ..control import bf
+from fastapi import APIRouter, Request
 
-app = FastAPI()
+from api.control.apiBF import ApiBF
+from api.validation.validator import Validator
+from entity.enums import Action
 
-@app.post("/sendMail")
-async def sendMailPostInterface(request: Request):
-    return await bf.prepareMailingData(request)
+router = APIRouter()
+apiBF = ApiBF()
+validator = Validator()
 
-@app.post("/sendErrorMail")
+@router.post("/sendMailAdded")
+async def sendMailAddedPostInterface(request: Request):
+    requestData = await request.json()
+    validData = validator.validateData(requestData)
+    return await apiBF.prepareMailingData(validData, Action.ADDED)
+
+@router.post("/sendMailDeleted")
+async def sendMailDeletedPostInterface(request: Request):
+    requestData = await request.json()
+    validData = validator.validateData(requestData)
+    return await apiBF.prepareMailingData(validData, Action.DELETED)
+
+@router.post("/sendErrorMail")
 async def sendErrorMailPostInterface(request: Request):
-    return await bf.prepareErrorMailingData(request)
+    requestData = await request.json()
+    validator.validateErrorMessage(requestData)
+    validData = validator.validateData(requestData)
+    return await apiBF.prepareMailingData(validData, Action.ERROR)
+
+
+   
