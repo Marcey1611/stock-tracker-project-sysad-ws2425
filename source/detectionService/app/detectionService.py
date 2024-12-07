@@ -6,7 +6,7 @@ import numpy as np
 
 from databaseService import manageAddToDatabase, manageDeleteToDatabase
 from RequestModuls import AddRequest
-from source.detectionService.app.detectionModules import TrackerManager
+from detectionModules import TrackerManager
 
 # Load the YOLO11 model
 model = YOLO("best.pt")
@@ -55,11 +55,11 @@ def update_object_tracking(results, trackers, TOLERANCE, ADD_THRESHOLD):
 def handle_disappeared_objects(current_track_ids, trackers, REMOVE_THRESHOLD):
     for track_id in trackers.detected_objects.copy():
         if track_id not in current_track_ids:
-            trackers['disappearance_time'][track_id] += 1
-            if trackers['disappearance_time'][track_id] >= REMOVE_THRESHOLD:
+            trackers.disappearance_time[track_id] += 1
+            if trackers.disappearance_time[track_id] >= REMOVE_THRESHOLD:
                 trackers.detected_objects.remove(track_id)
         else:
-            trackers['disappearance_time'][track_id] = 0
+            trackers.disappearance_time[track_id] = 0
 
 def update_database(added_objects, removed_objects, trackers):
     for added_object in added_objects:
@@ -75,8 +75,8 @@ def update_database(added_objects, removed_objects, trackers):
 
 def yolo_detection():
     TOLERANCE = 10
-    ADD_THRESHOLD = 1 * 30
-    REMOVE_THRESHOLD = 1 * 30
+    ADD_THRESHOLD = .5 * 30
+    REMOVE_THRESHOLD = .5 * 30
 
     trackers = TrackerManager()
 
@@ -87,15 +87,19 @@ def yolo_detection():
 
         results, annotated_frame = process_frame(frame)
 
+        current_track_ids = set()  # Leere Menge, falls keine Objekte erkannt werden
         if results[0].boxes is not None and results[0].boxes.id is not None:
             current_track_ids = update_object_tracking(results, trackers, TOLERANCE, ADD_THRESHOLD)
-            handle_disappeared_objects(current_track_ids, trackers, REMOVE_THRESHOLD)
 
-            added_objects = trackers.detected_objects - trackers.previous_detected_objects
-            removed_objects = trackers.previous_detected_objects - trackers.detected_objects
-            update_database(added_objects, removed_objects, trackers)
+        handle_disappeared_objects(current_track_ids, trackers, REMOVE_THRESHOLD)
 
-            trackers.previous_detected_objects = trackers.detected_objects.copy()
+        # Berechne hinzugefügte und entfernte Objekte
+        added_objects = trackers.detected_objects - trackers.previous_detected_objects
+        removed_objects = trackers.previous_detected_objects - trackers.detected_objects
+        update_database(added_objects, removed_objects, trackers)
+
+        # Aktualisiere vorherige Objekte
+        trackers.previous_detected_objects = trackers.detected_objects.copy()
 
         # Frame kodieren und zurückgeben
         ret, buffer = cv2.imencode('.jpg', annotated_frame)

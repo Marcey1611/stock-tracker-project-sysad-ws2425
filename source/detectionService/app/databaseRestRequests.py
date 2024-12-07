@@ -45,5 +45,5 @@ def getNextId():
                 logger.error("Could not receive a valid ID.")
                 return None
     except Exception as e:
-        logger.error(f"Error while trying to send an getNextID: {e}")
+        logger.error(f"Error while trying to send an getNextID: {str(e)}")
         return None
