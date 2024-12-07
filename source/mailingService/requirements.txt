@@ -2,3 +2,4 @@ fastapi
 uvicorn           # ASGI-Server für FastAPI
 pydantic
 requests
+jinja2
