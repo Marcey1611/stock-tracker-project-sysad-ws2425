@@ -25,6 +25,10 @@ class DeleteRequest:
         self._cls_id=cls_id
         self._systemOutTime=time
 
+    @property
+    def get_id(self):
+        return self._id
+
     def to_json(self):
         return {
             "id":self._id,

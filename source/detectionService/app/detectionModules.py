@@ -5,7 +5,6 @@ from RequestModuls import AddRequest
 
 class TrackerManager:
     def __init__(self):
-        """Initialisiert die benötigten Datenstrukturen für das Tracking."""
         self.track_history = defaultdict(lambda: [])
         self.stay_time = defaultdict(lambda: 0)
         self.detected_objects = set()
