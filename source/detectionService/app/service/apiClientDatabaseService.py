@@ -2,8 +2,8 @@ import logging
 from time import time
 from typing import DefaultDict
 
-from ..api.moduls.requestModuls import AddRequest, DeleteRequest
-from ..api.apiRestClientDatabase import fetchNextDatabaseId, addItemToDatabase, \
+from entities.models.requestModels import AddRequest, DeleteRequest
+from api.apiRestClientDatabase import fetchNextDatabaseId, addItemToDatabase, \
     deleteItemFromDatabase
 
 logger = logging.getLogger('databaseService')

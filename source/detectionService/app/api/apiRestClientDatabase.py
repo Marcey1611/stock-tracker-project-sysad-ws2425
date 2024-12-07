@@ -3,7 +3,7 @@ import requests
 import os
 
 
-from moduls.requestModuls import AddRequest, DeleteRequest
+from entities.models.requestModels import AddRequest, DeleteRequest
 
 url=os.getenv('DatabaseServiceURL') #ToBeChanged
 

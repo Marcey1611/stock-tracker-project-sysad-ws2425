@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from source.detectionService.app.api.moduls.requestModuls import AddRequest
+from .requestModels import AddRequest
 
 
 class TrackerManager:

@@ -1,12 +1,12 @@
 import cv2
-from source.detectionService.app.camera.cam import camera
 from ultralytics import YOLO
 
-from ..services.databaseService import manageAddToDatabase, manageDeleteToDatabase
-from moduls.detectionModuls import TrackerManager
+from camera.cam import camera
+from service.apiClientDatabaseService import manageAddToDatabase, manageDeleteToDatabase
+from entities.models.detectionModels import  TrackerManager
 
 # Load the YOLO11 model
-model = YOLO("best.pt")
+model = YOLO("./service/detection/best.pt")
 
 def processFrame(frame):
     results = model.track(frame, conf=0.4, persist=True, verbose=False, imgsz=640)
