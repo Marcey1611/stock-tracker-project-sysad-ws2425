@@ -1,37 +1,37 @@
 class AddRequest:
-    def __init__(self,dbId,cls_id,time):
+    def __init__(self,dbId,clsId,time):
         self._id=dbId
-        self._cls_id=cls_id
+        self._clsId=clsId
         self._systemInTime=time
 
-    def to_json(self):
+    def toJson(self):
         return {
             "id":self._id,
-            "cls_id":self._cls_id,
+            "clsId":self._clsId,
             "self.systemInTime":self._systemInTime
         }
     @property
-    def get_cls_id(self):
-        return self._cls_id
+    def getClsId(self):
+        return self._clsId
 
     @property
-    def get_id(self):
+    def getId(self):
         return self._id
 
 
 class DeleteRequest:
-    def __init__(self, detectId, cls_id,time):
+    def __init__(self, detectId, clsId,time):
         self._id=detectId
-        self._cls_id=cls_id
+        self._clsId=clsId
         self._systemOutTime=time
 
     @property
-    def get_id(self):
+    def getId(self):
         return self._id
 
-    def to_json(self):
+    def toJson(self):
         return {
             "id":self._id,
-            "cls_id":self._cls_id,
+            "clsId":self._clsId,
             "self.systemOutTime":self._systemOutTime
         }

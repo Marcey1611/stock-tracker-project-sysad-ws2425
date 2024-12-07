@@ -5,6 +5,6 @@ services:
     ports:
       - "8000:8000"
     devices:
-      - "/dev/video0:/dev/video0"
+      - "/dev/video2:/dev/video0"
     environment:
       - DATABASE_URL="https://database-url"

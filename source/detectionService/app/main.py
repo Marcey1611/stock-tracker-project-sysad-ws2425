@@ -1,10 +1,10 @@
 import logging
 
 from fastapi import FastAPI
-from routesVideo import router as video_router
+from api.videoFeedEndpoints import router as videoRouter
 
 app = FastAPI()
-app.include_router(video_router, prefix="/video", tags=["video"])
+app.include_router(videoRouter, prefix="/video", tags=["video"])
 
 logging.basicConfig(
     level=logging.DEBUG,
