@@ -2,76 +2,84 @@ from datetime import datetime
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from database.databaseProvider import DatabaseProvider
 from entities.httpStatusEnum import httpStatusCode
 from entities.StockLogRequestModell import StockLogRequest
-from entities.StockLogResponseModell import StockLogResponse
-from database.databaseProvider import DatabaseProvider
+from entities.DatabaseServiceResponseModel import DatabaseServiceResponse
 
 class DatabaseService:
     def __init__(self):
         self.databaseProvider = DatabaseProvider()
 
-    def addItem(self, stockLog: StockLogRequest) -> StockLogResponse:
+    def addItem(self, stockLogRequest: StockLogRequest) -> DatabaseServiceResponse:
         session = self.databaseProvider.get_session()
-        stockLogResponse = StockLogResponse(httpStatusCode=None, statusMessage=None)
+        databaseServiceResponse = DatabaseServiceResponse(httpStatusCode=None, statusMessage=None)
         try:
             # Check if stock log id is available
-            stockLog = session.query(self.dbProvider.Base.stockLog).filter_by(stockLogId=stockLog.stockLogId).first()
+            stockLog = session.query(self.dbProvider.Base.stockLog).filter_by(stockLogId=stockLogRequest.stockLogId).first()
 
             # Return conflict status if id is not available
             if stockLog:
-                stockLogResponse.setHttpStatusCode(httpStatusCode.CONFLICT)
-                stockLogResponse.setStatusMessage(f"Stock log with id {stockLog.stockLogId} already exists.")
-                return stockLogResponse
+                databaseServiceResponse.setHttpStatusCode(httpStatusCode.CONFLICT)
+                databaseServiceResponse.setStatusMessage(f"Stock log with id {stockLog.stockLogId} already exists.")
+                return databaseServiceResponse
  
             # Create new stock log entry
             newStockLog = self.dbProvider.Base.stockLog(
-                product_id=stockLog.productId,
-                system_time_in=stockLog.timeIn.time(),
-                system_time_out=stockLog.timeOut.time()
+                stockLogId=stockLogRequest.stockLogId,
+                productId=stockLogRequest.productId,
+                systemTimeIn=stockLogRequest.timeIn.time(),
+                systemTimeOut=None
             )
             session.add(newStockLog)
             session.commit()
 
-            stockLogResponse.setHttpStatusCode(httpStatusCode.OK)
-            stockLogResponse.setStatusMessage(f"Added stock log with id {stockLog.stockLogId}.")
-            return stockLogResponse
+            databaseServiceResponse.setHttpStatusCode(httpStatusCode.OK)
+            databaseServiceResponse.setStatusMessage(f"Added stock log with id {stockLog.stockLogId}.")
+
+            # Get product id, name and picture
+            databaseServiceResponse = self.getProduct(stockLogRequest.productId, databaseServiceResponse)
+            
+            return databaseServiceResponse
         
         except Exception as e:
             session.rollback()
-            stockLogResponse.setHttpStatusCode(httpStatusCode.SERVER_ERROR)
-            stockLogResponse.setStatusMessage(e)
-            return stockLogResponse
+            databaseServiceResponse.setHttpStatusCode(httpStatusCode.SERVER_ERROR)
+            databaseServiceResponse.setStatusMessage(e)
+            return databaseServiceResponse
         
         finally:
             session.close()
 
-    def removeItem(self, stockLog: StockLogRequest) -> StockLogResponse:
+    def removeItem(self, stockLogRequest: StockLogRequest) -> DatabaseServiceResponse:
         session = self.databaseProvider.get_session()
-        stockLogResponse = StockLogResponse(httpStatusCode=None, statusMessage=None)
+        databaseServiceResponse = DatabaseServiceResponse(httpStatusCode=None, statusMessage=None)
         try:
             # Check if stock log id exists
-            stockLog = session.query(self.dbProvider.Base.stockLog).filter_by(stockLogId=stockLog.stockLogId).first()
+            stockLog = session.query(self.dbProvider.Base.stockLog).filter_by(stockLogId=stockLogRequest.stockLogId).first()
 
             # Return bad request status if id does not exist
             if not stockLog:
-                stockLogResponse.setHttpStatusCode(httpStatusCode.BAD_REQUEST)
-                stockLogResponse.setStatusMessage(f"Stock log with id {stockLog.stockLogId} does not exist.")
-                return stockLogResponse
+                databaseServiceResponse.setHttpStatusCode(httpStatusCode.BAD_REQUEST)
+                databaseServiceResponse.setStatusMessage(f"Stock log with id {stockLog.stockLogId} does not exist.")
+                return databaseServiceResponse
 
             # Update system time out
             stockLog.systemTimeOut = datetime.time()
             session.commit()
 
-            stockLogResponse.setHttpStatusCode(httpStatusCode.OK)
-            stockLogResponse.setStatusMessage(f"Removed stock log with id {stockLog.stockLogId}.")
-            return stockLogResponse
+            databaseServiceResponse.setHttpStatusCode(httpStatusCode.OK)
+            databaseServiceResponse.setStatusMessage(f"Removed stock log with id {stockLog.stockLogId}.")
+            
+            # Get product id and name
+            databaseServiceResponse = self.getProduct(stockLogRequest.productId, databaseServiceResponse)
+            return databaseServiceResponse
         
         except Exception as e:
             session.rollback()
-            stockLogResponse.setHttpStatusCode(httpStatusCode.SERVER_ERROR)
-            stockLogResponse.setStatusMessage(e)
-            return stockLogResponse
+            databaseServiceResponse.setHttpStatusCode(httpStatusCode.SERVER_ERROR)
+            databaseServiceResponse.setStatusMessage(e)
+            return databaseServiceResponse
 
         finally:
             session.close()
@@ -109,3 +117,12 @@ class DatabaseService:
         else:
             nextId += 1
         return nextId
+    
+    def getProduct(self, session: Session, productId: int, databaseServiceResponse: DatabaseServiceResponse):
+        product = session.query(self.dbProvider.Base.Product).filter_by(productId=productId).first()
+        if product:
+            databaseServiceResponse.setProductId(product.productId)
+            databaseServiceResponse.setProductName(product.productName)
+            databaseServiceResponse.setProductPicture("This should be a picture")  # TODO: Replace with actual picture retrieval logic
+
+        return databaseServiceResponse

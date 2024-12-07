@@ -14,7 +14,7 @@ class Product(databaseProvider.Base):
 class StockLog(databaseProvider.Base):
     __tablename__ = 'stockLog'
 
-    stocLogId = Column(Integer, primary_key=True, autoincrement=True)
+    stockLogId = Column(Integer, primary_key=True, autoincrement=True)
     productId = Column(Integer, ForeignKey('products.product_id'), nullable=False)
     systemTimeIn = Column(datetime, default=datetime.utcnow)
     systemTimeOut = Column(datetime, nullable=True)
