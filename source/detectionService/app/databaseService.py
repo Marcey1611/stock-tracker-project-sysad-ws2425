@@ -12,7 +12,7 @@ def manageAddToDatabase(rest_models:DefaultDict[int, AddRequest], added_object:i
     dbId=getNextId()
     reqData = AddRequest(dbId, most_frequent_cls_id, time())
     if dbId is not None:
-        logger.debug(f"databaseService:manageAddToDatabase: received dbID:{dbId} for track_id{added_object}")
+        logger.info(f"databaseService:manageAddToDatabase: received dbID:{dbId} for track_id{added_object}")
         sendAddToDatabaseService(reqData)
     else:
         logger.error(f"databaseService:manageAddToDatabase:Error didn't receive an Id from Database for track_id{added_object}")
@@ -29,4 +29,4 @@ def manageDeleteToDatabase(rest_models:DefaultDict[int, AddRequest], removed_obj
     reqData = DeleteRequest(addReq.get_id,addReq.get_cls_id,time())
     sendDeleteToDatabaseService(reqData)
     del rest_models[removed_object]
-    logger.debug(f"databaseService:manageDeleteToDatabase: deleted item at track_id{removed_object}")
+    logger.info(f"databaseService:manageDeleteToDatabase: deleted item at track_id{removed_object}")

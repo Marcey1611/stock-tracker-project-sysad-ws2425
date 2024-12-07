@@ -1,9 +1,11 @@
 import logging
-
 import requests
+import os
+
+
 from RequestModuls import AddRequest, DeleteRequest
 
-url="http://DataBaseService" #ToBeChanged
+url=os.getenv('DatabaseServiceURL') #ToBeChanged
 
 headers = {
     "Content-Type": "application/json"  # Dies sagt dem Server, dass die Daten im JSON-Format sind
