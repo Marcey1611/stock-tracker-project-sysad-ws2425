@@ -85,7 +85,7 @@ class DatabaseService:
             session.close()
 
     def addProducts(self, products: List[str]) -> httpStatusCode:
-        session = self.databaseProvider.get_session()
+        session = self.databaseProvider.getSession()
         try:
             # Create product classes in database
             for product in products:

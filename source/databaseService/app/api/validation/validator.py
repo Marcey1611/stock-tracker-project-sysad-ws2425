@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from pydantic import ValidationError
-from app.entities.StockLogRequestModell import StockLogRequest
-from app.entities.httpStatusEnum import httpStatusCode
+from entities.StockLogRequestModell import StockLogRequest
+from entities.httpStatusEnum import httpStatusCode
 
 def validateAddItem(data: StockLogRequest):
     if not all([data.stockLogId, data.productId, data.timeIn]):

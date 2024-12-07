@@ -1,8 +1,8 @@
 import requests
 from typing import Optional
 from requests.exceptions import RequestException
-from app.entities.MailRequestModell import MailRequest
-from app.entities.httpStatusEnum import httpStatusCode
+from entities.MailRequestModell import MailRequest
+from entities.httpStatusEnum import httpStatusCode
 
 def triggerMailingService(action: str, payload: MailRequest):
     try:

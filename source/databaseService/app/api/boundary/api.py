@@ -1,9 +1,20 @@
 from fastapi import APIRouter, Request
-from control.apiBF import ApiBF
-from validation.validator import validateAddItem, validateDeleteItem
+from api.control.apiBF import ApiBF
+from ..validation.validator import validateAddItem, validateDeleteItem
 
 router = APIRouter()
 apiBf = ApiBF()
+
+apiBf.addProducts(["juice", 
+                   "jam", 
+                   "cofffee", 
+                   "water", 
+                   "chocolate", 
+                   "tea", 
+                   "cereal", 
+                   "tomato_sauce", 
+                   "pasta", 
+                   "chips"])  
 
 @router.post("/addItem")
 async def addItem(request: Request):

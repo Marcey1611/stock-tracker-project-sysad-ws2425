@@ -1,12 +1,12 @@
 import logging
 from datetime import datetime
-from typing import List
-from fastapi import Request, JSONResponse
-from app.bm.databaseService import DatabaseService
+from fastapi import Request
+from fastapi.responses import JSONResponse
+from bm.databaseService import DatabaseService
 from entities.StockLogRequestModell import StockLogRequest
-from app.entities.DatabaseServiceResponseModel import DatabaseServiceResponse
-from app.entities.MailRequestModell import MailRequest
-from mailingTrigger import triggerMailingService
+from entities.DatabaseServiceResponseModel import DatabaseServiceResponse
+from entities.MailRequestModell import MailRequest
+from .mailingTrigger import triggerMailingService
 
 class ApiBF:
     def __init__(self):
@@ -90,3 +90,8 @@ class ApiBF:
     def getNextID(self): 
         # Retrun next available ID
         return self.databaseService.getNextId(self.dataBaseService.databaseProvider.get_session(), False)
+    
+    def addProducts(self, products: list):
+        # Add products to database
+        self.databaseService.addProducts(products)
+        logging.info(f"Added products: {products}")
