@@ -2,11 +2,11 @@ from datetime import datetime
 from typing import List
 from fastapi import Request, JSONResponse
 from entities.StockLogRequestModell import StockLogRequest
-from databaseService import DatabaseService
+from app.bm.databaseService import DatabaseService
 
-class apiBF:
-    def __init__(self, databaseService: DatabaseService):
-        self.databaseService = databaseService
+class ApiBF:
+    def __init__(self):
+        self.databaseService = DatabaseService()
 
     def addItem(self, request:Request):
         # Create StockLogRequest object from request data

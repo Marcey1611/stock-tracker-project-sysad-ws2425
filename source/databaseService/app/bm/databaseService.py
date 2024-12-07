@@ -8,8 +8,8 @@ from entities.StockLogResponseModell import StockLogResponse
 from database.databaseProvider import DatabaseProvider
 
 class DatabaseService:
-    def __init__(self, databaseProvider: DatabaseProvider):
-        self.databaseProvider = databaseProvider
+    def __init__(self):
+        self.databaseProvider = DatabaseProvider()
 
     def addItem(self, stockLog: StockLogRequest) -> StockLogResponse:
         session = self.databaseProvider.get_session()
