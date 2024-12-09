@@ -30,3 +30,11 @@ class MailRequest:
 
     def setErrorMessage(self, errorMessage: Optional[str]):
         self.errorMessage = errorMessage
+
+    def toDict(self) -> dict:
+        return {
+            "productId": self.productId,
+            "productName": self.productName,
+            "productPicture": self.productPicture,
+            "errorMessage": self.errorMessage,
+        }

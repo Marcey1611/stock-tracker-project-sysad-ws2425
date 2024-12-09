@@ -1,24 +1,23 @@
 import logging
-from datetime import datetime
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from bm.databaseService import DatabaseService
 from entities.StockLogRequestModell import StockLogRequest
 from entities.DatabaseServiceResponseModel import DatabaseServiceResponse
 from entities.MailRequestModell import MailRequest
+from entities.httpStatusEnum import httpStatusCode
 from .mailingTrigger import triggerMailingService
 
 class ApiBF:
     def __init__(self):
         self.databaseService = DatabaseService()
+        self.logger = logging.getLogger(self.__class__.__name__)
 
-    def addItem(self, request:Request):
+    def addItem(self, request):
         # Create StockLogRequest object from request data
         stockLog = StockLogRequest(
             request["stockLogId"], 
-            request["productId"], 
-            request["timeIn"], 
-            request["timeout"]
+            request["productId"]
             )
         
         # Add item to database
@@ -32,10 +31,10 @@ class ApiBF:
         )
 
         # Trigger error mail if failed to add item
-        if databaseServiceResponse.getHttpStatusCode() != 200:
+        if databaseServiceResponse.getHttpStatusCode() != httpStatusCode.OK:
             logging.error(f"Error while adding new Item: {databaseServiceResponse.getStatusMessage()}")
 
-            mailRequest.setErrorMessage(databaseServiceResponse.getStatusMessage())
+            mailRequest.setErrorMessage(str(databaseServiceResponse.getStatusMessage()))
             response = triggerMailingService("sendErrorMail", mailRequest)
         
         # Trigger mail added event
@@ -47,15 +46,14 @@ class ApiBF:
         logging.info(f"Response from Mailing-Service: {response.get('message', 'No message available')}")
 
         # Create response
-        return JSONResponse(content = databaseServiceResponse.getStatusMessage, status_code = databaseServiceResponse.getHttpStatusCode)
+        return JSONResponse(content = str(databaseServiceResponse.getStatusMessage()), 
+                            status_code = databaseServiceResponse.getHttpStatusCode().value)
 
-    def removeItem(self, request:Request):
+    def removeItem(self, request):
         # Create StockLogRequest object from request data
         stockLog = StockLogRequest(
             request["stockLogId"], 
-            request["productId"], 
-            request["timeIn"], 
-            request["timeout"]
+            request["productId"]
             )
         
         # Remove item from database
@@ -69,10 +67,10 @@ class ApiBF:
         )
 
         # Trigger error mail if failed to remove item
-        if databaseServiceResponse.getHttpStatusCode() != 200:
+        if databaseServiceResponse.getHttpStatusCode() != httpStatusCode.OK:
             logging.error(f"Error while removing Item: {databaseServiceResponse.getStatusMessage()}")
 
-            mailRequest.setErrorMessage(databaseServiceResponse.getStatusMessage())
+            mailRequest.setErrorMessage(str(databaseServiceResponse.getStatusMessage()))
             response = triggerMailingService("sendErrorMail", mailRequest)
         
         # Trigger mail removed event
@@ -85,7 +83,8 @@ class ApiBF:
 
 
         # Create response
-        return JSONResponse(content = databaseServiceResponse.getStatusMessage(), status_code = databaseServiceResponse.getHttpStatusCode())
+        return JSONResponse(content = str(databaseServiceResponse.getStatusMessage()), 
+                            status_code = databaseServiceResponse.getHttpStatusCode().value)
         
     def getNextID(self): 
         # Retrun next available ID

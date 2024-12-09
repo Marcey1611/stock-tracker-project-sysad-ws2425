@@ -1,13 +1,13 @@
 import requests
-from typing import Optional
 from requests.exceptions import RequestException
 from entities.MailRequestModell import MailRequest
 from entities.httpStatusEnum import httpStatusCode
 
 def triggerMailingService(action: str, payload: MailRequest):
+    print(payload.toDict())
     try:
         for _ in range(2):  # Retry once if failed
-            response = requests.post("http://mailing-service:8000/" + action, json=payload)
+            response = requests.post("http://mailing-service:8000/" + action, json=payload.toDict())
 
             if response["statusCode"] == 200:
                 break

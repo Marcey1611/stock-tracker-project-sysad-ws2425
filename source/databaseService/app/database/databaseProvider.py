@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 class DatabaseProvider:
-    DATABASE_URL = "postgresql://myuser:mypassword@db:5432/stocktracker"
+    DATABASE_URL = "sqlite:///./test.db"
 
     def __init__(self):
         # Initilies the engine and the session fabricator

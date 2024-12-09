@@ -5,18 +5,20 @@ from sqlalchemy import func
 from database.databaseProvider import DatabaseProvider
 from entities.httpStatusEnum import httpStatusCode
 from entities.StockLogRequestModell import StockLogRequest
+from database.databaseTableModells import Product, StockLog
 from entities.DatabaseServiceResponseModel import DatabaseServiceResponse
 
 class DatabaseService:
     def __init__(self):
         self.databaseProvider = DatabaseProvider()
+        self.databaseProvider.initDb()
 
     def addItem(self, stockLogRequest: StockLogRequest) -> DatabaseServiceResponse:
-        session = self.databaseProvider.get_session()
+        session = self.databaseProvider.getSession()
         databaseServiceResponse = DatabaseServiceResponse(httpStatusCode=None, statusMessage=None)
         try:
             # Check if stock log id is available
-            stockLog = session.query(self.dbProvider.Base.stockLog).filter_by(stockLogId=stockLogRequest.stockLogId).first()
+            stockLog = session.query(StockLog).filter_by(stockLogId=stockLogRequest.stockLogId).first()
 
             # Return conflict status if id is not available
             if stockLog:
@@ -25,10 +27,10 @@ class DatabaseService:
                 return databaseServiceResponse
  
             # Create new stock log entry
-            newStockLog = self.dbProvider.Base.stockLog(
+            newStockLog = StockLog(
                 stockLogId=stockLogRequest.stockLogId,
                 productId=stockLogRequest.productId,
-                systemTimeIn=stockLogRequest.timeIn.time(),
+                systemTimeIn=datetime.time(),
                 systemTimeOut=None
             )
             session.add(newStockLog)
@@ -52,11 +54,11 @@ class DatabaseService:
             session.close()
 
     def removeItem(self, stockLogRequest: StockLogRequest) -> DatabaseServiceResponse:
-        session = self.databaseProvider.get_session()
+        session = self.databaseProvider.getSession()
         databaseServiceResponse = DatabaseServiceResponse(httpStatusCode=None, statusMessage=None)
         try:
             # Check if stock log id exists
-            stockLog = session.query(self.dbProvider.Base.stockLog).filter_by(stockLogId=stockLogRequest.stockLogId).first()
+            stockLog = session.query(StockLog).filter_by(stockLogId=stockLogRequest.stockLogId).first()
 
             # Return bad request status if id does not exist
             if not stockLog:
@@ -90,7 +92,7 @@ class DatabaseService:
             # Create product classes in database
             for product in products:
                 productId = self.getNextId(session, True)
-                newProduct = self.dbProvider.Base.product(
+                newProduct = Product(
                     productId=productId, 
                     productName=product
                     )
@@ -108,9 +110,9 @@ class DatabaseService:
 
     def getNextId(self, session: Session, addProducts: bool) -> int:
         if addProducts:
-            nextId = session.query(func.max(getattr(self.dbProvider.Base.products.productId))).first()[0]
+            nextId = session.query(func.max(getattr(Product.productId))).first()[0]
         else:
-            nextId = session.query(func.max(getattr(self.dbProvider.Base.stockLog.stockLogId))).first()[0]
+            nextId = session.query(func.max(getattr(StockLog.stockLogId))).first()[0]
 
         if nextId is None:
             nextId = 1
@@ -119,7 +121,7 @@ class DatabaseService:
         return nextId
     
     def getProduct(self, session: Session, productId: int, databaseServiceResponse: DatabaseServiceResponse):
-        product = session.query(self.dbProvider.Base.Product).filter_by(productId=productId).first()
+        product = session.query(Product).filter_by(productId=productId).first()
         if product:
             databaseServiceResponse.setProductId(product.productId)
             databaseServiceResponse.setProductName(product.productName)
