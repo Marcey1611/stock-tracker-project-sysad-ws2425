@@ -3,9 +3,8 @@
 node detection {
     component camera
     component detectionService {
-        portout addItemOUT
-        portout deleteItemOUT
-        portout getNextIdOUT
+        portout addItemsOUT
+        portout deleteItemsOUT
         portout feedIN
         portout trackIN
     }
@@ -13,9 +12,8 @@ node detection {
 node database {
     database postgresDatabase
     component databaseService{
-        portin addItemIN
-        portin deleteItemIN
-        portin getNextIdIN
+        portin addItemsIN
+        portin deleteItemsIN
 
         portin getDataIN
 
@@ -41,9 +39,8 @@ node appWebsite {
 
 camera -down-> detectionService
 
-addItemOUT -down-> addItemIN
-deleteItemOUT -down-> deleteItemIN
-getNextIdOUT -down-> getNextIdIN
+addItemsOUT -down-> addItemsIN
+deleteItemsOUT -down-> deleteItemsIN
 
 getDataOUT -down-> getDataIN
 
