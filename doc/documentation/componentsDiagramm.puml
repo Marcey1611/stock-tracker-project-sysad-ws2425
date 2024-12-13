@@ -3,34 +3,54 @@
 node detection {
     component camera
     component detectionService {
-        portout saveProductOUT
+        portout addItemsOUT
+        portout deleteItemsOUT
+        portout feedIN
+        portout trackIN
     }
 }
 node database {
     database postgresDatabase
     component databaseService{
-        portin saveProductIN
+        portin addItemsIN
+        portin deleteItemsIN
+
         portin getDataIN
-        portout sendMailOUT
+
+        portout sendMailAddedOUT
+        portout sendMailDeletedOUT
+        portout sendErrorMailOUT
     }
 }
 node mail {
     component mailService{
-        portin sendMailIN
+        portin sendMailAddedIN
+        portin sendMailDeletedIN
+        portin sendErrorMailIN
     }
 }
 node appWebsite {
     component flutterApp {
         portout getDataOUT
+        portin feedOUT
+        portin trackOUT
     }
 }
 
 camera -down-> detectionService
-saveProductOUT -down-> saveProductIN
-getDataOUT -down-> getDataIN
-sendMailOUT -down-> sendMailIN
-databaseService -left-> postgresDatabase
 
-note top of database: Possible implementation as docker-network, \nwith the docker-instances 'databaseService' and 'postgresDatabase'.
+addItemsOUT -down-> addItemsIN
+deleteItemsOUT -down-> deleteItemsIN
+
+getDataOUT -down-> getDataIN
+
+feedOUT -right-> feedIN
+trackOUT -right-> trackIN
+
+sendMailAddedOUT -down-> sendMailAddedIN 
+sendMailDeletedOUT -down-> sendMailDeletedIN
+sendErrorMailOUT -down-> sendErrorMailIN
+
+databaseService -left-> postgresDatabase
 
 @enduml
