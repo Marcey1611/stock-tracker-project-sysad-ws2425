@@ -1,18 +1,11 @@
 import requests
 from requests.exceptions import RequestException
-from entities.MailRequestModell import MailRequest
-from entities.httpStatusEnum import httpStatusCode
+from entities.UpdatedProductResponse import UpdatedProductResponse
 
-def triggerMailingService(action: str, payload: MailRequest):
+def triggerMailingService(action: str, payload: list[UpdatedProductResponse]):
     print(payload.toDict())
     try:
-        for _ in range(2):  # Retry once if failed
-            response = requests.post("http://mailing-service:8000/" + action, json=payload.toDict())
-
-            if response["statusCode"] == 200:
-                break
-        
-        return response
+        return requests.post("http://mailing-service:8002/" + action, json=payload.toDict())
     
-    except RequestException as exception:
-        return {"statusCode": httpStatusCode.SERVER_ERROR, "message": str(exception)}
+    except RequestException as e:
+        raise RequestException(f"An error occurred while triggering mailing-service: {e}")

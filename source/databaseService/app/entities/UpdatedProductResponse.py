@@ -1,10 +1,12 @@
 from typing import Optional
 
-class MailRequest:
-    def __init__(self, productId: int, productName:str, productPicture: str, errorMessage: Optional[str] = None):
+class UpdatedProductResponse:
+    def __init__(self, productId: int, productName:str, productPicture: str, productAmountTotal: int, productAmountAdded: int, errorMessage: Optional[str] = None):
         self.productId = productId
         self.productName = productName
         self.productPicture = productPicture
+        self.productAmountTotal = productAmountTotal
+        self.productAmountAdded = productAmountAdded
         self.errorMessage = errorMessage
 
     def getProductId(self) -> int:
@@ -14,7 +16,14 @@ class MailRequest:
         return self.productName
     
     def getProductPicture(self) -> str:
-        return self.productPicture
+        # TODO: Add product picture handling
+        return ""
+    
+    def getproductAmountTotal(self) -> int:
+        return self.productAmountTotal
+    
+    def getproductAmountAdded(self) -> int:
+        return self.productAmountAdded
     
     def getErrorMessage(self) -> Optional[str]:
         return self.errorMessage
@@ -28,6 +37,12 @@ class MailRequest:
     def setProductPicture(self, productPicture: str):
         self.productPicture = productPicture
 
+    def setproductAmountTotal(self, productAmountTotal: int):
+        self.productAmountTotal = productAmountTotal
+
+    def setproductAmountAdded(self, productAmountAdded: int):
+        self.productAmountAdded = productAmountAdded
+
     def setErrorMessage(self, errorMessage: Optional[str]):
         self.errorMessage = errorMessage
 
@@ -36,5 +51,6 @@ class MailRequest:
             "productId": self.productId,
             "productName": self.productName,
             "productPicture": self.productPicture,
+            "productAmount": self.productAmount,
             "errorMessage": self.errorMessage,
         }

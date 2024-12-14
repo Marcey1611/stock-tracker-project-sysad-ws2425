@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 from api.control.apiBF import ApiBF
-from ..validation.validator import validateAddItem, validateDeleteItem
+from ..validation.validator import validateRequest
 
 router = APIRouter()
 apiBf = ApiBF()  
@@ -8,17 +8,17 @@ apiBf = ApiBF()
 @router.post("/addItem")
 async def addItem(request: Request):
     requestData = await request.json()
-    validateAddItem(requestData)
-    return apiBf.addItem(requestData)
+    # validateRequest(requestData)
+    return apiBf.addAmount(requestData)
 
 @router.post("/removeItem")
 async def removeItem(request: Request):
     requestData = await request.json()
-    validateDeleteItem(requestData)
-    return apiBf.removeItem(requestData)
+    # validateRequest(requestData)
+    return apiBf.removeAmount(requestData)
 
-@router.get("/getNextId")
-async def getNextId():
-    return {"nextId": apiBf.getNextID()}
+@router.get("/clearALl")
+async def clearAll():
+    return apiBf.resetAmounts()
 
             
