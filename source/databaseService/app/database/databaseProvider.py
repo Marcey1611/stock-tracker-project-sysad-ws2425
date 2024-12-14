@@ -4,12 +4,12 @@ from sqlalchemy.orm import sessionmaker
 
 class DatabaseProvider:
     DATABASE_URL = "sqlite:///./test.db"
+    Base = declarative_base()
 
     def __init__(self):
         # Initilies the engine and the session fabricator
         self.engine = create_engine(self.DATABASE_URL)
-        self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-        self.Base = declarative_base()  
+        self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)  
 
     def initDb(self):
         # Initilies the tables in the database

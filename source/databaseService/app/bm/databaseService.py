@@ -1,17 +1,15 @@
+import logging
 from fastapi import HTTPException
 from database.databaseProvider import DatabaseProvider
 from entities.httpStatusEnum import httpStatusCode
 from database.databaseTableModells import Products
 from entities.UpdatedProductResponse import UpdatedProductResponse
 
-
-# TODO: Rework exception handling and error messages
-
-
 class DatabaseService:
     def __init__(self):
         self.databaseProvider = DatabaseProvider()
         self.databaseProvider.initDb()
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     def updateProductsAmount(self, add: bool ,updatedProductIds: list[int]):
         try:
@@ -26,14 +24,14 @@ class DatabaseService:
                 if not product:
                     raise HTTPException(
                         status_code=httpStatusCode.CONFLICT,
-                        detail=f"Product with id {updatedProductId} doesn't exist."
+                        detail=updatedProductIds
                         )
  
                 # Update product amount
                 if add:
-                    product.amount += 1
+                    product.productAmount += 1
                 else:
-                    product.amount -= 1
+                    product.productAmount -= 1
 
                 # Append or update products to list 
                 for updatedProduct in updatedProductsList:
@@ -77,7 +75,7 @@ class DatabaseService:
             
             # Reset product amount
             for product in products:
-                product.amount = 0
+                product.productAmount = 0
 
             # Commit changes 
             session.commit()

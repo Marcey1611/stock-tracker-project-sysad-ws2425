@@ -14,10 +14,11 @@ class ApiBF:
     def addAmount(self, request):
         try: 
             # Update product amount in database
-            databaseServiceResponseList = self.databaseService.updateProductsAmount(True, request)
+            updatedProductIds = request.get("productId")
+            databaseServiceResponseList = self.databaseService.updateProductsAmount(True, updatedProductIds)
             
             # Try againg if failed to trigger mailing-service
-            for _ in 2:
+            for _ in range(2):
                 # Trigger mail added event
                 response = triggerMailingService("sendMailAdded", databaseServiceResponseList)
 

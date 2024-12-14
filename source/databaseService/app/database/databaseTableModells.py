@@ -1,13 +1,9 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
-from datetime import datetime
+from sqlalchemy import Column, Integer, String
 from .databaseProvider import DatabaseProvider
 
-databaseProvider = DatabaseProvider()
+class Products(DatabaseProvider.Base):
+    __tablename__ = 'products'
 
-class Products(databaseProvider.Base):
-    __tablename__ = 'Products'
-
-    productId = Column(Integer, primary_key=True, autoincrement=True)
-    productName = Column(String, nullable=False)
-    productAmount = Column(Integer, nullable=False)
+    productId = Column("productId", Integer, primary_key=True)
+    productName = Column("productName", String(30), nullable=False)
+    productAmount = Column("productAmount", Integer, nullable=False)
