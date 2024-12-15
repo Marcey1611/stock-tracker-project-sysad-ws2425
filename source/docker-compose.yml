@@ -10,7 +10,19 @@ services:
     devices:
       - "/dev/video0:/dev/video0"
     environment:
-      - DATABASE_URL="http://database-url"
+      - DATABASE_SERVICE_URL=http://database-service:8000
+
+  database-service:
+    build:
+      context: ./databaseService
+    container_name: dataBaseServiceContainer
+    networks:
+      - stockTrackerDockerNetwork
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./test.db   # Dummy-Datenbank-URL für Entwicklung
+      - MAILING_SERVICE_URL=http://mailing-service:8002/
 
   mailing-service:
     build: ./mailingService
