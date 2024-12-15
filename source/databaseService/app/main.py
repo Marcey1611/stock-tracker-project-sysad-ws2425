@@ -1,5 +1,17 @@
-from api import app
-import uvicorn
+#Entrypoint
+from fastapi import FastAPI 
+from api.boundary import api
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+app = FastAPI()
+app.include_router(api.router)
+
+api.apiBf.addProducts(["juice", 
+                    "jam", 
+                    "cofffee", 
+                    "water", 
+                    "chocolate", 
+                    "tea", 
+                    "cereal", 
+                    "tomato_sauce", 
+                    "pasta", 
+                    "chips"])
