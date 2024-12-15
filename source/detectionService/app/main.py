@@ -1,60 +1,14 @@
-from fastapi import FastAPI
-import requests
+import logging
 
+from fastapi import FastAPI
+from routesVideo import router as video_router
 
 app = FastAPI()
+app.include_router(video_router, prefix="/video", tags=["video"])
 
-# TODO: wieder entfernen sobald testreihe positiv
-'''
-@app.get("/addItems")
-def testRequestAddItems():
-    payload = {
-        "id": 3,
-        "classID": 5,
-        "SystemInTime": "2024-11-30 13:00:00",
-    }
-    try:
-        response = requests.post("http://database-service:8000/add_item", json=payload) 
-        return {"response": response.json()}
-    except requests.exceptions.RequestException as exception:  
-        return {"status": "error", "message": str(exception)}
-'''
-'''         
-#zweiter Datensatz
-@app.get("/addItems")
-def testRequestAddItems():
-    payload = {
-        "id": 7,
-        "classID": 2,
-        "SystemInTime": "2024-11-30 14:40:00",
-    }
-    try:
-        response = requests.post("http://database-service:8000/add_item", json=payload)  
-        return {"response": response.json()}
-    except requests.exceptions.RequestException as exception:  
-        return {"status": "error", "message": str(exception)}
-'''
-'''
-@app.get("/deleteItems")
-def testRequestDeleteItems():
-    payload = {
-        "id": 3,
-        "classID": 5,
-        "SystemOutTime": "2024-11-30 14:45:00",
-    }
-    try:
-        response = requests.post("http://database-service:8000/delete_item", json=payload)  
-        return {"response": response.json()}
-    except requests.exceptions.RequestException as exception:  
-        return {"status": "error", "message": str(exception)}
-''' 
-
-@app.get("/getNextID")
-
-def testRequestGetNextID():
-    try:
-        response = requests.get("http://database-service:8000/get_next_id")
-        return {"response": response.json()}
-    except requests.exceptions.RequestException as exception:  
-        return {"status": "error", "message": str(exception)}
-
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(filename)s - %(funcName)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    handlers=[logging.StreamHandler()]  # Ausgabe in die Konsole
+)
