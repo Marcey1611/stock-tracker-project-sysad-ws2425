@@ -51,6 +51,7 @@ class UpdatedProductResponse:
             "productId": self.productId,
             "productName": self.productName,
             "productPicture": self.productPicture,
-            "productAmount": self.productAmount,
+            "productAmountTotal": self.productAmountTotal,
+            "productAmountAdded": self.productAmountAdded,
             "errorMessage": self.errorMessage,
         }
