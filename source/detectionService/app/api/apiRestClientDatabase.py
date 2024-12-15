@@ -30,20 +30,10 @@ def deleteItemFromDatabase(data):
         logger.error(f"Error while trying to send a Delete-Request: {str(e)}")
 
 
-def fetchNextDatabaseId():
+def clearAll():
     try:
-        response = requests.get(url+"/get-next-id") #ToBeChanged
+        response = requests.get(url+"/clear-all") #ToBeChanged
         if response.status_code!=200:
             logger.error(f"Database could not process getNextID correctly")
-        else:
-            response_data = response.json()
-            nextId = response_data.get("id")
-            if nextId is not None:
-                logger.info(f"received ID: {nextId}")
-                return nextId
-            else:
-                logger.error("Could not receive a valid ID.")
-                return None
     except Exception as e:
         logger.error(f"Error while trying to send an getNextID: {str(e)}")
-        return None
