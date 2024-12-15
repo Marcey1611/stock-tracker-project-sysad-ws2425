@@ -4,15 +4,15 @@ from threading import Event
 from ultralytics import YOLO
 import cv2
 import time
-import api.apiRestClientDatabase
+import api.apiRestClientDatabase as ApiRestClientDatabase
 
 logger = logging.getLogger('detectionThread')
 
-model = YOLO("./service/detection/yolo11x.pt")
+model = YOLO("./service/detection/best.pt")
 
 def detectionThread(feedEvent:Event,feedQ:queue.Queue,trackEvent:Event,trackQ:queue.Queue,source):
     try:
-        api.apiRestClientDatabase.clearAll()
+        ApiRestClientDatabase.clearAll()
         camera = cv2.VideoCapture(source)
         if camera.isOpened():
             logger.info(f"Kamera {source} wurde geöffnet.")
@@ -120,14 +120,14 @@ def updateDatabase(addedObjects, removedObjects):
         for addedObject in addedObjects:
             logger.info(f"debug {addedObject}")
             addArray.append(addedObjects)
-        api.apiRestClientDatabase.addItemToDatabase(addArray)
+        ApiRestClientDatabase.addItemToDatabase(addArray)
 
     if len(removedObjects)>0:
         removeArray = []
         for removedObject in removedObjects:
             logger.debug(f"removed {removedObject}")
             removeArray.append(removedObject)
-        api.apiRestClientDatabase.deleteItemFromDatabase(removeArray)
+        ApiRestClientDatabase.deleteItemFromDatabase(removeArray)
 
 def initCam(camera:cv2.VideoCapture,source):
     desiredWidth = 1920
