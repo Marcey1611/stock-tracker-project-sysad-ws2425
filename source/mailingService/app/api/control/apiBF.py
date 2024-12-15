@@ -14,12 +14,14 @@ class ApiBF:
 
     async def prepareMailingData(self, validData, action: Action):
         try:
-            if action == Action.ADDED or action == Action.DELETED:
-                mailData = MailData(validData["productId"], validData["productName"], validData["productPicture"], action)
-            elif action == Action.ERROR:
-                mailData = MailData(validData["productId"], validData["productName"], validData["productPicture"], action, validData["errorMessage"])
+            mailDataArray = []
+            self.logger.info("Prepare mail data for action: " + str(action))
+            for product in validData:
+                mailData = MailData(product["productId"], product["productName"], product["productPicture"], product["productAmountAdded"], product["productAmountTotal"], action)
+                self.logger.info(mailData)
+                mailDataArray.append(mailData)
             mailSendingService = MailSendingService()
-            mailSendingService.sendMail(mailData)
+            mailSendingService.sendMail(mailDataArray[0])
             return JSONResponse(content={"message": "Successfully send mail"}, status_code=200)
         except Exception as exception:
             self.logger.error(exception)

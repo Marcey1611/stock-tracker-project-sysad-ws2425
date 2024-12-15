@@ -33,24 +33,29 @@ class MailSendingService:
             templateContent = emailTemplate.read()
 
         template = Template(templateContent)
-        if mailData.action == Action.ADDED:
+        if mailData.getAction() == Action.ADDED:
             body = template.render(
                 title = "Successfully Added",
                 message = f"Following product was detected and added: ",
-                productId = mailData.productId,
-                productName = mailData.productName,
-                errorMessage = ""
+                productId = mailData.getProductId(),
+                productName = mailData.getProductName(),
             )
             subject = "Successfully Added"
-        elif mailData.action == Action.DELETED:
+        elif mailData.getAction() == Action.DELETED:
             body = template.render(
                 title = "Successfully Deleted",
                 message = f"Following product was detected and deleted: ",
-                productId = mailData.productId,
-                productName = mailData.productName,
-                errorMessage = ""
+                productId = mailData.getProductId(),
+                productName = mailData.getProductName(),
             )
             subject = "Successfully Deleted"
+        
+        else:
+            self.logger.error(f"Invalid Action: {mailData.action.value}")
+            raise BadRequestException()
+        productPicture = mailData.getProductPicture()
+        return subject, body, productPicture
+        '''
         elif mailData.action == Action.ERROR:
             body = template.render(
                 title = "Something went wrong",
@@ -60,11 +65,7 @@ class MailSendingService:
                 errorMessage = mailData.errorMessage
             )
             subject = "Something went wrong"
-        else:
-            self.logger.error(f"Invalid Action: {mailData.action.value}")
-            raise BadRequestException()
-        productPicture = mailData.productPicture
-        return subject, body, productPicture
+        '''
     
     def configMessage(self, subject: str, body: str, productPicture: str):
         message = MIMEMultipart()
@@ -81,12 +82,13 @@ class MailSendingService:
         logoPart.add_header("Content-Disposition", "inline", filename="logo.png")
         message.attach(logoPart)
 
-        with open(productPicture, "rb") as productPictureFile:
-            productPicturePart = MIMEImage(productPictureFile.read(), name=productPicture)
+        if len(productPicture) > 0:
+            with open(productPicture, "rb") as productPictureFile:
+                productPicturePart = MIMEImage(productPictureFile.read(), name=productPicture)
         
-        productPicturePart.add_header("Content-ID", "<productPicture>")
-        productPicturePart.add_header("Content-Disposition", "inline", filename=productPicture)
-        message.attach(productPicturePart)
+            productPicturePart.add_header("Content-ID", "<productPicture>")
+            productPicturePart.add_header("Content-Disposition", "inline", filename=productPicture)
+            message.attach(productPicturePart)
 
         return message
 

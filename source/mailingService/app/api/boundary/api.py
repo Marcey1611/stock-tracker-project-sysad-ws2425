@@ -11,11 +11,9 @@ validator = Validator()
 
 @router.post("/sendMailAdded")
 async def sendMailAddedPostInterface(request: Request):
-    #requestData = await request.json()
-    #validData = validator.validateData(requestData, True)
-    return JSONResponse(content={"message": "Successfully send mail"}, status_code=200)
-
-    #return await apiBF.prepareMailingData(validData, Action.ADDED)
+    requestData = await request.json()
+    validData = validator.validateData(requestData)
+    return await apiBF.prepareMailingData(validData, Action.ADDED)
 
 @router.post("/sendMailDeleted")
 async def sendMailDeletedPostInterface(request: Request):
