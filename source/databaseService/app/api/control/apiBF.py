@@ -18,12 +18,12 @@ class ApiBF:
             databaseServiceResponseList = self.databaseService.updateProductsAmount(True, updatedProductIds)
             
             # Try againg if failed to trigger mailing-service
-            for _ in range(2):
-                # Trigger mail added event
-                response = triggerMailingService("sendMailAdded", databaseServiceResponseList)
+            #for _ in range(2):
+            #    # Trigger mail added event
+            #    response = triggerMailingService("sendMailAdded", databaseServiceResponseList)
 
-                if response.get('status_code') == httpStatusCode.OK:
-                    break
+            #    if response.get('status_code') == httpStatusCode.OK:
+            #        break
 
             # Create response
             return JSONResponse(content = "Updatet products", status_code = httpStatusCode.OK.value)
@@ -39,15 +39,16 @@ class ApiBF:
     def removeAmount(self, request):
         try:
             # Update product amount in database
-            databaseServiceResponseList = self.databaseService.updateProductsAmount(False, request)
+            updatedProductIds = request.get("productId")
+            databaseServiceResponseList = self.databaseService.updateProductsAmount(False, updatedProductIds)
 
             # Try againg if failed to trigger mailing-service
-            for _ in 2:
-                # Trigger mail added event
-                response = triggerMailingService("sendMailDeleted", databaseServiceResponseList)
+            #for _ in 2:
+            #    # Trigger mail added event
+            #    response = triggerMailingService("sendMailDeleted", databaseServiceResponseList)
 
-                if response.get('status_code') == httpStatusCode.OK:
-                    break
+            #    if response.get('status_code') == httpStatusCode.OK:
+            #        break
 
             # Create response
             return JSONResponse(content = "Updatet products", status_code = httpStatusCode.OK.value)
