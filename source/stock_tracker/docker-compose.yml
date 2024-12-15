@@ -1,0 +1,13 @@
+#version: '3.8'
+
+services:
+  flutter-app:
+    build: .
+    container_name: flutterWebsite
+    networks:
+      - stockTrackerDockerNetwork  
+
+
+networks:
+  stockTrackerDockerNetwork:
+    external: true  
