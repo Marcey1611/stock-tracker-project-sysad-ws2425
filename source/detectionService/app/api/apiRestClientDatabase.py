@@ -23,7 +23,7 @@ def deleteItemFromDatabase(data):
     try:
         response = requests.post(f"{url}/delete-item", json=json.dumps(data), headers=headers)
         if response.status_code!=200:
-            logger.error(f"Database could not process delete correctly:{str(data.getId)}")
+            logger.error(f"Database could not process delete correctly:{str(data)}")
     except Exception as e:
         logger.error(f"Error while trying to send a Delete-Request: {str(e)}")
 
