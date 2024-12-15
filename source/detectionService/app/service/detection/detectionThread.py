@@ -15,16 +15,16 @@ def detectionThread(feedEvent:Event,feedQ:queue.Queue,trackEvent:Event,trackQ:qu
         ApiRestClientDatabase.clearAll()
         camera = cv2.VideoCapture(source)
         if camera.isOpened():
-            logger.info(f"Kamera {source} wurde geöffnet.")
+            logger.info(f"Camera {source} opend.")
         else:
-            logger.debug(f"Fehler: Kamera {source} konnte nicht geöffnet werden.")
+            logger.error(f"Could not open camera:{source}.")
             return  # Beende den Thread, wenn die Kamera nicht geöffnet werden kann
         initCam(camera,source)
 
         while True:
             success, frame = camera.read()  # Frame von der Kamera lesen
             if not success:
-                logger.debug("Fehler beim Abrufen des Frames von der Kamera.")
+                logger.error("Error could not access camera frame.")
                 break
             else:
                 success, frame = camera.read()
@@ -33,14 +33,12 @@ def detectionThread(feedEvent:Event,feedQ:queue.Queue,trackEvent:Event,trackQ:qu
 
                 annotatedFrame = processFrame(frame)
 
-
                 if feedEvent.is_set():
                     _, buffer = cv2.imencode('.jpg', frame)
                     frameBytes = buffer.tobytes()
                     feedQ.put(b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frameBytes + b'\r\n')
                 if trackEvent.is_set():
-                    # Frame kodieren und zurückgeben
                     ret, buffer = cv2.imencode('.jpg', annotatedFrame)
                     if not ret:
                         break
@@ -50,9 +48,9 @@ def detectionThread(feedEvent:Event,feedQ:queue.Queue,trackEvent:Event,trackQ:qu
                             b'Content-Type: image/jpeg\r\n\r\n' + frameBytes + b'\r\n')
 
         camera.release()
-        logger.info(f"Kamera {source} wurde geschlossen.")
+        logger.info(f"Camera {source} closed.")
     except cv2.error as e:
-        logger.error(f"OpenCV-Fehler: {e}")
+        logger.error(f"OpenCV-Error: {e}")
 
 
 
@@ -118,14 +116,12 @@ def updateDatabase(addedObjects, removedObjects):
     if len(addedObjects):
         addArray=[]
         for addedObject in addedObjects:
-            logger.info(f"debug {addedObject}")
             addArray.append(addedObjects)
         ApiRestClientDatabase.addItemToDatabase(addArray)
 
     if len(removedObjects)>0:
         removeArray = []
         for removedObject in removedObjects:
-            logger.debug(f"removed {removedObject}")
             removeArray.append(removedObject)
         ApiRestClientDatabase.deleteItemFromDatabase(removeArray)
 
@@ -139,4 +135,4 @@ def initCam(camera:cv2.VideoCapture,source):
 
     frameWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
     frameHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    logger.debug(f"Auflösung der Kamera{str(source)}: {int(frameWidth)}x{int(frameHeight)}")
+    logger.debug(f"Camera resolution:{str(source)}: {int(frameWidth)}x{int(frameHeight)}")

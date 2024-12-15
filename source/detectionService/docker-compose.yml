@@ -7,4 +7,4 @@ services:
     devices:
       - "/dev/video2:/dev/video0"
     environment:
-      - DATABASE_URL="https://database-url"
+      - DATABASE_SERVICE_URL="http://database-service-url"

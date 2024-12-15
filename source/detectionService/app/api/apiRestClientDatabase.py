@@ -3,9 +3,7 @@ import logging
 import requests
 import os
 
-url=os.getenv('DatabaseServiceURL') #ToBeChanged
-if not url:
-    url = "https://localhost:8001"
+url=os.getenv('DATABASE_SERVICE_URL') #ToBeChanged
 
 headers = {
     "Content-Type": "application/json"  # Dies sagt dem Server, dass die Daten im JSON-Format sind
@@ -15,7 +13,7 @@ logger = logging.getLogger('databaseRestRequests')
 
 def addItemToDatabase(data):
     try:
-        response = requests.post(url +"/add-item", json=json.dumps(data), headers=headers) #ToBeChanged
+        response = requests.post(f"{url}/add-item", json=json.dumps(data), headers=headers)
         if response.status_code!=200:
             logger.error(f"Database could not process add correctly:{str(data)}")
     except Exception as e:
@@ -23,7 +21,7 @@ def addItemToDatabase(data):
 
 def deleteItemFromDatabase(data):
     try:
-        response = requests.post(url +"/delete-item", json=json.dumps(data), headers=headers) #ToBeChanged
+        response = requests.post(f"{url}/delete-item", json=json.dumps(data), headers=headers)
         if response.status_code!=200:
             logger.error(f"Database could not process delete correctly:{str(data.getId)}")
     except Exception as e:
@@ -32,8 +30,8 @@ def deleteItemFromDatabase(data):
 
 def clearAll():
     try:
-        response = requests.get(url+"/clear-all") #ToBeChanged
+        response = requests.get(f"{url}/clear-all")
         if response.status_code!=200:
-            logger.error(f"Database could not process getNextID correctly")
+            logger.error(f"Database could not process clearAll correctly")
     except Exception as e:
-        logger.error(f"Error while trying to send an getNextID: {str(e)}")
+        logger.error(f"Error while trying to send an clearAll: {str(e)}")
