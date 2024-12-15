@@ -3,3 +3,4 @@ sqlalchemy
 psycopg2-binary   # PostgreSQL-Treiber für Python
 uvicorn           # ASGI-Server für FastAPI
 requests
+python-dotenv
