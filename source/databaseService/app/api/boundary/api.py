@@ -17,7 +17,7 @@ async def removeItem(request: Request):
     # validateRequest(requestData)
     return apiBf.removeAmount(requestData)
 
-@router.get("/clearALl")
+@router.get("/clearAll")
 async def clearAll():
     return apiBf.resetAmounts()
 

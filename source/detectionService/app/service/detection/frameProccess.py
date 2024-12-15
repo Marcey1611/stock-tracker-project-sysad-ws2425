@@ -71,7 +71,7 @@ def updateDatabase(addedObjects, removedObjects):
     if len(addedObjects):
         addArray=[]
         for addedObject in addedObjects:
-            addArray.append(addedObjects)
+            addArray.append(addedObject)
         ApiRestClientDatabase.addItemToDatabase(addArray)
 
     if len(removedObjects)>0:
