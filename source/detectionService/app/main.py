@@ -23,7 +23,7 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]  # Ausgabe in die Konsole
 )
 
-detection_thread = threading.Thread(target=detectionThread, args=(feedEvent, feedQ, trackEvent, trackQ, 2))
+detection_thread = threading.Thread(target=detectionThread, args=(feedEvent, feedQ, trackEvent, trackQ, 0))
 detection_thread.daemon = True  # Daemon-Thread, wird beendet, wenn das Hauptprogramm beendet wird
 detection_thread.start()
 app.include_router(videoRouter2, prefix="/thread", tags=["video"])
