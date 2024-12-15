@@ -9,6 +9,7 @@ services:
       - "8001:8000"
     environment:
       - DATABASE_URL=sqlite:///./test.db   # Dummy-Datenbank-URL für Entwicklung
+      - MAILING_SERVICE_URL=http://mailing-service:8002/
     networks:
       - stockTrackerDockerNetwork
 
