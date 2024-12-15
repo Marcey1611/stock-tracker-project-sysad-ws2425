@@ -79,25 +79,9 @@ def processFrame(frame):
         updateDatabase(addedClasses, removedClasses)
         return annotatedFrame
 
-    # Überprüfe hinzugefügte Klassen
-    for cls in currentClasses:
-        if cls not in objectCountHistory:
-            if cls not in objectTimestamps:
-                objectTimestamps[cls] = current_time  # Speichere den Zeitstempel
-            elif current_time - objectTimestamps[cls] >= DELAY:
-                addedClasses.append(cls)
-                objectCountHistory[cls] = True
-                del objectTimestamps[cls]  # Entferne den Zeitstempel, da die Klasse nun hinzugefügt wurde
+    checkForAddObjects(currentClasses,current_time, addedClasses)
 
-    # Überprüfe entfernte Klassen
-    for cls in list(objectCountHistory.keys()):
-        if cls not in currentClasses:
-            if cls not in removalTimestamps:
-                removalTimestamps[cls] = current_time  # Speichere den Zeitstempel
-            elif current_time - removalTimestamps[cls] >= DELAY:
-                removedClasses.append(cls)
-                del objectCountHistory[cls]
-                del removalTimestamps[cls]  # Entferne den Zeitstempel, da die Klasse nun entfernt wurde
+    checkForDelObjects(currentClasses, current_time, removedClasses)
 
     # Aktualisiere Zeitstempel für erkannte Objekte
     for cls in list(objectTimestamps.keys()):
@@ -110,7 +94,26 @@ def processFrame(frame):
 
     updateDatabase(addedClasses, removedClasses)
     return annotatedFrame
+def checkForAddObjects(currentClasses,current_time,addedClasses):
+    # Überprüfe hinzugefügte Klassen
+    for cls in currentClasses:
+        if cls not in objectCountHistory:
+            if cls not in objectTimestamps:
+                objectTimestamps[cls] = current_time  # Speichere den Zeitstempel
+            elif current_time - objectTimestamps[cls] >= DELAY:
+                addedClasses.append(cls)
+                objectCountHistory[cls] = True
+                del objectTimestamps[cls]  # Entferne den Zeitstempel, da die Klasse nun hinzugefügt wurde
 
+def checkForDelObjects(currentClasses,current_time,removedClasses):
+    for cls in list(objectCountHistory.keys()):
+        if cls not in currentClasses:
+            if cls not in removalTimestamps:
+                removalTimestamps[cls] = current_time  # Speichere den Zeitstempel
+            elif current_time - removalTimestamps[cls] >= DELAY:
+                removedClasses.append(cls)
+                del objectCountHistory[cls]
+                del removalTimestamps[cls]  # Entferne den Zeitstempel, da die Klasse nun entfernt wurde
 
 def updateDatabase(addedObjects, removedObjects):
     if len(addedObjects):
