@@ -5,7 +5,7 @@ from api.boundary import api
 app = FastAPI()
 app.include_router(api.router)
 
-api.apiBf.addProducts(["juice", 
+api.apiBf.handleCreateRequest(["juice", 
                     "jam", 
                     "cofffee", 
                     "water", 
