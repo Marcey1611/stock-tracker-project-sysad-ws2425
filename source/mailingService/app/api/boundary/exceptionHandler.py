@@ -12,7 +12,7 @@ def register_exception_handlers(app: FastAPI):
 
     @app.exception_handler(Exception)
     async def mailSendingExceptionHandler():
-        return response("Unexpected Exception!", 500)
+        return response("Internal Server Error", 500)
 
     @app.exception_handler(BadRequestException)
     async def badRequestExceptionHandler(request, exception: BadRequestException):

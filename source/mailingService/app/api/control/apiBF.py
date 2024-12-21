@@ -1,5 +1,6 @@
 from fastapi.responses import JSONResponse
 import logging
+from fastapi import Request
 
 from bm.mailSendingServiceBA import MailSendingService
 from entity.models.MailData import MailData
@@ -12,18 +13,35 @@ class ApiBF:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    async def prepareMailingData(self, validData, action: Action):
+    async def prepareMailingData(self, validData: Request, action: Action):
         try:
-            mailDataArray = []
-            self.logger.info("Prepare mail data for action: " + str(action))
+            if action == Action.ADDED:
+                productAmountChanged = "productAmountAdded" 
+            elif action == Action.DELETED:
+                productAmountChanged ="productAmountDeleted"
+            else:
+                raise InternalErrorException()
+            
+            mailDataList = []
             for product in validData:
-                mailData = MailData(product["productId"], product["productName"], product["productPicture"], product["productAmountAdded"], product["productAmountTotal"], action)
-                self.logger.info(mailData)
-                mailDataArray.append(mailData)
+                mailData = MailData(product["productId"], product["productName"], product[productAmountChanged], product["productAmountTotal"], action)
+                mailDataList.append(mailData)
             mailSendingService = MailSendingService()
-            mailSendingService.sendMail(mailDataArray[0])
+            mailSendingService.sendMail(mailDataList, action) 
             return JSONResponse(content={"message": "Successfully send mail"}, status_code=200)
+        
         except Exception as exception:
-            self.logger.error(exception)
+            self.logger.error(f"Exception: {exception}")
+            raise InternalErrorException()
+        
+    async def prepareMailingDataError(self, validData: Request):
+        try:
+            errorMessage = validData["errorMessage"]
+            mailSendingService = MailSendingService()
+            mailSendingService.sendMail(errorMessage, Action.ERROR)
+            return JSONResponse(content={"message": "Successfully send error mail"}, status_code=200)
+        
+        except Exception as exception:
+            self.logger.error(f"Exception: {exception}")
             raise InternalErrorException()
 
