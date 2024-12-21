@@ -1,16 +1,14 @@
 import os
 import requests
 from dotenv import load_dotenv
-from requests.exceptions import RequestException
-from entities.UpdatedProductResponse import UpdatedProductResponse
 
-def triggerMailingService(action: str, payload: list[UpdatedProductResponse]):
-    try:
-        load_dotenv()
+def triggerMailingService(action: str, updatedProductsDict: dict):
+    load_dotenv()
 
-        payload_dicts = [item.toDict() for item in payload]
+    # Convert dict to Json payload
+    json_payload = {key: value.dict() for key, value in updatedProductsDict.items()}
 
-        return requests.post(os.getenv("MAILING_SERVICE_URL") + action, json=payload_dicts)
-    
-    except RequestException as e:
-        raise RequestException(f"An error occurred while triggering mailing-service: {e}")
+    # Send request | Retry once if response is not 200
+    for _ in range(2):
+        mailingServiceResponse = requests.post(os.getenv("MAILING_SERVICE_URL") + action, json=json_payload)
+        if mailingServiceResponse.status_code == 200: break
