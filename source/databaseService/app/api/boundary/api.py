@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from api.control.apiBF import ApiBF
-from entities.models import Request, Response
+from entities.models import Request, Response, AppResponse
 
 router = APIRouter()
 apiBf = ApiBF()  
@@ -17,5 +17,9 @@ async def removeItem(request: Request):
 @router.get("/clearAll", response_model=Response)
 async def clearAll():
     return apiBf.handleResetRequest()
+
+@router.get("/updateApp", response_model=AppResponse)
+async def updateApp():
+    return apiBf.handleAppRequest()
 
             

@@ -83,6 +83,28 @@ class DatabaseService:
         finally:
             session.close()
 
+    def getProducts(self) -> dict:
+        try:
+            productsDict = {}
+            session = DatabaseService.databaseProvider.getSession()
+
+            # Get all products
+            products = session.query(Products).all()
+
+            # Create dictionary with products
+            for product in products:
+                productsDict[product.id] = product
+
+            return productsDict
+
+        except Exception as e:
+            session.rollback()
+            raise RuntimeError(f"An error occurred while getting products: {e}")
+        
+        finally:
+            session.close()
+        
+
     def addProducts(self, products: list[str]):
         try:
             session = DatabaseService.databaseProvider.getSession()

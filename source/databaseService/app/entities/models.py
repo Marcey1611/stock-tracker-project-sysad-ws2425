@@ -14,3 +14,6 @@ class MailResponse(BaseModel):
     productAmountTotal: int
     productAmountAdded: int
     errorMessage: str | None = None
+
+class AppResponse(BaseModel):
+    products: dict

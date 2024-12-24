@@ -2,7 +2,7 @@ import logging
 from fastapi import HTTPException
 
 from bm.databaseService import DatabaseService
-from entities.models import Request, Response
+from entities.models import Request, Response, AppResponse
 from .mailingTrigger import triggerMailingService
 
 class ApiBF:
@@ -31,6 +31,14 @@ class ApiBF:
         except Exception as e:
             self.logger.error(f"Error while reseting products amount: {e}")
             return Response(statusCode = 500)
+
+    def handleAppRequest(self) -> AppResponse:
+        try:
+            return AppResponse(ApiBF.databaseService.getProducts())
+        
+        except Exception as e:
+            self.logger.error(f"Error while getting products: {e}")
+            return 500
 
     def handleCreateRequest(self, products: list):
         try:
