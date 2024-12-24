@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  detection-service:
+    container_name: detectionServiceContainer
+    build: ./detectionService
+    networks:
+      - stockTrackerDockerNetwork
+    ports:
+      - "8000:8000"
+    devices:
+      - "/dev/video0:/dev/video0"
+    environment:
+      - DATABASE_SERVICE_URL=http://database-service:8000
+
+  database-service:
+    build:
+      context: ./databaseService
+    container_name: dataBaseServiceContainer
+    networks:
+      - stockTrackerDockerNetwork
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./test.db   # Dummy-Datenbank-URL für Entwicklung
+      - MAILING_SERVICE_URL=http://mailing-service:8002/
+
+  mailing-service:
+    build: ./mailingService
+    container_name: mailingServiceContainer
+    networks:
+      - stockTrackerDockerNetwork
+    ports:
+      - "8002:8000"
+    environment:
+      SMTP_SERVER: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_USER: sysad.stock.tracker@gmail.com
+      SMTP_PASSWORD: qlddayafyvqszzlt
+
+
+networks:
+  stockTrackerDockerNetwork:
+    driver: bridge
+

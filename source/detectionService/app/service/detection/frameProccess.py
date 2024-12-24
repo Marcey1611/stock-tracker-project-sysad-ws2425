@@ -34,10 +34,12 @@ def updateObjectTracking(results, trackers:TrackerManager):
     trackIds = results[0].boxes.id.int().cpu().tolist()
     clsIds = results[0].boxes.cls.int().cpu().tolist()
 
-    currentTrackIds = set()
-    for box, trackId, clsId in zip(boxes, trackIds, clsIds):
-        x, y, w, h = map(float, box)
-        currentTrackIds.add(trackId)
+def updateDatabase(addedObjects, removedObjects):
+    if len(addedObjects):
+        addArray=[]
+        for addedObject in addedObjects:
+            addArray.append(addedObject)
+        ApiRestClientDatabase.addItemToDatabase(addArray)
 
         # Aktualisiere Klassenhistorie
         trackers.clsIdHistory[trackId][clsId] += 1
