@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 
 from api.control.apiBF import ApiBF
 from api.validation.validator import Validator
@@ -9,23 +10,22 @@ apiBF = ApiBF()
 validator = Validator()
 
 @router.post("/sendMailAdded")
-async def sendMailAddedPostInterface(request: Request):
+async def sendMailAdded(request: Request):
     requestData = await request.json()
-    validData = validator.validateData(requestData)
+    validData = validator.validateData(requestData, Action.ADDED)
     return await apiBF.prepareMailingData(validData, Action.ADDED)
 
 @router.post("/sendMailDeleted")
-async def sendMailDeletedPostInterface(request: Request):
+async def sendMailDeleted(request: Request):
     requestData = await request.json()
-    validData = validator.validateData(requestData)
+    validData = validator.validateData(requestData, Action.DELETED)
     return await apiBF.prepareMailingData(validData, Action.DELETED)
 
 @router.post("/sendErrorMail")
-async def sendErrorMailPostInterface(request: Request):
+async def sendErrorMail(request: Request):
     requestData = await request.json()
-    validator.validateErrorMessage(requestData)
-    validData = validator.validateData(requestData)
-    return await apiBF.prepareMailingData(validData, Action.ERROR)
+    validData = validator.validateErrorMessage(requestData)
+    return await apiBF.prepareMailingDataError(validData)
 
 
    
