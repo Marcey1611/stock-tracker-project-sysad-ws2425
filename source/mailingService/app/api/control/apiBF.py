@@ -15,16 +15,9 @@ class ApiBF:
 
     async def prepareMailingData(self, validData: Request, action: Action):
         try:
-            if action == Action.ADDED:
-                productAmountChanged = "productAmountAdded" 
-            elif action == Action.DELETED:
-                productAmountChanged ="productAmountDeleted"
-            else:
-                raise InternalErrorException()
-            
             mailDataList = []
             for product in validData:
-                mailData = MailData(product["productId"], product["productName"], product[productAmountChanged], product["productAmountTotal"], action)
+                mailData = MailData(product["productId"], product["productName"], product["productAmountAdded"], product["productAmountTotal"], action)
                 mailDataList.append(mailData)
             mailSendingService = MailSendingService()
             mailSendingService.sendMail(mailDataList, action) 

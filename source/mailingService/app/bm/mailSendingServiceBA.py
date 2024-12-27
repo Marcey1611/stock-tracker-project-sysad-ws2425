@@ -37,7 +37,6 @@ class MailSendingService:
         
     def setMailData(self, mailDataList: list[MailData], action: Action):
         try:
-            productAmountChanged = "productAmountAdded" if action == Action.ADDED else "productAmountDeleted"
             with open("emailTemplate.html", "r") as emailTemplate:
                 templateContent = emailTemplate.read()
                 template = Template(templateContent)
@@ -46,7 +45,7 @@ class MailSendingService:
                 {
                     "productId": mailData.getProductId(),
                     "productName": mailData.getProductName(),
-                    productAmountChanged: mailData.getProductAmountChanged(),
+                    "productAmountAdded": mailData.getProductAmountAdded(),
                     "productAmountTotal": mailData.getProductAmountTotal(),
                 }
                 for mailData in mailDataList

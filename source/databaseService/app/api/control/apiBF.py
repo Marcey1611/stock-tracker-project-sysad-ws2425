@@ -16,7 +16,8 @@ class ApiBF:
             # Update product amount in database
             updatedProductIds = request.get("productId")
             databaseServiceResponseList = self.databaseService.updateProductsAmount(True, updatedProductIds)
-            
+            triggerMailingService("sendMailAdded", databaseServiceResponseList)
+
             # Try againg if failed to trigger mailing-service
             #for _ in range(2):
             #    # Trigger mail added event
@@ -41,6 +42,9 @@ class ApiBF:
             # Update product amount in database
             updatedProductIds = request.get("productId")
             databaseServiceResponseList = self.databaseService.updateProductsAmount(False, updatedProductIds)
+            self.logger.info("BEFORE")
+            triggerMailingService("sendMailDeleted", databaseServiceResponseList)
+            self.logger.info("AFTER")
 
             # Try againg if failed to trigger mailing-service
             #for _ in 2:

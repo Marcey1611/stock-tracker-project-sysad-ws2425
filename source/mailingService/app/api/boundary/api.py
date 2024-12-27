@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
+import logging
 
 from api.control.apiBF import ApiBF
 from api.validation.validator import Validator

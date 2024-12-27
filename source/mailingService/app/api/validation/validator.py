@@ -12,18 +12,17 @@ class Validator:
 
     def validateData(self, productList: Dict[str, Any], action: Action) -> Dict[str, Any]:
         try:
-            productAmountChanged = "productAmountAdded" if action == Action.ADDED else "productAmountDeleted"
             for product in productList:
                 isDataValid = []
 
                 isDataValid.append("productId" in product)
                 isDataValid.append("productName" in product)
-                isDataValid.append(productAmountChanged in product)
+                isDataValid.append("productAmountAdded" in product)
                 isDataValid.append("productAmountTotal"  in product)
 
                 isDataValid.append(isinstance(product["productId"], int))
                 isDataValid.append(isinstance(product["productName"], str))
-                isDataValid.append(isinstance(product[productAmountChanged], int))
+                isDataValid.append(isinstance(product["productAmountAdded"], int))
                 isDataValid.append(isinstance(product["productAmountTotal"], int))
                 isDataValid.append(len(product["productName"]) > 0)
 
