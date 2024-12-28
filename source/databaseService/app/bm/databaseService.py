@@ -39,10 +39,10 @@ class DatabaseService:
                     updatedProductsDict[product.productId] = MailResponse(
                         productId=product.productId, 
                         productName=product.productName, 
-                        productPicture="", # TODO: Add product picture handling
+                        productPicture="", # TODO: Remove picture
                         productAmountTotal=product.productAmount,
                         productAmountAdded=1,
-                        errorMessage=None,
+                        errorMessage=None, # TODO: Remove error message and only send error message
                     )
 
             # Commit changes
