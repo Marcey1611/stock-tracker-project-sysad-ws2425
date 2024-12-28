@@ -12,6 +12,9 @@ class Validator:
 
     def validateData(self, productList: Dict[str, Any], action: Action) -> Dict[str, Any]:
         try:
+            if len(productList) < 1:
+                self.logger.error("Got empty product list!")
+                raise BadRequestException()
             for product in productList:
                 isDataValid = []
 
