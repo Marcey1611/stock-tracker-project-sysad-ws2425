@@ -74,7 +74,7 @@ class ApiBF:
       
     def handleResetRequest(self) -> Response: 
         try:
-            return ApiBF.databaseService.resetAmounts().value
+            return Response(statusCode=200)
         
         except Exception as e:
             self.logger.error(f"Error while reseting products amount: {e}")
