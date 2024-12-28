@@ -10,7 +10,8 @@ class Validator:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def validateData(self, productList: Dict[str, Any]) -> Dict[str, Any]:
+    def validateData(self, productList) -> Dict[str, Any]:
+        self.logger.debug("test")
         try:
             if len(productList) < 1:
                 self.logger.error("No products provided!")
@@ -20,13 +21,13 @@ class Validator:
 
                 isDataValid.append("productId" in product)
                 isDataValid.append("productName" in product)
-                isDataValid.append("productAmountAdded" in product)
                 isDataValid.append("productAmountTotal"  in product)
+                isDataValid.append("productAmountAdded" in product)
 
                 isDataValid.append(isinstance(product["productId"], int))
                 isDataValid.append(isinstance(product["productName"], str))
-                isDataValid.append(isinstance(product["productAmountAdded"], int))
                 isDataValid.append(isinstance(product["productAmountTotal"], int))
+                isDataValid.append(isinstance(product["productAmountAdded"], int))
                 isDataValid.append(len(product["productName"]) > 0)
 
                 if False in isDataValid:

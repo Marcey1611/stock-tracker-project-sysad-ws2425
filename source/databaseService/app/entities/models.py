@@ -10,7 +10,5 @@ class Response(BaseModel):
 class MailResponse(BaseModel):
     productId: int
     productName: str
-    productPicture: str
     productAmountTotal: int
     productAmountAdded: int
-    errorMessage: str | None = None
