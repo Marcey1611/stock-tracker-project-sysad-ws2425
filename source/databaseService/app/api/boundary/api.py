@@ -1,24 +1,21 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
+
 from api.control.apiBF import ApiBF
-from ..validation.validator import validateRequest
+from entities.models import Request, Response
 
 router = APIRouter()
 apiBf = ApiBF()  
 
-@router.post("/addItem")
+@router.post("/addItem", response_model=Response)
 async def addItem(request: Request):
-    requestData = await request.json()
-    # validateRequest(requestData)
-    return apiBf.addAmount(requestData)
+    return apiBf.handleUpdateRequest(request, True)
 
-@router.post("/removeItem")
+@router.post("/removeItem", response_model=Response)
 async def removeItem(request: Request):
-    requestData = await request.json()
-    # validateRequest(requestData)
-    return apiBf.removeAmount(requestData)
+    return apiBf.handleUpdateRequest(request, False)
 
-@router.get("/clearAll")
+@router.get("/clearAll", response_model=Response)
 async def clearAll():
-    return apiBf.resetAmounts()
+    return apiBf.handleResetRequest()
 
             

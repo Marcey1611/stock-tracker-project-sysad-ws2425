@@ -397,3 +397,6 @@ doc/**/*.sta
 
 # mac generated files for meta data
 .DS_Store
+
+# IDEA files generated files
+.idea
