@@ -6,7 +6,6 @@ import api.apiRestClientDatabase as ApiRestClientDatabase
 from entities.detection.trackManager import TrackerManager
 
 from service.detection.frameProccess import processFrame
-from service.detection.humanCheck import isHumanInFrame
 
 logger = logging.getLogger('detectionThread')
 
@@ -29,21 +28,14 @@ def detectionThread(feedEvent:Event,feedQ:queue.Queue,trackEvent:Event,trackQ:qu
             logger.error("Error could not access camera frame.")
             break
         else:
-            humanCheck, annotatedFrame = isHumanInFrame(frame)
-            if humanCheck:
-                if feedEvent.is_set():
-                    streamFeedFrames(frame, feedQ)
-                if trackEvent.is_set():
-                    if not streamTrackFrames(annotatedFrame, trackQ):
-                        break
-            else:
-                annotatedFrame = processFrame(frame,trackers)
 
-                if feedEvent.is_set():
-                    streamFeedFrames(frame, feedQ)
-                if trackEvent.is_set():
-                    if not streamTrackFrames(annotatedFrame, trackQ):
-                        break
+            annotatedFrame = processFrame(frame,trackers)
+
+            if feedEvent.is_set():
+                streamFeedFrames(frame, feedQ)
+            if trackEvent.is_set():
+                if not streamTrackFrames(annotatedFrame, trackQ):
+                    break
 
     camera.release()
     logger.info(f"Camera {source} closed.")
