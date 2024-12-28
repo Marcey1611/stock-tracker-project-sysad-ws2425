@@ -23,7 +23,7 @@ def addItemToDatabase(data):
 def deleteItemFromDatabase(data):
     try:
         jsonData = { "ids":data}
-        response = requests.post(f"{url}/deleteItem", json=jsonData, headers=headers)
+        response = requests.post(f"{url}/removeItem", json=jsonData, headers=headers)
         if response.status_code!=200:
             logger.error(f"Database could not process delete correctly:{str(data)}")
     except Exception as e:
