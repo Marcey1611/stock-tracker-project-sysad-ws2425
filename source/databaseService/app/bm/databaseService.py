@@ -32,7 +32,7 @@ class DatabaseService:
                 product.productAmount += 1 if add else -1 
 
                 # Update or append dictionary
-                if product.id in updatedProductsDict:
+                if product.productId in updatedProductsDict:
                     updatedProductsDict[product.productId].productAmountTotal = product.productAmount
                     updatedProductsDict[product.productId].productAmountAdded += 1 if add else -1
                 else:

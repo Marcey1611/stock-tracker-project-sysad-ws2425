@@ -13,7 +13,7 @@ class ApiBF:
 
     def handleUpdateRequest(self, request: Request, isAdd: bool) -> Response:
         try: 
-            updatedProductsDict = ApiBF.databaseService.updateAmount(request.ids, isAdd)
+            updatedProductsDict = ApiBF.databaseService.updateProductsAmount(isAdd,request.ids)
             triggerMailingService("sendMailAdded" if isAdd else "sendMailDeleted", updatedProductsDict)
             return Response(statusCode = 200)
         
@@ -26,7 +26,7 @@ class ApiBF:
       
     def handleResetRequest(self) -> Response: 
         try:
-            return ApiBF.databaseService.resetAmounts().value
+            return Response(statusCode=200)
         
         except Exception as e:
             self.logger.error(f"Error while reseting products amount: {e}")
