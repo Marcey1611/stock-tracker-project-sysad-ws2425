@@ -32,17 +32,15 @@ class DatabaseService:
                 product.productAmount += 1 if add else -1 
 
                 # Update or append dictionary
-                if product.id in updatedProductsDict:
+                if product.productId in updatedProductsDict:
                     updatedProductsDict[product.productId].productAmountTotal = product.productAmount
                     updatedProductsDict[product.productId].productAmountAdded += 1 if add else -1
                 else:
                     updatedProductsDict[product.productId] = MailResponse(
                         productId=product.productId, 
                         productName=product.productName, 
-                        productPicture="", # TODO: Add product picture handling
                         productAmountTotal=product.productAmount,
-                        productAmountAdded=1,
-                        errorMessage=None,
+                        productAmountAdded=1
                     )
 
             # Commit changes

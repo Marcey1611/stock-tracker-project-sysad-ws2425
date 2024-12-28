@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
@@ -8,17 +10,18 @@ from entity.enums import Action
 router = APIRouter()
 apiBF = ApiBF()
 validator = Validator()
+logger = logging.getLogger(__name__)
 
 @router.post("/sendMailAdded")
 async def sendMailAdded(request: Request):
     requestData = await request.json()
-    validData = validator.validateData(requestData, Action.ADDED)
+    validData = validator.validateData(requestData)
     return await apiBF.prepareMailingData(validData, Action.ADDED)
 
 @router.post("/sendMailDeleted")
 async def sendMailDeleted(request: Request):
     requestData = await request.json()
-    validData = validator.validateData(requestData, Action.DELETED)
+    validData = validator.validateData(requestData)
     return await apiBF.prepareMailingData(validData, Action.DELETED)
 
 @router.post("/sendErrorMail")
