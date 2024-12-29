@@ -1,19 +1,98 @@
 @startuml
 
-class API {
-    ApiBF apiBf
-    ApiRouter router
-    Validator validator
+package api {
+    package boundary {
+        +class API {
+            +ApiBF apiBf
+            +ApiRouter router
+            +Validator validator
 
-    String sendMailAdded(Request request)
-    JSONResponse sendMailDeleted(Request request)
-    JSONResponse sendErrorMail(Request request)
+            +JSONResponse sendMailAdded(Request request)
+            +JSONResponse sendMailDeleted(Request request)
+            +JSONResponse sendErrorMail(Request request)
+        }
+
+        +class ExceptionHandler {
+            +Logger logger
+            +JSONResponse registerExceptionHandler(FastAPI app)
+            +JSONResponse response(str detail, int statusCode)                
+        }
+    }
+
+    package control {
+        +class ApiBF {
+            +None __init__(ApiBF self)
+            +prepareMailingData(ApiBF self, Request validData, Action action)
+            +prepareMailingDataError(ApiBF self, Request validData)
+        }
+    }
+
+    package validation {
+        +class Validator {
+            +None __init__(Validator self)
+            +list<Dict<str, int | str>> validateData(Validator self, list<Dict<str, int | str>> productList)
+            +list<Dict<str, int | str>> validateErrorMessage(Validator self, list<Dict<str, int | str>> requestData)
+        }
+    }
 }
 
-class Validator {
-    void __init__(self)
-    JSONResponse prepareMailingData(self, Request validData, Action action)
-    JSONResponse sendMail
+package bm {
+    class MailSendingServiceBA {
+        +None __init__(MailSendingServiceBA self)
+        +None sendMail(MailSendingService self, object | list<object> mailData, Action action)
+        +str, object setMailData(MailSendingService self, list<MailData> mailDataList, Action action)
+        +str, object setErrorMailData(MailSendingService self, str errorMessage)
+        +MIMEMultipart configMessage(MailSendingService self, str subject, str body)
+        +sendingEMail(MailSendingService self, MIMEMultipart message)
+    }
 }
+
+package entity {
+    class MailData {
+        +None __init__(MailData self, int productId, str productName, int productAmountChanged, int productAmountTotal, Action action)
+        +int getProductId(MailData self)
+        +str getProductName(MailData self)
+        +int getProductAmountChanged(MailData self)
+        +int getProductAmountTotal(MailData self)
+        +Action getAction(MailData self)
+    }
+
+    enum Action {
+        ADDED
+        DELETED
+        ERROR
+    }
+
+    class InternalErrorException {
+        +None __init__(InternalErrorException self, str = "Internal Server Error" detail, int = 500 status_code)
+    }
+
+    class BadRequestException {
+        +None __init__(BadRequestException self, str = "Bad Request" detail, int = 400 status_code)
+
+    }
+}
+
+class Main {
+    +FastAPI app
+}
+
+Main ..> ExceptionHandler
+Main ..> API
+
+API ..> Validator
+API ..> ApiBF
+API ..> Action
+
+ApiBF ..> MailData
+ApiBF ..> MailSendingServiceBA
+ApiBF ..> InternalErrorException
+ApiBF ..> Action
+
+Validator ..> BadRequestException
+
+MailSendingServiceBA ..> Action
+MailSendingServiceBA ..> InternalErrorException
+MailSendingServiceBA ..> MailData
 
 @enduml

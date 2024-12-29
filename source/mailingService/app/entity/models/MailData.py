@@ -1,4 +1,4 @@
-from entity.enums import Action
+from source.mailingService.app.entity.enums.Action import Action
 
 class MailData:
     def __init__(self, productId: int, productName: str, productAmountChanged: int, productAmountTotal: int, action: Action):
