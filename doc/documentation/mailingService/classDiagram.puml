@@ -3,58 +3,58 @@
 package api {
     package boundary {
         +class API {
-            +ApiBF apiBf
-            +ApiRouter router
-            +Validator validator
+            +apiBf : ApiBF 
+            +router : ApiRouter 
+            +validator : Validator 
 
-            +JSONResponse sendMailAdded(Request request)
-            +JSONResponse sendMailDeleted(Request request)
-            +JSONResponse sendErrorMail(Request request)
+            +sendMailAdded(request : Request) : JSONResponse
+            +sendMailDeleted(request : Request) : JSONResponse
+            +sendErrorMail(request : Request) : JSONResponse
         }
 
         +class ExceptionHandler {
-            +Logger logger
-            +JSONResponse registerExceptionHandler(FastAPI app)
-            +JSONResponse response(str detail, int statusCode)                
+            +logger : Logger
+            +registerExceptionHandler(FastAPI : app) : JSONResponse
+            +response(detail : str, statusCode : int) : JSONResponse            
         }
     }
 
     package control {
         +class ApiBF {
-            +None __init__(ApiBF self)
-            +prepareMailingData(ApiBF self, Request validData, Action action)
-            +prepareMailingDataError(ApiBF self, Request validData)
+            +__init__(self : ApiBF) : None
+            +prepareMailingData(self : ApiBF, validData : Request, action : Action): None
+            +prepareMailingDataError(self : ApiBF, validData : Request) : None
         }
     }
 
     package validation {
         +class Validator {
-            +None __init__(Validator self)
-            +list<Dict<str, int | str>> validateData(Validator self, list<Dict<str, int | str>> productList)
-            +list<Dict<str, int | str>> validateErrorMessage(Validator self, list<Dict<str, int | str>> requestData)
+            +__init__(self : Validator) : None
+            +validateData(self : Validator, productList : list<Dict<str, int | str>>) : list<Dict<str, int | str>>
+            +validateErrorMessage(self : Validator, requestData : list<Dict<str, int | str>>) : list<Dict<str, int | str>> 
         }
     }
 }
 
 package bm {
     class MailSendingServiceBA {
-        +None __init__(MailSendingServiceBA self)
-        +None sendMail(MailSendingService self, object | list<object> mailData, Action action)
-        +str, object setMailData(MailSendingService self, list<MailData> mailDataList, Action action)
-        +str, object setErrorMailData(MailSendingService self, str errorMessage)
-        +MIMEMultipart configMessage(MailSendingService self, str subject, str body)
-        +sendingEMail(MailSendingService self, MIMEMultipart message)
+        +__init__(self : MailSendingServiceBA) : None
+        +sendMail(self : MailSendingService, mailData : object | list<object>, action : Action) : None
+        +setMailData(self : MailSendingService, mailDataList : list<MailData>, action : Action) : str, object 
+        +setErrorMailData(self : MailSendingService, errorMessage : str) : str, object 
+        +configMessage(self : MailSendingService, subject : str, body : str) : MIMEMultipart
+        +sendingEMail(self : MailSendingService, message : MIMEMultipart) : None
     }
 }
 
 package entity {
     class MailData {
-        +None __init__(MailData self, int productId, str productName, int productAmountChanged, int productAmountTotal, Action action)
-        +int getProductId(MailData self)
-        +str getProductName(MailData self)
-        +int getProductAmountChanged(MailData self)
-        +int getProductAmountTotal(MailData self)
-        +Action getAction(MailData self)
+        +__init__(self : MailData, productId : int, productName : str, productAmountChanged : int, productAmountTotal : int, action : Action) : None
+        +getProductId(self : MailData) : int
+        +getProductName(self : MailData) : str
+        +getProductAmountChanged(self : MailData) : int
+        +getProductAmountTotal(self : MailData) : int
+        +getAction(self : MailData) : Action
     }
 
     enum Action {
@@ -64,17 +64,17 @@ package entity {
     }
 
     class InternalErrorException {
-        +None __init__(InternalErrorException self, str = "Internal Server Error" detail, int = 500 status_code)
+        +__init__(self : InternalErrorException, detail : str = "Internal Server Error", status_code : int = 500) : None
     }
 
     class BadRequestException {
-        +None __init__(BadRequestException self, str = "Bad Request" detail, int = 400 status_code)
+        +__init__(self : BadRequestException, detail : str = "Bad Request", status_code : int = 400) : None
 
     }
 }
 
 class Main {
-    +FastAPI app
+    +app : FastAPI
 }
 
 Main ..> ExceptionHandler
