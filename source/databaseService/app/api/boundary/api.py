@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from typing import Dict, Any
 
 from api.control.apiBF import ApiBF
 from entities.models import Request, Response, AppResponse
@@ -18,8 +19,6 @@ async def removeItem(request: Request):
 async def clearAll():
     return apiBf.handleResetRequest()
 
-@router.get("/updateApp", response_model=AppResponse)
+@router.get("/updateApp", response_model=Dict[Any, dict])
 async def updateApp():
     return apiBf.handleAppRequest()
-
-            

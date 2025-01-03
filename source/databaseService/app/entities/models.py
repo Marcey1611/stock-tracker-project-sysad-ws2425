@@ -16,4 +16,7 @@ class MailResponse(BaseModel):
     errorMessage: str | None = None
 
 class AppResponse(BaseModel):
-    products: dict
+    productId: int
+    productName: str
+    productPicture: str | None = None
+    productAmount: int

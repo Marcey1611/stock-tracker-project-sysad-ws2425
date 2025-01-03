@@ -4,7 +4,7 @@ from fastapi import HTTPException
 
 from database.databaseProvider import DatabaseProvider
 from database.databaseTableModells import Products
-from entities.models import MailResponse
+from entities.models import MailResponse, AppResponse
 
 class DatabaseService:
     databaseProvider = DatabaseProvider()
@@ -94,18 +94,23 @@ class DatabaseService:
 
             # Create dictionary with products
             for product in products:
-                productsDict[product.id] = product
+                productsDict[product.productId] = AppResponse(
+                    productId=product.productId,
+                    productName=product.productName,
+                    productPicture=None, # TODO: Send an actual picture
+                    productAmount=product.productAmount
+                )
 
             return productsDict
 
         except Exception as e:
             session.rollback()
-            raise RuntimeError(f"An error occurred while getting products: {e}")
+            self.logger.error(f"Error while getting products: {e}")
+            raise HTTPException(status_code=500, detail="Error while getting products")
         
         finally:
             session.close()
         
-
     def addProducts(self, products: List[str]):
         try:
             session = DatabaseService.databaseProvider.getSession()

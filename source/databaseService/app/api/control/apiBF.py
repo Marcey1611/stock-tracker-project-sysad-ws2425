@@ -1,5 +1,7 @@
 import logging
 from fastapi import HTTPException
+from typing import Dict, Any
+
 
 from bm.databaseService import DatabaseService
 from entities.models import Request, Response, AppResponse
@@ -34,13 +36,14 @@ class ApiBF:
             self.logger.error(f"Error while reseting products amount: {e}")
             return Response(statusCode = 500)
 
-    def handleAppRequest(self) -> AppResponse:
+    def handleAppRequest(self) -> Dict[Any, dict]:
         try:
-            return AppResponse(ApiBF.databaseService.getProducts())
+            allProductsDict = ApiBF.databaseService.getProducts()
+            return {key: value.dict() for key, value in allProductsDict.items()}
         
         except Exception as e:
-            self.logger.error(f"Error while getting products: {e}")
-            return 500
+            self.logger.error(f"Error while handling app-request: {e}")
+            raise HTTPException(status_code=500, detail="Error while handling request")
 
     def handleCreateRequest(self, products: list):
         try:
