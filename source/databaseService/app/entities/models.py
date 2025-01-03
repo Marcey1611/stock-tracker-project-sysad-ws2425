@@ -8,7 +8,7 @@ class Response(BaseModel):
     statusCode: int
 
 class MailResponse(BaseModel):
-    productID: int
+    productId: int
     productName: str
     productPicture: str
     productAmountTotal: int

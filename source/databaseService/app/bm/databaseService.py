@@ -1,4 +1,5 @@
 import logging
+from typing import List
 from fastapi import HTTPException
 
 from database.databaseProvider import DatabaseProvider
@@ -12,27 +13,27 @@ class DatabaseService:
         self.databaseProvider.initDb()
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def updateProductsAmount(self, add: bool ,ids: list[int]) -> dict:
+    def updateProductsAmount(self, add: bool ,requestIds: List[int]) -> dict:
         try:
             session = DatabaseService.databaseProvider.getSession()
             updatedProductsDict = {}
 
             # Check if product id exists and update amount
-            for id in ids:
+            for id in requestIds:
                 product = session.query(Products).filter_by(productId=id).first()
 
                 # Raise HTTP-Exception if product doesn't exist
                 if not product:
                     raise HTTPException(
                         status_code=404,
-                        detail=ids
-                        )
+                        detail=id
+                    )
  
                 # Update product amount
                 product.productAmount += 1 if add else -1 
 
                 # Update or append dictionary
-                if product.id in updatedProductsDict:
+                if product.productId in updatedProductsDict:
                     updatedProductsDict[product.productId].productAmountTotal = product.productAmount
                     updatedProductsDict[product.productId].productAmountAdded += 1 if add else -1
                 else:
@@ -105,7 +106,7 @@ class DatabaseService:
             session.close()
         
 
-    def addProducts(self, products: list[str]):
+    def addProducts(self, products: List[str]):
         try:
             session = DatabaseService.databaseProvider.getSession()
 
