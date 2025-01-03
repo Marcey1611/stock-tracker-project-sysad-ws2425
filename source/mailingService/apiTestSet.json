@@ -1,0 +1,23 @@
+[
+    {
+        "productId": 1,
+        "productName": "Product 1",
+        "productPicture": "Product 1 picture",
+        "productAmountAdded": 3,
+        "productAmountTotal": 2
+    },
+    {
+        "productId": 2,
+        "productName": "Product 2",
+        "productPicture": "Product 2 picture",
+        "productAmountAdded": 3,
+        "productAmountTotal": 2
+    },
+    {
+        "productId": 3,
+        "productName": "productName",
+        "productPicture": "productPicture",
+        "productAmountAdded": 3,
+        "productAmountTotal": 2
+    }
+]

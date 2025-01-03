@@ -1,5 +1,6 @@
 fastapi
-uvicorn           # ASGI-Server für FastAPI
+uvicorn
 pydantic
 requests
 jinja2
+python-dotenv

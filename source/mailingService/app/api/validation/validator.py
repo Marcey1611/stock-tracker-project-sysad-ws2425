@@ -2,39 +2,54 @@ from typing import Dict, Any
 import logging
 
 from entity.exceptions import BadRequestException
+from entity.enums import Action
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 class Validator:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
-    
-    def validateData(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        try:
-            productIdMissing = "productId" not in data
-            productNameMissing = "productName" not in data
-            productPictureMissing = "productPicture" not in data
-            productIdInvalidType = not isinstance(data["productId"], int)
-            productNameInvalidType = not isinstance(data["productName"], str)
-            productPictureInvalidType = not isinstance(data["productPicture"], str)
-            productNameEmpty = len(data["productName"]) == 0
 
-            if productIdMissing or productNameMissing or productPictureMissing or productIdInvalidType or productNameInvalidType or productPictureInvalidType or productNameEmpty:
-                self.logger.error(f"Invalid data: {data}")
+    def validateData(self, productList) -> Dict[str, Any]:
+        self.logger.debug("test")
+        try:
+            if len(productList) < 1:
+                self.logger.error("No products provided!")
                 raise BadRequestException()
-            
-            return data
-        except Exception as exception:
-            self.logger.error(f"Invalid data: {data}")
+            for product in productList:
+                isDataValid = []
+
+                isDataValid.append("productId" in product)
+                isDataValid.append("productName" in product)
+                isDataValid.append("productAmountTotal"  in product)
+                isDataValid.append("productAmountAdded" in product)
+
+                isDataValid.append(isinstance(product["productId"], int))
+                isDataValid.append(isinstance(product["productName"], str))
+                isDataValid.append(isinstance(product["productAmountTotal"], int))
+                isDataValid.append(isinstance(product["productAmountAdded"], int))
+                isDataValid.append(len(product["productName"]) > 0)
+
+                if False in isDataValid:
+                    self.logger.error("Validation failed!")
+                    raise BadRequestException()
+            return productList
+        
+        except Exception:
+            self.logger.error(f"Invalid data: {productList}")
             raise BadRequestException()
 
-    def validateErrorMessage(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def validateErrorMessage(self, requestData: Dict[str, Any]) -> Dict[str, Any]:
         try:
-            errorMessageMissing = "errorMessage" not in data
-            errorMessageInvalidType = not isinstance(data["errorMessage"], str)
-            errorMessageEmpty = len(data["errorMessage"]) == 0
-            if errorMessageMissing or errorMessageInvalidType or errorMessageEmpty:
+            isDataValid = []
+            isDataValid.append("errorMessage" in requestData)
+            isDataValid.append(isinstance(requestData["errorMessage"], str))
+            isDataValid.append(len(requestData["errorMessage"]) > 0)
+            if False in isDataValid:
+                    self.logger.error("Validation failed!")
                     raise BadRequestException()
-        except Exception as exception:
-            self.logger.error(f"Invalid data: {data}")
+            return requestData
+        
+        except Exception:
+            self.logger.error(f"Invalid data: {requestData}")
             raise BadRequestException()
