@@ -3,8 +3,10 @@ import queue
 from threading import Event
 import cv2
 import api.apiRestClientDatabase as ApiRestClientDatabase
+from entities.detection.trackManager import TrackerManager
 
 from service.detection.frameProccess import processFrame
+from service.detection.humanCheck import isHumanInFrame
 
 logger = logging.getLogger('detectionThread')
 
@@ -19,23 +21,29 @@ def detectionThread(feedEvent:Event,feedQ:queue.Queue,trackEvent:Event,trackQ:qu
         return  # Beende den Thread, wenn die Kamera nicht geöffnet werden kann
     initCam(camera,source)
 
+    trackers = TrackerManager()
+
     while True:
         success, frame = camera.read()  # Frame von der Kamera lesen
         if not success:
             logger.error("Error could not access camera frame.")
             break
         else:
-            success, frame = camera.read()
-            if not success:
-                break
+            humanCheck, annotatedFrame = isHumanInFrame(frame)
+            if humanCheck:
+                if feedEvent.is_set():
+                    streamFeedFrames(frame, feedQ)
+                if trackEvent.is_set():
+                    if not streamTrackFrames(annotatedFrame, trackQ):
+                        break
+            else:
+                annotatedFrame = processFrame(frame,trackers)
 
-            annotatedFrame = processFrame(frame)
-
-            if feedEvent.is_set():
-                streamFeedFrames(frame, feedQ)
-            if trackEvent.is_set():
-                if not streamTrackFrames(annotatedFrame, trackQ):
-                    break
+                if feedEvent.is_set():
+                    streamFeedFrames(frame, feedQ)
+                if trackEvent.is_set():
+                    if not streamTrackFrames(annotatedFrame, trackQ):
+                        break
 
     camera.release()
     logger.info(f"Camera {source} closed.")

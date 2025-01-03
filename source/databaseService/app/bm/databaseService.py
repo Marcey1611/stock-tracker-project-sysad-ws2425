@@ -1,62 +1,56 @@
 import logging
 from fastapi import HTTPException
+
 from database.databaseProvider import DatabaseProvider
-from entities.httpStatusEnum import httpStatusCode
 from database.databaseTableModells import Products
-from entities.UpdatedProductResponse import UpdatedProductResponse
+from entities.models import MailResponse
 
 class DatabaseService:
+    databaseProvider = DatabaseProvider()
+
     def __init__(self):
-        self.databaseProvider = DatabaseProvider()
         self.databaseProvider.initDb()
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def updateProductsAmount(self, add: bool ,updatedProductIds: list[int]):
+    def updateProductsAmount(self, add: bool ,ids: list[int]) -> dict:
         try:
-            session = self.databaseProvider.getSession()
-            updatedProductsList = []
+            session = DatabaseService.databaseProvider.getSession()
+            updatedProductsDict = {}
 
             # Check if product id exists and update amount
-            for updatedProductId in updatedProductIds:
-                product = session.query(Products).filter_by(productId=updatedProductId).first()
+            for id in ids:
+                product = session.query(Products).filter_by(productId=id).first()
 
                 # Raise HTTP-Exception if product doesn't exist
                 if not product:
                     raise HTTPException(
-                        status_code=httpStatusCode.CONFLICT,
-                        detail=updatedProductIds
+                        status_code=404,
+                        detail=ids
                         )
  
                 # Update product amount
-                if add:
-                    product.productAmount += 1
-                else:
-                    product.productAmount -= 1
+                product.productAmount += 1 if add else -1 
 
-                # Append or update products to list 
-                for updatedProduct in updatedProductsList:
-                    if product.productId == updatedProduct.productId and add:
-                        updatedProduct.productAmountAdded += 1
-                    elif product.productId == updatedProduct.productId:
-                        updatedProduct.productAmountAdded -= 1
-                    else:
-                        updatedProductsList.append(UpdatedProductResponse(
-                            productId=product.productId, 
-                            productName=product.productName, 
-                            productPicture="", # TODO: Add product picture handling
-                            productAmountTotal=product.productAmount,
-                            productAmountAdded=1,
-                            errorMessage=None,
-                        ))
-                        updatedProductsList.append(product)
+                # Update or append dictionary
+                if product.productId in updatedProductsDict:
+                    updatedProductsDict[product.productId].productAmountTotal = product.productAmount
+                    updatedProductsDict[product.productId].productAmountAdded += 1 if add else -1
+                else:
+                    updatedProductsDict[product.productId] = MailResponse(
+                        productId=product.productId, 
+                        productName=product.productName, 
+                        productAmountTotal=product.productAmount,
+                        productAmountAdded=1
+                    )
 
             # Commit changes
             session.commit()
             
-            return updatedProductsList
+            return updatedProductsDict
         
         except HTTPException as http_exception:
             session.rollback()
+            self.logger.error(f"Error while searching for product: {http_exception}")
             raise http_exception
         
         except Exception as e:
@@ -68,7 +62,7 @@ class DatabaseService:
 
     def resetAmounts(self):
         try:
-            session = self.databaseProvider.getSession()
+            session = DatabaseService.databaseProvider.getSession()
 
             # Get all products
             products = session.query(Products).all()
@@ -79,8 +73,6 @@ class DatabaseService:
 
             # Commit changes 
             session.commit()
-
-            return httpStatusCode.OK
         
         except Exception as e:
             session.rollback()
@@ -91,7 +83,7 @@ class DatabaseService:
 
     def addProducts(self, products: list[str]):
         try:
-            session = self.databaseProvider.getSession()
+            session = DatabaseService.databaseProvider.getSession()
 
             # Create product classes in database
             for product in products:
@@ -103,11 +95,10 @@ class DatabaseService:
                 session.add(newProduct)
 
             session.commit()
-            return httpStatusCode.OK
         
         except Exception as e:
             session.rollback()
-            raise RuntimeError(f"An error occurred creating product classes: {e}")
+            raise RuntimeError(f"An error occurred while creating products: {e}")
         
         finally:
             session.close()

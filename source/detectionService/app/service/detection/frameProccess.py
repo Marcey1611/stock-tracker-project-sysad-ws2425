@@ -1,81 +1,117 @@
+import logging
+from collections import defaultdict
+from copy import deepcopy, copy
+
 from ultralytics import YOLO
-import time
 import api.apiRestClientDatabase as ApiRestClientDatabase
+from entities.detection.detectedObject import DetectedObject
+from entities.detection.trackManager import TrackerManager
 
-objectCountHistory = {}  # Historie der erkannten Objekte pro Klasse
-objectTimestamps = {}  # Zeitstempel für das erste Auftreten jeder Klasse
-removalTimestamps = {}  # Zeitstempel für das letzte Verschwinden jeder Klasse
-DELAY = 2  # Verzögerung in Sekunden, bevor ein Objekt als hinzugefügt/entfernt gilt
-
+TOLERANCE = 10
+ADD_REMOVE_THRESHOLD = .5 * 30
 
 model = YOLO("./service/detection/best.pt")
 
+logger = logging.getLogger(__name__)
 
-def processFrame(frame):
-    results = model.predict(frame, conf=0.55, imgsz=640, verbose=False)
+def processFrame(frame,trackers:TrackerManager):
+    results = model.track(frame, conf=0.55, imgsz=640, verbose=False)
     annotatedFrame = results[0].plot()
-    detected_objects = results[0].boxes.cls.int().cpu().tolist()
-    currentClasses = set(detected_objects)
 
-    addedClasses = []
-    removedClasses = []
+    currentTrackIds = set()
+    if results[0].boxes is not None and results[0].boxes.id is not None:
+        currentTrackIds = updateObjectTracking(results, trackers)
+    handleDisappearedObjects(currentTrackIds,trackers)
 
-    # Initialisiere die Historie beim ersten Aufruf
-    global objectCountHistory, objectTimestamps, removalTimestamps
-    current_time = time.time()
+    updateDatabase(trackers,len(results[0].names))
 
-    if not objectCountHistory:
-        objectCountHistory = {cls: True for cls in currentClasses}
-        objectTimestamps = {cls: current_time for cls in currentClasses}
-        addedClasses = list(currentClasses)
-        updateDatabase(addedClasses, removedClasses)
-        return annotatedFrame
+    trackers.previousDetectedObjects = trackers.detectedObjects.copy()
 
-    checkForAddObjects(currentClasses,current_time, addedClasses)
-
-    checkForDelObjects(currentClasses, current_time, removedClasses)
-
-    # Aktualisiere Zeitstempel für erkannte Objekte
-    for cls in list(objectTimestamps.keys()):
-        if cls not in currentClasses:
-            del objectTimestamps[cls]  # Entferne Zeitstempel, wenn die Klasse nicht mehr erkannt wird
-
-    for cls in list(removalTimestamps.keys()):
-        if cls in currentClasses:
-            del removalTimestamps[cls]  # Entferne den Entfernungstempel, wenn die Klasse wieder erkannt wird
-
-    updateDatabase(addedClasses, removedClasses)
     return annotatedFrame
-def checkForAddObjects(currentClasses,current_time,addedClasses):
-    # Überprüfe hinzugefügte Klassen
-    for cls in currentClasses:
-        if cls not in objectCountHistory:
-            if cls not in objectTimestamps:
-                objectTimestamps[cls] = current_time  # Speichere den Zeitstempel
-            elif current_time - objectTimestamps[cls] >= DELAY:
-                addedClasses.append(cls)
-                objectCountHistory[cls] = True
-                del objectTimestamps[cls]  # Entferne den Zeitstempel, da die Klasse nun hinzugefügt wurde
 
-def checkForDelObjects(currentClasses,current_time,removedClasses):
-    for cls in list(objectCountHistory.keys()):
-        if cls not in currentClasses:
-            if cls not in removalTimestamps:
-                removalTimestamps[cls] = current_time  # Speichere den Zeitstempel
-            elif current_time - removalTimestamps[cls] >= DELAY:
-                removedClasses.append(cls)
-                del objectCountHistory[cls]
-                del removalTimestamps[cls]  # Entferne den Zeitstempel, da die Klasse nun entfernt wurde
+def updateObjectTracking(results, trackers:TrackerManager):
+    boxes = results[0].boxes.xywh.cpu()
+    trackIds = results[0].boxes.id.int().cpu().tolist()
+    clsIds = results[0].boxes.cls.int().cpu().tolist()
 
-def updateDatabase(addedObjects, removedObjects):
-    if len(addedObjects):
-        addArray=[]
-        for addedObject in addedObjects:
-            addArray.append(addedObjects)
-        ApiRestClientDatabase.addItemToDatabase(addArray)
+    currentTrackIds = set()
+    for box, trackId, clsId in zip(boxes, trackIds, clsIds):
+        x, y, w, h = map(float, box)
+        currentTrackIds.add(trackId)
 
-    if len(removedObjects)>0:
-        removeArray = []
-        for removedObject in removedObjects:
-            removeArray.append(removedObject)
-        ApiRestClientDatabase.deleteItemFromDatabase(removeArray)
+        # Aktualisiere Klassenhistorie
+        trackers.clsIdHistory[trackId][clsId] += 1
+
+        # Berechne Entfernung und aktualisiere Verweilzeit
+        if trackers.trackHistory[trackId]:
+            lastX, lastY = trackers.trackHistory[trackId][-1]
+            distance = ((x - lastX) ** 2 + (y - lastY) ** 2) ** 0.5
+        else:
+            distance = float('inf')
+
+        if distance <= TOLERANCE:
+            trackers.stayTime[trackId] += 1
+        else:
+            trackers.stayTime[trackId] = 0
+
+        # Objekt hinzufügen, wenn es stabil bleibt
+        if trackers.stayTime[trackId] >= ADD_REMOVE_THRESHOLD:
+            position= (x,y,w,h)
+            trackers.detectedObjects[trackId]=DetectedObject(trackId,clsId,position)
+            trackers.disappearanceTime[trackId] = 0
+
+        # Speichere Positionshistorie
+        trackers.trackHistory[trackId].append((x, y))
+        if len(trackers.trackHistory[trackId]) > 30:
+            trackers.trackHistory[trackId].pop(0)
+    return currentTrackIds
+
+
+def handleDisappearedObjects(currentTrackIds, trackers: TrackerManager):
+    toRemove = []
+
+    for _, detectOb in trackers.detectedObjects.items():
+        trackId = detectOb.getTrackId()
+        if trackId not in currentTrackIds:
+            trackers.disappearanceTime[trackId] += 1
+            if trackers.disappearanceTime[trackId] >= ADD_REMOVE_THRESHOLD:
+                toRemove.append(trackId)
+        else:
+            trackers.disappearanceTime[trackId] = 0
+
+    for trackId in toRemove:
+        del trackers.detectedObjects[trackId]
+
+
+def updateDatabase(trackers:TrackerManager,amountOfCls):
+    detectedObjects = trackers.detectedObjects.copy()
+    previousDetectedObjects = trackers.previousDetectedObjects.copy()
+    nowDetectedDict = defaultdict(int)
+    prevDetectedDict= defaultdict(int)
+
+    for _,nowDetectedOb in detectedObjects.items():
+        if nowDetectedOb.getClsId() is not None:
+            nowDetectedDict[nowDetectedOb.getClsId()] +=1
+    for _,prevDetectedOb in previousDetectedObjects.items():
+        if prevDetectedOb.getClsId() is not None:
+            prevDetectedDict[prevDetectedOb.getClsId()] +=1
+
+    if not nowDetectedDict == prevDetectedDict:
+        addDiff = []
+        delDiff = []
+
+        for index in range(amountOfCls-1):
+            if nowDetectedDict[index] is not None and prevDetectedDict[index] is not None:
+                if nowDetectedDict[index] > prevDetectedDict[index]:
+                    addDiff.extend([index] * (nowDetectedDict[index] - prevDetectedDict[index]))
+                if prevDetectedDict[index] > nowDetectedDict[index]:
+                    delDiff.extend([index] * (prevDetectedDict[index] - nowDetectedDict[index]))
+            if nowDetectedDict[index] is None and prevDetectedDict[index] is not None:
+                delDiff.extend([index] * (prevDetectedDict[index] - nowDetectedDict[index]))
+            if nowDetectedDict[index] is not None and prevDetectedDict[index] is None:
+                addDiff.extend([index] * (nowDetectedDict[index] - prevDetectedDict[index]))
+
+        if len(addDiff)>0:
+            ApiRestClientDatabase.addItemToDatabase(addDiff)
+        if len(delDiff)>0:
+            ApiRestClientDatabase.deleteItemFromDatabase(delDiff)
