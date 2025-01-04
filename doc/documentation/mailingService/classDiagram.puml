@@ -14,6 +14,7 @@ package api {
 
         +class ExceptionHandler {
             +logger : Logger
+
             +registerExceptionHandler(FastAPI : app) : JSONResponse
             +response(detail : str, statusCode : int) : JSONResponse            
         }
@@ -21,7 +22,7 @@ package api {
 
     package control {
         +class ApiBF {
-            +__init__(self : ApiBF) : None
+            +__init__() : None
             +prepareMailingData(self : ApiBF, validData : Request, action : Action): None
             +prepareMailingDataError(self : ApiBF, validData : Request) : None
         }
@@ -29,7 +30,7 @@ package api {
 
     package validation {
         +class Validator {
-            +__init__(self : Validator) : None
+            +__init__() : None
             +validateData(self : Validator, productList : list<Dict<str, int | str>>) : list<Dict<str, int | str>>
             +validateErrorMessage(self : Validator, requestData : list<Dict<str, int | str>>) : list<Dict<str, int | str>> 
         }
@@ -37,8 +38,8 @@ package api {
 }
 
 package bm {
-    class MailSendingServiceBA {
-        +__init__(self : MailSendingServiceBA) : None
+    +class MailSendingServiceBA {
+        +__init__() : None
         +sendMail(self : MailSendingService, mailData : object | list<object>, action : Action) : None
         +setMailData(self : MailSendingService, mailDataList : list<MailData>, action : Action) : str, object 
         +setErrorMailData(self : MailSendingService, errorMessage : str) : str, object 
@@ -48,8 +49,14 @@ package bm {
 }
 
 package entity {
-    class MailData {
-        +__init__(self : MailData, productId : int, productName : str, productAmountChanged : int, productAmountTotal : int, action : Action) : None
+    +class MailData {
+        +productId : int
+        +productName : str
+        +productAmountChanged : int
+        +productAmountTotal : int
+        +action : Action
+
+        +__init__(productId : int, productName : str, productAmountChanged : int, productAmountTotal : int, action : Action) : None
         +getProductId(self : MailData) : int
         +getProductName(self : MailData) : str
         +getProductAmountChanged(self : MailData) : int
@@ -57,23 +64,29 @@ package entity {
         +getAction(self : MailData) : Action
     }
 
-    enum Action {
+    +enum Action {
         ADDED
         DELETED
         ERROR
     }
 
-    class InternalErrorException {
-        +__init__(self : InternalErrorException, detail : str = "Internal Server Error", status_code : int = 500) : None
+    +class InternalErrorException {
+        +detail : str
+        +status_code : int
+        
+        +__init__(detail : str = "Internal Server Error", status_code : int = 500) : None
     }
 
-    class BadRequestException {
-        +__init__(self : BadRequestException, detail : str = "Bad Request", status_code : int = 400) : None
+    +class BadRequestException {
+        +detail : str
+        +status_code : int
+
+        +__init__(detail : str = "Bad Request", status_code : int = 400) : None
 
     }
 }
 
-class Main {
++class Main {
     +app : FastAPI
 }
 
