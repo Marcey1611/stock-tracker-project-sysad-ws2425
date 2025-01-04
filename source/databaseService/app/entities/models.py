@@ -12,3 +12,10 @@ class MailResponse(BaseModel):
     productName: str
     productAmountTotal: int
     productAmountAdded: int
+    errorMessage: str | None = None
+
+class AppResponse(BaseModel):
+    productId: int
+    productName: str
+    productPicture: str | None = None
+    productAmount: int
