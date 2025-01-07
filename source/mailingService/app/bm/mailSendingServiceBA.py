@@ -7,12 +7,12 @@ from string import Template
 from jinja2 import Template
 
 from entity.models.MailData import MailData
-from entity.exceptions import InternalErrorException
-from entity.enums import Action
+from entity.exceptions.InternalErrorException import InternalErrorException
+from entity.enums.Action import Action
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
-class MailSendingService:
+class MailSendingServiceBA:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.smtpServer = "smtp.gmail.com"
