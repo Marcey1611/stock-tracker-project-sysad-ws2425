@@ -8,6 +8,7 @@ from jinja2 import Template
 from entity.models.mail_data import MailData
 from entity.exceptions.internal_error_exception import InternalErrorException
 from entity.enums.action import Action
+from bm.mail_sending_service_ba import MailSendingServiceBa
 
 class MailPreparingServiceBa:
     def __init__(self):
@@ -15,7 +16,7 @@ class MailPreparingServiceBa:
         self.sender_email = "sysad.stock.tracker@gmail.com"
         self.receiver_email = "sysad.project.ws2425@gmail.com"
 
-    def prepare_mail(self, mail_data_list: list[MailData], action: Action) -> MIMEMultipart:
+    def prepare_mail(self, mail_data_list: list[MailData], action: Action):
         self.logger.info("Preparing email...")
         try:
             if action == Action.ADDED or Action.DELETED:
@@ -24,7 +25,8 @@ class MailPreparingServiceBa:
                 subject, body = self.set_error_mail_data(mail_data_list)
             else:
                 raise InternalErrorException()
-            return self.config_message(subject, body)
+            mail_sending_service_ba = MailSendingServiceBa()
+            mail_sending_service_ba.send_mail(self.config_message(subject, body))
         
         except Exception as exception:
             self.logger.error(f"Exception: {exception}")

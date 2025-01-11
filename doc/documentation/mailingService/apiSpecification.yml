@@ -101,7 +101,7 @@ components:
       required:
         - product_id
         - product_name
-        - product_amount_added
+        - product_amount_changed
         - product_amount_total
       properties:
         product_id:
@@ -110,7 +110,7 @@ components:
         product_name:
           type: string
           example: "Müsli"
-        product_amount_added:
+        product_amount_changed:
           type: integer
           example: 2
         product_amount_total:
@@ -124,16 +124,16 @@ components:
       example:
         - product_id: 1
           product_name: "Müsli"
-          product_amount_added: 2
+          product_amount_changed: 2
           product_amount_total: 5
         - product_id: 2
           product_name: "Wasser"
-          product_amount_added: 2
+          product_amount_changed: 2
           product_amount_total: 5
     error_mail_data:
       type: object
       required:
-        - errorMessage
+        - error_message
       properties:
         error_message:
           type: string

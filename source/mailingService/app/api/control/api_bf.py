@@ -2,7 +2,7 @@ from fastapi.responses import JSONResponse
 import logging
 from fastapi import Request
 
-from bm.mail_sending_service_ba import MailSendingServiceBa
+from bm.mail_preparing_service_ba import MailPreparingServiceBa
 from entity.models.mail_data import MailData
 from entity.exceptions.internal_error_exception import InternalErrorException
 from entity.enums.action import Action
@@ -23,8 +23,8 @@ class ApiBf:
                     action
                 )
                 mail_data_list.append(mail_data)
-            mail_sending_service = MailSendingServiceBa()
-            mail_sending_service.send_mail(mail_data_list, action)
+            mail_preparing_service = MailPreparingServiceBa()
+            mail_preparing_service.prepare_mail(mail_data_list, action)
             return JSONResponse(content={"message": "Successfully sent mail"}, status_code=200)
         
         except Exception as exception:

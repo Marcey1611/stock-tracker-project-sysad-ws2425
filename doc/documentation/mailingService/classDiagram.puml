@@ -4,11 +4,10 @@ package api {
     package boundary {
         +class Api {
             +api_bf : ApiBf
-            +router : apiRouter
+            +api_router : apiRouter
             +validator : validator
 
-            +send_mail_added(request : Request) : JSONResponse
-            +send_mail_deleted(request : Request) : JSONResponse
+            +send_update_mail(request : Request) : JSONResponse
             +send_error_mail(request : Request) : JSONResponse
         }
 
@@ -22,6 +21,8 @@ package api {
 
     package control {
         +class ApiBf {
+            - logger: Logger
+
             +__init__() : None
             +prepare_mailing_data(valid_data : Request, action : Action) : None
             +prepare_mailing_data_error(valid_data : Request) : None
@@ -30,38 +31,47 @@ package api {
 
     package validation {
         +class Validator {
-            +__init__() : None
-            +validate_data(product_list : list<dict<str, int | str>>) : list<dict<str, int | str>>
-            +validate_error_message(request_data : list<dict<str, int | str>>) : list<dict<str, int | str>>
+            - logger: Logger
+
+            + __init__() : None
+            + validate_data(product_list : list<dict<str, int | str>>) : list<dict<str, int | str>>
+            + validate_error_message(request_data : list<dict<str, int | str>>) : list<dict<str, int | str>>
         }
     }
 }
 
 package bm {
+    +class MailPreparingServiceBa {
+        - logger : Logger
+        - sender_email : str
+        - receiver_email : str
+
+        + __init__() : None
+        + prepare_mail(mail_data_list : list<MailData>, action : Action) : None
+        + set_mail_data(mail_data_list : list<MailData>, action : Action) : str, str
+        + set_error_mail_data(error_message : str) : str, str
+        + config_message(subject : str, body : str) : MIMEMultipart
+    }
     +class MailSendingServiceBa {
-        +__init__() : None
-        +send_mail(mail_data : object | list<object>, action : Action) : None
-        +set_mail_data(mail_data_list : list<MailData>, action : Action) : str, object
-        +set_error_mail_data(error_message : str) : str, object
-        +config_message(subject : str, body : str) : MIMEMultipart
-        +sending_email(message : MIMEMultipart) : None
+        - logger : Logger
+        - smtp_server : str
+        - smtp_port : int
+        - sender_email : str
+        - receiver_email : str
+        - password : str
+
+        + __init__() : None
+        + send_mail(message : MIMEMultipart) : None
     }
 }
 
 package entity {
     +class MailData {
-        +product_id : int
-        +product_name : str
-        +product_amount_changed : int
-        +product_amount_total : int
-        +action : Action
-
-        +__init__(product_id : int, product_name : str, product_amount_changed : int, product_amount_total : int, action : action) : None
-        +get_product_id() : int
-        +get_product_name() : str
-        +get_product_amount_changed() : int
-        +get_product_amount_total() : int
-        +get_action() : Action
+        + product_id : int
+        + product_name : str
+        + product_amount_changed : int
+        + product_amount_total : int
+        + action : Action
     }
 
     +enum Action {
@@ -71,16 +81,10 @@ package entity {
     }
 
     +class InternalErrorException {
-        +detail : str
-        +status_code : int
-
-        +__init__(detail : str = "Internal Server Error", status_code : int = 500) : None
+        + __init__(detail : str = "Internal Server Error", status_code : int = 500) : None
     }
 
     +class BadRequestException {
-        +detail : str
-        +status_code : int
-
         +__init__(detail : str = "Bad Request", status_code : int = 400) : None
     }
 }
@@ -97,11 +101,16 @@ Api ..> ApiBf
 Api ..> Action
 
 ApiBf ..> MailData
-ApiBf ..> MailSendingServiceBa
+ApiBf ..> MailPreparingServiceBa
 ApiBf ..> InternalErrorException
 ApiBf ..> Action
 
 Validator ..> BadRequestException
+
+MailPreparingServiceBa ..> MailSendingServiceBa
+MailPreparingServiceBa ..> Action
+MailPreparingServiceBa ..> InternalErrorException
+MailPreparingServiceBa ..> MailData
 
 MailSendingServiceBa ..> Action
 MailSendingServiceBa ..> InternalErrorException
