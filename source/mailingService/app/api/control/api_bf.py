@@ -16,10 +16,10 @@ class ApiBf:
             mail_data_list = []
             for product in valid_data:
                 mail_data = MailData(
-                    product["productId"], 
-                    product["productName"], 
-                    product["productAmountAdded"], 
-                    product["productAmountTotal"], 
+                    product["product_id"], 
+                    product["product_name"], 
+                    product["product_amount_changed"], 
+                    product["product_amount_total"], 
                     action
                 )
                 mail_data_list.append(mail_data)
@@ -33,7 +33,7 @@ class ApiBf:
         
     async def prepare_mailing_data_error(self, valid_data: Request):
         try:
-            error_message = valid_data["errorMessage"]
+            error_message = valid_data["error_message"]
             mail_sending_service = MailSendingServiceBa()
             mail_sending_service.send_mail(error_message, Action.ERROR)
             return JSONResponse(content={"message": "Successfully sent error mail"}, status_code=200)

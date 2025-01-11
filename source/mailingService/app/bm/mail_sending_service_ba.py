@@ -8,6 +8,7 @@ from jinja2 import Template
 from entity.models.mail_data import MailData
 from entity.exceptions.internal_error_exception import InternalErrorException
 from entity.enums.action import Action
+from bm.mail_preparing_service_ba import MailPreparingServiceBa
 
 class MailSendingServiceBa:
     def __init__(self):
@@ -15,108 +16,27 @@ class MailSendingServiceBa:
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port = 587
         self.sender_email = "sysad.stock.tracker@gmail.com"
-        self.receiver_email = "sysad.stock.tracker@gmail.com"
+        self.receiver_email = "sysad.project.ws2425@gmail.com"
         self.password = "tihs holh clyi dlai"
 
-    def send_mail(self, mail_data, action: Action):
+    def send_mail(self, mail_data_list: list[MailData], action: Action):
         try:
-            if action == Action.ADDED or action == Action.DELETED:
-                subject, body = self.set_mail_data(mail_data, action)
-            elif action == Action.ERROR:
-                subject, body = self.set_error_mail_data(mail_data)
-            else:
-                raise InternalErrorException()
-            message = self.config_message(subject, body)
+            mail_preparing_service_ba = MailPreparingServiceBa()
+            message = mail_preparing_service_ba.prepare_mail(mail_data_list, action)
             self.send_email(message)
         except Exception as exception:
             self.logger.error(f"Exception: {exception}")
             raise InternalErrorException()
-        
-    def set_mail_data(self, mail_data_list: list[MailData], action: Action):
-        try:
-            product_amount_changed = "productAmountAdded" if action == Action.ADDED else "productAmountDeleted"
-            with open("email_template.html", "r") as email_template:
-                template_content = email_template.read()
-                template = Template(template_content)
-            
-            products = [
-                {
-                    "productId": mail_data.get_product_id(),
-                    "productName": mail_data.get_product_name(),
-                    product_amount_changed: mail_data.get_product_amount_changed(),
-                    "productAmountTotal": mail_data.get_product_amount_total(),
-                }
-                for mail_data in mail_data_list
-            ]
-
-            if action == Action.ADDED:
-                body = template.render(
-                    title="Products Successfully Added",
-                    message="The following products were detected and added:",
-                    products=products,
-                )
-                subject = "Products Successfully Added" 
-
-            elif action == Action.DELETED:
-                body = template.render(
-                    title="Products Successfully Deleted",
-                    message="The following products were detected and deleted:",
-                    products=products,
-                )
-                subject = "Products Successfully Deleted" 
-
-            else:
-                self.logger.error("Unexpected action!")
-                raise InternalErrorException()
-            return subject, body
-        
-        except Exception as e:
-            self.logger.error(f"Error setting mail data: {str(e)}")
-            raise InternalErrorException()
-        
-    def set_error_mail_data(self, error_message: str):
-        try:
-            with open("error_email_template.html", "r") as email_template:
-                template_content = email_template.read()
-                template = Template(template_content)
-
-                body = template.render(
-                    title="Error occurred during Detection",
-                    message=error_message,
-                )
-                subject = "Error occurred during Detection"
-            return subject, body
-        
-        except Exception as exception:
-            self.logger.error(f"Error setting mail data: {str(exception)}")
-            raise InternalErrorException()
-        
-    def config_message(self, subject: str, body: str):
-        try:
-            message = MIMEMultipart()
-            message["From"] = self.sender_email
-            message["To"] = self.receiver_email
-            message["Subject"] = subject
-            message.attach(MIMEText(body, "html"))
-
-            with open("logo.png", "rb") as logo:
-                logo_part = MIMEImage(logo.read(), name="logo.png")
-            logo_part.add_header("Content-ID", "<logo>")
-            logo_part.add_header("Content-Disposition", "inline", filename="logo.png")
-            message.attach(logo_part)
-            return message
-        
-        except Exception as exception:
-            self.logger.error(f"Error setting message: {str(exception)}")
-            raise InternalErrorException()
 
     def send_email(self, message: MIMEMultipart):
+        self.logger.info("Sending email...")
         try:
             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
                 server.starttls()
                 server.login(self.sender_email, self.password)
                 server.send_message(message)   
-
+        
         except Exception as exception:
             self.logger.error(f"Error sending mail: {str(exception)}")
             raise InternalErrorException()
+        self.logger.info("Successfully sent email!")

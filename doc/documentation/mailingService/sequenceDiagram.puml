@@ -1,7 +1,7 @@
 @startuml
 
 actor "DatabaseService" as Database
-participant "API" as API
+participant "Api" as API
 participant "ApiBF" as ApiBF
 participant "MailSendingServiceBA" as MailService
 participant "Gmail" as Gmail

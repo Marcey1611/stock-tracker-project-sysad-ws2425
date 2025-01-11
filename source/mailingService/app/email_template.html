@@ -93,11 +93,7 @@
                 <tr>
                     <td>{{ product.product_id }}</td>
                     <td>{{ product.product_name }}</td>
-                    {% if product.product_amount_added %}
-                    <td>{{ product.product_amount_added }}</td>
-                    {% else %}
-                    <td>{{ product.product_amount_deleted }}</td>
-                    {% endif %}
+                    <td>{{ product.product_amount_changed }}</td>
                     <td>{{ product.product_amount_total }}</td>
                 </tr>
                 {% endfor %}
