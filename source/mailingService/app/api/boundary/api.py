@@ -2,31 +2,28 @@ import logging
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
-from api.control.apiBF import ApiBF
+from api.control.api_bf import ApiBf
 from api.validation.validator import Validator
-from entity.enums.Action import Action
+from entity.enums.action import Action
 
-router = APIRouter()
-apiBF = ApiBF()
+api_router = APIRouter()
+api_bf = ApiBf()
 validator = Validator()
 
-@router.post("/sendMailAdded")
-async def sendMailAdded(request: Request):
-    requestData = await request.json()
-    validData = validator.validateData(requestData)
-    return await apiBF.prepareMailingData(validData, Action.ADDED)
+@api_router.post("/send_mail_added")
+async def send_mail_added(request: Request):
+    request_data = await request.json()
+    valid_data = validator.validate_data(request_data)
+    return await api_bf.prepare_mailing_data(valid_data, Action.ADDED)
 
-@router.post("/sendMailDeleted")
-async def sendMailDeleted(request: Request):
-    requestData = await request.json()
-    validData = validator.validateData(requestData)
-    return await apiBF.prepareMailingData(validData, Action.DELETED)
+@api_router.post("/send_mail_deleted")
+async def send_mail_deleted(request: Request):
+    request_data = await request.json()
+    valid_data = validator.validate_data(request_data)
+    return await api_bf.prepare_mailing_data(valid_data, Action.DELETED)
 
-@router.post("/sendErrorMail")
-async def sendErrorMail(request: Request):
-    requestData = await request.json()
-    validData = validator.validateErrorMessage(requestData)
-    return await apiBF.prepareMailingDataError(validData)
-
-
-   
+@api_router.post("/send_error_mail")
+async def send_error_mail(request: Request):
+    request_data = await request.json()
+    valid_data = validator.validate_error_message(request_data)
+    return await api_bf.prepare_mailing_data_error(valid_data)

@@ -2,66 +2,66 @@
 
 package api {
     package boundary {
-        +class API {
-            +apiBf : ApiBF 
-            +router : ApiRouter 
-            +validator : Validator 
+        +class Api {
+            +api_bf : ApiBf
+            +router : apiRouter
+            +validator : validator
 
-            +sendMailAdded(request : Request) : JSONResponse
-            +sendMailDeleted(request : Request) : JSONResponse
-            +sendErrorMail(request : Request) : JSONResponse
+            +send_mail_added(request : Request) : JSONResponse
+            +send_mail_deleted(request : Request) : JSONResponse
+            +send_error_mail(request : Request) : JSONResponse
         }
 
         +class ExceptionHandler {
-            +logger : Logger
+            +logger : logger
 
-            +registerExceptionHandler(FastAPI : app) : JSONResponse
-            +response(detail : str, statusCode : int) : JSONResponse            
+            +register_exception_handler(fast_api : app) : JSONResponse
+            +response(detail : str, status_code : int) : JSONResponse
         }
     }
 
     package control {
-        +class ApiBF {
+        +class ApiBf {
             +__init__() : None
-            +prepareMailingData(self : ApiBF, validData : Request, action : Action): None
-            +prepareMailingDataError(self : ApiBF, validData : Request) : None
+            +prepare_mailing_data(valid_data : Request, action : Action) : None
+            +prepare_mailing_data_error(valid_data : Request) : None
         }
     }
 
     package validation {
         +class Validator {
             +__init__() : None
-            +validateData(self : Validator, productList : list<Dict<str, int | str>>) : list<Dict<str, int | str>>
-            +validateErrorMessage(self : Validator, requestData : list<Dict<str, int | str>>) : list<Dict<str, int | str>> 
+            +validate_data(product_list : list<dict<str, int | str>>) : list<dict<str, int | str>>
+            +validate_error_message(request_data : list<dict<str, int | str>>) : list<dict<str, int | str>>
         }
     }
 }
 
 package bm {
-    +class MailSendingServiceBA {
+    +class MailSendingServiceBa {
         +__init__() : None
-        +sendMail(self : MailSendingService, mailData : object | list<object>, action : Action) : None
-        +setMailData(self : MailSendingService, mailDataList : list<MailData>, action : Action) : str, object 
-        +setErrorMailData(self : MailSendingService, errorMessage : str) : str, object 
-        +configMessage(self : MailSendingService, subject : str, body : str) : MIMEMultipart
-        +sendingEMail(self : MailSendingService, message : MIMEMultipart) : None
+        +send_mail(mail_data : object | list<object>, action : Action) : None
+        +set_mail_data(mail_data_list : list<MailData>, action : Action) : str, object
+        +set_error_mail_data(error_message : str) : str, object
+        +config_message(subject : str, body : str) : MIMEMultipart
+        +sending_email(message : MIMEMultipart) : None
     }
 }
 
 package entity {
     +class MailData {
-        +productId : int
-        +productName : str
-        +productAmountChanged : int
-        +productAmountTotal : int
+        +product_id : int
+        +product_name : str
+        +product_amount_changed : int
+        +product_amount_total : int
         +action : Action
 
-        +__init__(productId : int, productName : str, productAmountChanged : int, productAmountTotal : int, action : Action) : None
-        +getProductId(self : MailData) : int
-        +getProductName(self : MailData) : str
-        +getProductAmountChanged(self : MailData) : int
-        +getProductAmountTotal(self : MailData) : int
-        +getAction(self : MailData) : Action
+        +__init__(product_id : int, product_name : str, product_amount_changed : int, product_amount_total : int, action : action) : None
+        +get_product_id() : int
+        +get_product_name() : str
+        +get_product_amount_changed() : int
+        +get_product_amount_total() : int
+        +get_action() : Action
     }
 
     +enum Action {
@@ -73,7 +73,7 @@ package entity {
     +class InternalErrorException {
         +detail : str
         +status_code : int
-        
+
         +__init__(detail : str = "Internal Server Error", status_code : int = 500) : None
     }
 
@@ -82,30 +82,29 @@ package entity {
         +status_code : int
 
         +__init__(detail : str = "Bad Request", status_code : int = 400) : None
-
     }
 }
 
 +class Main {
-    +app : FastAPI
+    +app : fast_api
 }
 
 Main ..> ExceptionHandler
-Main ..> API
+Main ..> Api
 
-API ..> Validator
-API ..> ApiBF
-API ..> Action
+Api ..> Validator
+Api ..> ApiBf
+Api ..> Action
 
-ApiBF ..> MailData
-ApiBF ..> MailSendingServiceBA
-ApiBF ..> InternalErrorException
-ApiBF ..> Action
+ApiBf ..> MailData
+ApiBf ..> MailSendingServiceBa
+ApiBf ..> InternalErrorException
+ApiBf ..> Action
 
 Validator ..> BadRequestException
 
-MailSendingServiceBA ..> Action
-MailSendingServiceBA ..> InternalErrorException
-MailSendingServiceBA ..> MailData
+MailSendingServiceBa ..> Action
+MailSendingServiceBa ..> InternalErrorException
+MailSendingServiceBa ..> MailData
 
 @enduml
