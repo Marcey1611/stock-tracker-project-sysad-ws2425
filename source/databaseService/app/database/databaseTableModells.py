@@ -13,6 +13,6 @@ class Products(DatabaseProvider.Base):
 class Products(DatabaseProvider.Base):
     __tablename__ = 'products'
 
-    productId = Column(Integer, primary_key=True, autoincrement=True)
-    productName = Column(String(255), nullable=False)
-    productAmount = Column(Integer, nullable=False)
+    productId = Column("product_id", Integer, primary_key=True, autoincrement=True)
+    productName = Column("product_name", String(255), nullable=False)
+    productAmount = Column("product_amount", Integer, nullable=False)
