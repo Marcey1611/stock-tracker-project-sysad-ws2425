@@ -34,8 +34,8 @@ class ApiBf:
     async def prepare_mailing_data_error(self, valid_data: Request):
         try:
             error_message = valid_data["error_message"]
-            mail_sending_service = MailSendingServiceBa()
-            mail_sending_service.send_mail(error_message, Action.ERROR)
+            mail_preparing_service = MailPreparingServiceBa()
+            mail_preparing_service.prepare_mail(error_message, Action.ERROR)
             return JSONResponse(content={"message": "Successfully sent error mail"}, status_code=200)
         
         except Exception as exception:

@@ -16,13 +16,13 @@ class MailPreparingServiceBa:
         self.sender_email = "sysad.stock.tracker@gmail.com"
         self.receiver_email = "sysad.project.ws2425@gmail.com"
 
-    def prepare_mail(self, mail_data_list: list[MailData], action: Action):
-        self.logger.info("Preparing email...")
+    def prepare_mail(self, mail_data, action: Action):
+        self.logger.info(f"Preparing email...")
         try:
-            if action == Action.ADDED or Action.DELETED:
-                subject, body = self.set_mail_data(mail_data_list, action)
+            if action == Action.ADDED or action == Action.DELETED:
+                subject, body = self.set_mail_data(mail_data, action)
             elif action == Action.ERROR:
-                subject, body = self.set_error_mail_data(mail_data_list)
+                subject, body = self.set_error_mail_data(mail_data)
             else:
                 raise InternalErrorException()
             mail_sending_service_ba = MailSendingServiceBa()
