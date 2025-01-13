@@ -1,16 +1,17 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
-from entity.exceptions import BadRequestException, InternalErrorException
+from entity.exceptions.BadRequestException import BadRequestException
+from entity.exceptions.InternalErrorException import InternalErrorException
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
-def register_exception_handlers(app: FastAPI):
+def registerExceptionHandlers(app: FastAPI):
 
-    @app.exception_handler(Exception)
+    @app.exceptionHandler(Exception)
     async def mailSendingExceptionHandler():
         return response("Internal Server Error", 500)
 

@@ -1,16 +1,14 @@
 import logging
-
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
 from api.control.apiBF import ApiBF
 from api.validation.validator import Validator
-from entity.enums import Action
+from entity.enums.Action import Action
 
 router = APIRouter()
 apiBF = ApiBF()
 validator = Validator()
-logger = logging.getLogger(__name__)
 
 @router.post("/sendMailAdded")
 async def sendMailAdded(request: Request):

@@ -2,10 +2,10 @@ from fastapi.responses import JSONResponse
 import logging
 from fastapi import Request
 
-from bm.mailSendingServiceBA import MailSendingService
+from bm.mailSendingServiceBA import MailSendingServiceBA
 from entity.models.MailData import MailData
-from entity.exceptions import InternalErrorException
-from entity.enums import Action
+from entity.exceptions.InternalErrorException import InternalErrorException
+from entity.enums.Action import Action
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
@@ -19,7 +19,7 @@ class ApiBF:
             for product in validData:
                 mailData = MailData(product["productId"], product["productName"], product["productAmountAdded"], product["productAmountTotal"], action)
                 mailDataList.append(mailData)
-            mailSendingService = MailSendingService()
+            mailSendingService = MailSendingServiceBA()
             mailSendingService.sendMail(mailDataList, action) 
             return JSONResponse(content={"message": "Successfully send mail"}, status_code=200)
         
@@ -30,7 +30,7 @@ class ApiBF:
     async def prepareMailingDataError(self, validData: Request):
         try:
             errorMessage = validData["errorMessage"]
-            mailSendingService = MailSendingService()
+            mailSendingService = MailSendingServiceBA()
             mailSendingService.sendMail(errorMessage, Action.ERROR)
             return JSONResponse(content={"message": "Successfully send error mail"}, status_code=200)
         
