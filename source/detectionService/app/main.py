@@ -1,6 +1,7 @@
 import logging
 import threading
 import queue
+import os
 
 from fastapi import FastAPI
 from api.videoFeedEndpointsThreads import router as videoRouter2
@@ -22,8 +23,8 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
     handlers=[logging.StreamHandler()]  # Ausgabe in die Konsole
 )
-
-detection_thread = threading.Thread(target=detectionThread, args=(feedEvent, feedQ, trackEvent, trackQ, 0))
+cam_url=os.getenv('CAM_SERVICE_URL')
+detection_thread = threading.Thread(target=detectionThread, args=(feedEvent, feedQ, trackEvent, trackQ, cam_url))
 detection_thread.daemon = True  # Daemon-Thread, wird beendet, wenn das Hauptprogramm beendet wird
 detection_thread.start()
 app.include_router(videoRouter2, prefix="/thread", tags=["video"])

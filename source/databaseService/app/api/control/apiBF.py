@@ -15,7 +15,7 @@ class ApiBF:
 
     def handleUpdateRequest(self, request: Request, isAdd: bool) -> Response:
         try: 
-            updatedProductsDict = ApiBF.databaseService.updateProductsAmount(isAdd, request.ids)
+            updatedProductsDict = ApiBF.databaseService.updateProductsAmount(isAdd, request.product_ids)
             triggerMailingService("sendMailAdded" if isAdd else "sendMailDeleted", updatedProductsDict)
             return Response(statusCode = 200)
         

@@ -10,7 +10,7 @@ services:
     devices:
       - "/dev/video0:/dev/video0"
     environment:
-      - DATABASE_SERVICE_URL=http://database-service:8000
+      - DATABASE_SERVICE_URL=http://141.69.58.228:8000
 
   database-service:
     build:

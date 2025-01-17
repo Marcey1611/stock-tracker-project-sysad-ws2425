@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  detection-service:
+    container_name: detectionServiceContainer
+    build: ./detectionService
+    networks:
+      - stockTrackerDockerNetwork
+    ports:
+      - "8000:8000"
+    devices:
+      - "/dev/video0:/dev/video0"
+    environment:
+      - DATABASE_SERVICE_URL=http://141.69.58.228:8001
+networks:
+  stockTrackerDockerNetwork:
+    driver: bridge
+

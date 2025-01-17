@@ -1,7 +1,8 @@
+import base64
 import logging
 from collections import defaultdict
-from copy import deepcopy, copy
 
+import cv2
 from ultralytics import YOLO
 import api.apiRestClientDatabase as ApiRestClientDatabase
 from entities.detection.detectedObject import DetectedObject
@@ -29,7 +30,7 @@ def processFrame(frame,trackers:TrackerManager):
 
     return annotatedFrame
 
-def updateObjectTracking(results, trackers:TrackerManager):
+def updateObjectTracking(results, trackers:TrackerManager):  # von Chatgpt mit anpassungen von uns.
     boxes = results[0].boxes.xywh.cpu()
     trackIds = results[0].boxes.id.int().cpu().tolist()
     clsIds = results[0].boxes.cls.int().cpu().tolist()
@@ -83,7 +84,7 @@ def handleDisappearedObjects(currentTrackIds, trackers: TrackerManager):
         del trackers.detectedObjects[trackId]
 
 
-def updateDatabase(trackers:TrackerManager,amountOfCls):
+def updateDatabase(trackers:TrackerManager,amountOfCls,annotatedFrame,results:[]):
     detectedObjects = trackers.detectedObjects.copy()
     previousDetectedObjects = trackers.previousDetectedObjects.copy()
     nowDetectedDict = defaultdict(int)
@@ -111,7 +112,35 @@ def updateDatabase(trackers:TrackerManager,amountOfCls):
             if nowDetectedDict[index] is not None and prevDetectedDict[index] is None:
                 addDiff.extend([index] * (nowDetectedDict[index] - prevDetectedDict[index]))
 
-        if len(addDiff)>0:
-            ApiRestClientDatabase.addItemToDatabase(addDiff)
-        if len(delDiff)>0:
-            ApiRestClientDatabase.deleteItemFromDatabase(delDiff)
+        if len(addDiff)>0 or len(delDiff)>0:
+            class_ids = get_necessary_class_ids(trackers)
+            segmented_images = {}
+            for class_id in class_ids:
+                segmented_images[class_id] = select_class_frames(class_id, results.copy())
+            if len(addDiff)>0:
+                ApiRestClientDatabase.addItemToDatabase(addDiff,annotatedFrame,segmented_images)
+            if len(delDiff)>0:
+                ApiRestClientDatabase.deleteItemFromDatabase(delDiff,annotatedFrame,segmented_images)
+
+
+def get_necessary_class_ids(trackers:TrackerManager):
+    detectedObjects = trackers.detectedObjects.copy()
+    necessary_Class_Ids = []
+    for _,nowDetectedOb in detectedObjects.items():
+        if nowDetectedOb.getClsId() is not None and nowDetectedOb.getClsId() not in necessary_Class_Ids:
+            necessary_Class_Ids += [nowDetectedOb.getClsId()]
+    return necessary_Class_Ids
+
+def select_class_frames(class_id,results:[]):
+    filteredBoxes = results[0].boxes[results[0].boxes.cls == class_id]
+    results[0].boxes = filteredBoxes
+    annotated_frame = results[0].plot()
+    success, buffer = cv2.imencode('.webp', annotated_frame, [cv2.IMWRITE_WEBP_QUALITY, 90])
+
+    if success:
+        # Convert the JPEG buffer to Base64
+        base64_encoded_image = base64.b64encode(buffer).decode('utf-8')
+        # Print or use the Base64 string
+        return base64_encoded_image
+    else:
+        return None

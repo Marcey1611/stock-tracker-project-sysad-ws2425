@@ -5,6 +5,7 @@ services:
     ports:
       - "8000:8000"
     devices:
-      - "/dev/video2:/dev/video0"
+      - "/dev/video0:/dev/video0"
     environment:
       - DATABASE_SERVICE_URL="http://database-service-url"
+      - CAM_SERVICE_URL="http://127.0.0.1:7999/video"

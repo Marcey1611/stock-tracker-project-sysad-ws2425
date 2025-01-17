@@ -32,42 +32,31 @@ def detectionThread(feedEvent:Event,feedQ:queue.Queue,trackEvent:Event,trackQ:qu
             humanCheck, annotatedFrame = isHumanInFrame(frame)
             if humanCheck:
                 if feedEvent.is_set():
-                    streamFeedFrames(frame, feedQ)
+                    streamFrames(frame, feedQ)
                 if trackEvent.is_set():
-                    if not streamTrackFrames(annotatedFrame, trackQ):
+                    if not streamFrames(annotatedFrame, trackQ):
                         break
             else:
                 annotatedFrame = processFrame(frame,trackers)
 
                 if feedEvent.is_set():
-                    streamFeedFrames(frame, feedQ)
+                    streamFrames(frame, feedQ)
                 if trackEvent.is_set():
-                    if not streamTrackFrames(annotatedFrame, trackQ):
+                    if not streamFrames(annotatedFrame, trackQ):
                         break
 
     camera.release()
     logger.info(f"Camera {source} closed.")
 
-def streamFeedFrames(frame,feedQ:queue.Queue):
-    _, buffer = cv2.imencode('.jpg', frame)
-    frameBytes = buffer.tobytes()
-    feedQ.put(b'--frame\r\n'
-              b'Content-Type: image/jpeg\r\n\r\n' + frameBytes + b'\r\n')
-
-def streamTrackFrames(annotatedFrame,trackQ):
-    ret, buffer = cv2.imencode('.jpg', annotatedFrame)
+def streamFrames(frame,feedQ:queue.Queue):
+    ret, buffer = cv2.imencode('.webp', frame)
     if not ret:
         return False
-
     frameBytes = buffer.tobytes()
-    trackQ.put(b'--frame\r\n'
+    logger.debug(frameBytes)
+    feedQ.put(b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frameBytes + b'\r\n')
     return True
-
-
-
-
-
 
 def initCam(camera:cv2.VideoCapture,source):
     desiredWidth = 1920

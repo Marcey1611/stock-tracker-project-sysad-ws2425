@@ -11,18 +11,26 @@ headers = {
 
 logger = logging.getLogger('databaseRestRequests')
 
-def addItemToDatabase(data):
+def addItemToDatabase(data,frame,pictures:[]):
     try:
-        jsonData = { "ids":data}
+        jsonData = {
+            "product_ids":data,
+            "pictures":pictures,
+            "overall_picture":frame,
+        }
         response = requests.post(f"{url}/addItem", json=jsonData, headers=headers)
         if response.status_code!=200:
             logger.error(f"Database could not process add correctly:{str(data)}")
     except Exception as e:
         logger.error(f"Error while trying to send an Add-Request: {str(e)}")
 
-def deleteItemFromDatabase(data):
+def deleteItemFromDatabase(data,frame,pictures:[]):
     try:
-        jsonData = { "ids":data}
+        jsonData = {
+            "product_ids":data,
+            "pictures":pictures,
+            "overall_picture":frame,
+        }
         response = requests.post(f"{url}/removeItem", json=jsonData, headers=headers)
         if response.status_code!=200:
             logger.error(f"Database could not process delete correctly:{str(data)}")
