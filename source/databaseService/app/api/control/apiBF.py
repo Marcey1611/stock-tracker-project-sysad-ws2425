@@ -1,8 +1,10 @@
 import logging
 from fastapi import HTTPException
+from typing import Dict, Any
+
 
 from bm.databaseService import DatabaseService
-from entities.models import Request, Response
+from entities.models import Request, Response, AppResponse
 from .mailingTrigger import triggerMailingService
 
 class ApiBF:
@@ -13,7 +15,7 @@ class ApiBF:
 
     def handleUpdateRequest(self, request: Request, isAdd: bool) -> Response:
         try: 
-            updatedProductsDict = ApiBF.databaseService.updateProductsAmount(isAdd,request.ids)
+            updatedProductsDict = ApiBF.databaseService.updateProductsAmount(isAdd, request.ids)
             triggerMailingService("sendMailAdded" if isAdd else "sendMailDeleted", updatedProductsDict)
             return Response(statusCode = 200)
         
@@ -26,11 +28,22 @@ class ApiBF:
       
     def handleResetRequest(self) -> Response: 
         try:
-            return Response(statusCode=200)
+            ApiBF.databaseService.resetAmounts()
+
+            return Response(statusCode = 200)
         
         except Exception as e:
             self.logger.error(f"Error while reseting products amount: {e}")
             return Response(statusCode = 500)
+
+    def handleAppRequest(self) -> Dict[Any, dict]:
+        try:
+            allProductsDict = ApiBF.databaseService.getProducts()
+            return {key: value.dict() for key, value in allProductsDict.items()}
+        
+        except Exception as e:
+            self.logger.error(f"Error while handling app-request: {e}")
+            raise HTTPException(status_code=500, detail="Error while handling request")
 
     def handleCreateRequest(self, products: list):
         try:

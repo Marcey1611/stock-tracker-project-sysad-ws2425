@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS products (
-    productId SERIAL PRIMARY KEY,
+    product_id SERIAL PRIMARY KEY,
     product_picture VARCHAR(255),
-    productName VARCHAR(255),
-    productAmount NUMBER(20) NOT NULL
+    product_name VARCHAR(255),
+    product_amount BIGINT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS overall_picture (

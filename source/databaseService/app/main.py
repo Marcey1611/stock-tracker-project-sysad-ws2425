@@ -1,4 +1,5 @@
 #Entrypoint
+import logging
 from fastapi import FastAPI 
 from api.boundary import api
 
