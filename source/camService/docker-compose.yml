@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  detection-service:
+    build: .
+    network_mode: "host"
+    ports:
+      - "9999:9999"
+    devices:
+      - "/dev/video2:/dev/video0"
