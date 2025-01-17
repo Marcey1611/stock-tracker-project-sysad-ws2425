@@ -17,5 +17,3 @@ async def removeItem(request: Request):
 @router.get("/clearAll", response_model=Response)
 async def clearAll():
     return apiBf.handleResetRequest()
-
-            
