@@ -48,8 +48,9 @@ class DatabaseService:
                     )
 
             # Update overall picture
-            overall_picture = session.query(OverallPicture).all()
-            overall_picture.overall_picture = request.overall_picture
+            picture = session.query(OverallPicture).first()
+            if picture:
+                picture.overall_picture = request.overall_picture
 
             # Commit changes
             session.commit()
@@ -79,6 +80,11 @@ class DatabaseService:
             for product in products:
                 product.product_amount = 0
                 product.product_picture = None
+                
+            # Reset overall picture
+            picture = session.query(OverallPicture).first()
+            if picture:
+                picture.overall_picture = None
 
             # Commit changes 
             session.commit()
@@ -125,10 +131,13 @@ class DatabaseService:
             for product in products:
                 new_product = Products(
                     product_name=product,
+                    product_picture=None,
                     product_amount=0
                     )
 
                 session.add(new_product)
+
+            session.add(OverallPicture(overall_picture=None))
 
             session.commit()
         

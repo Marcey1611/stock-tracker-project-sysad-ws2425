@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 CREATE TABLE IF NOT EXISTS overall_picture (
-    overall_picture VARCHAR(255),
+    overall_picture_id SERIAL PRIMARY KEY,
+    overall_picture VARCHAR(255)
 )

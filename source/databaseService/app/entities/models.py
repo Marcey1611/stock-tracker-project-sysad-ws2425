@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class Request(BaseModel):
     products: List[int]
-    pictures: Dict[int: str]
+    pictures: Dict[int, str]
     overall_picture: str
 
 class Response(BaseModel):
