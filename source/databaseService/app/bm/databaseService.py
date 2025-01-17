@@ -38,9 +38,9 @@ class DatabaseService:
                     updated_products_dict[product.product_id].product_amount_changed += 1 if add else -1
                 else:
                     updated_products_dict[product.product_id] = MailResponse(
-                        product_id=product.productId, 
-                        product_name=product.productName, 
-                        product_amount_total=product.productAmount,
+                        product_id=product.product_id, 
+                        product_name=product.product_name, 
+                        product_amount_total=product.product_amount,
                         product_amount_changed=1 if add else -1
                     )
 
