@@ -1,0 +1,19 @@
+@startuml
+
+actor "DatabaseService" as Database
+participant "API" as API
+participant "ApiBF" as ApiBF
+participant "MailSendingServiceBA" as MailService
+participant "Gmail" as Gmail
+
+Database -> API: POST /sendMailAdded
+API -> API: Validate request
+API -> ApiBF: prepareMailingData(validData, Action.ADDED)
+ApiBF -> MailService: sendMail(mailData, Action.ADDED)
+MailService -> Gmail: Send email with configured message
+Gmail --> MailService: Email sent confirmation
+MailService --> ApiBF: Success
+ApiBF --> API: Success response
+API --> Database: JSONResponse (email sent)
+
+@enduml

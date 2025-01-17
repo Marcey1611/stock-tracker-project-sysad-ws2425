@@ -4,5 +4,5 @@ from api.boundary import exceptionHandler
 
 
 app = FastAPI()
-exceptionHandler.register_exception_handlers(app)
+exceptionHandler.registerExceptionHandlers(app)
 app.include_router(api.router)

@@ -1,0 +1,149 @@
+openapi: 3.0.3
+
+info:
+  title: Mailing-Service API
+  description: This is the API-Specification for the Mailing-Service
+  version: 1.0.0
+
+paths:
+  /sendMailAdded:
+    post:
+      summary: Interface for sending an email that a product was added
+      description: Interface for sending an email with the given data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailDataArray'
+      responses:
+        '2XX':
+          description: Response of the mailing service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONResponse'
+        '4XX':
+          description: Response of the mailing service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONResponse'
+        '5XX':
+          description: Response of the mailing service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONResponse'
+  /sendMailDeleted:
+    post:
+      summary: Interface for sending an email that a product was deleted
+      description: Interface for sending an email with the given data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailDataArray'
+      responses:
+        '2XX':
+          description: Response of the mailing service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONResponse'
+        '4XX':
+          description: Response of the mailing service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONResponse'
+        '5XX':
+          description: Response of the mailing service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONResponse'
+  /sendErrorMail:
+    post:
+      summary: Interface for sending an email that an error occurred
+      description: Interface for sending an email with the given data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorMailData'
+      responses:
+        '2XX':
+          description: Response of the mailing service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONResponse'
+        '4XX':
+          description: Response of the mailing service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONResponse'
+        '5XX':
+          description: Response of the mailing service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONResponse'
+
+components:
+  schemas:
+    MailData:
+      type: object
+      required:
+        - productId
+        - productName
+        - productAmountAdded
+        - productAmountTotal
+      properties:
+        productId:
+          type: integer
+          example: 1
+        productName:
+          type: string
+          example: "Müsli"
+        productAmountAdded:
+          type: integer
+          example: 2
+        productAmountTotal:
+          type: integer
+          example: 5
+    MailDataArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/MailData'
+      description: An array of MailData objects
+      example:
+        - productId: 1
+          productName: "Müsli"
+          productAmountAdded: 2
+          productAmountTotal: 5
+        - productId: 2
+          productName: "Wasser"
+          productAmountAdded: 2
+          productAmountTotal: 5
+    ErrorMailData:
+      type: object
+      required:
+        - errorMessage
+      properties:
+        errorMessage:
+          type: string
+          example: "The database service couldn't save the product"
+    JSONResponse:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Message sent successfully"
