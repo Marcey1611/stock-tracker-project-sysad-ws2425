@@ -9,7 +9,7 @@ class Products(DatabaseProvider.Base):
     product_name = Column("product_name", String(255), nullable=False)
     product_amount = Column("product_amount", Integer, nullable=False)
 
-class Products(DatabaseProvider.Base):
+class OverallPicture(DatabaseProvider.Base):
     __tablename__ = 'overall_picture'
 
     overall_picture = Column("overall_picture", String(255), nullable=False)
