@@ -1,20 +1,20 @@
 [
     {
-        "productId": 1,
-        "productName": "Product 1",
-        "productAmountAdded": 3,
-        "productAmountTotal": 2
+        "product_id": 1,
+        "product_name": "Product 1",
+        "product_amount_added": 3,
+        "product_amount_total": 2
     },
     {
-        "productId": 2,
-        "productName": "Product 2",
-        "productAmountAdded": 3,
-        "productAmountTotal": 2
+        "product_id": 2,
+        "product_name": "Product 2",
+        "product_amount_added": 3,
+        "product_amount_total": 2
     },
     {
-        "productId": 3,
-        "productName": "productName",
-        "productAmountAdded": 3,
-        "productAmountTotal": 2
+        "product_id": 3,
+        "product_name": "product name",
+        "product_amount_added": 3,
+        "product_amount_total": 2
     }
 ]
