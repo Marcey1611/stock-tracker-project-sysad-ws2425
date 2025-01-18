@@ -114,9 +114,8 @@ class DatabaseService:
             session = DatabaseService.databaseProvider.getSession()
 
             # Create product classes in database
-            for index, product in enumerate(products):
+            for product in products:
                 newProduct = Products(
-                    productId=index, 
                     productName=product,
                     productAmount=0
                     )
