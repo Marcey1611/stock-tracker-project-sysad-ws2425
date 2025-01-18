@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  stock-tracker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stock_tracker_container
+    ports:
+      - "8080:80"
+    environment:
+      - DATABASE_SERVICE_URL="http://database-service-url"
+    networks:
+      - stockTrackerDockerNetwork
+
+networks:
+  stockTrackerDockerNetwork:
+    external: true
+
+
+
+
+#version: '3.8'
+
+#services:
+ # flutter-app:
+  #  build: .
+   # container_name: flutterWebsite
+    #networks:
+     # - stockTrackerDockerNetwork  
+
+
+#networks:
+ # stockTrackerDockerNetwork:
+  #  external: true  
