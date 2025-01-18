@@ -1,5 +1,20 @@
 version: "3.9"
 services:
+  database:
+    build: ./database
+    container_name: databaseContainer
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - stockTrackerDockerNetwork
+
   detection-service:
     container_name: detectionServiceContainer
     build: ./detectionService
@@ -21,7 +36,7 @@ services:
     ports:
       - "8001:8000"
     environment:
-      - DATABASE_URL=sqlite:///./test.db   # Dummy-Datenbank-URL für Entwicklung
+      - DATABASE_URL=postgresql://myuser:mypassword@stock_tracker_postgres_db:5432/mydatabase
       - MAILING_SERVICE_URL=http://mailing-service:8000/
 
   mailing-service:
@@ -36,7 +51,6 @@ services:
       SMTP_PORT: 587
       SMTP_USER: sysad.stock.tracker@gmail.com
       SMTP_PASSWORD: qlddayafyvqszzlt
-
 
 networks:
   stockTrackerDockerNetwork:
