@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  database:
+  stock_tracker_postgres_db:
     build: ./database
     container_name: databaseContainer
     environment:
@@ -9,11 +9,35 @@ services:
       POSTGRES_DB: mydatabase
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     networks:
       - stockTrackerDockerNetwork
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  database-service:
+    build: ./databaseService
+    container_name: dataBaseServiceContainer
+    networks:
+      - stockTrackerDockerNetwork
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://myuser:mypassword@databaseContainer:5432/mydatabase
+      - MAILING_SERVICE_URL=http://mailing-service:8000/
+    depends_on:
+      stock_tracker_postgres_db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/updateApp || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   detection-service:
     container_name: detectionServiceContainer
@@ -25,19 +49,10 @@ services:
     devices:
       - "/dev/video0:/dev/video0"
     environment:
-      - DATABASE_SERVICE_URL=http://database-service:8000
-
-  database-service:
-    build:
-      context: ./databaseService
-    container_name: dataBaseServiceContainer
-    networks:
-      - stockTrackerDockerNetwork
-    ports:
-      - "8001:8000"
-    environment:
-      - DATABASE_URL=postgresql://myuser:mypassword@stock_tracker_postgres_db:5432/mydatabase
-      - MAILING_SERVICE_URL=http://mailing-service:8000/
+      - DATABASE_SERVICE_URL=http://dataBaseServiceContainer:8000
+    depends_on:
+      database-service:
+        condition: service_healthy
 
   mailing-service:
     build: ./mailingService
@@ -51,6 +66,9 @@ services:
       SMTP_PORT: 587
       SMTP_USER: sysad.stock.tracker@gmail.com
       SMTP_PASSWORD: qlddayafyvqszzlt
+
+volumes:
+  pgdata:
 
 networks:
   stockTrackerDockerNetwork:
