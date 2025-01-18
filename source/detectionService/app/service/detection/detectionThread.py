@@ -3,6 +3,7 @@ import queue
 from threading import Event
 import cv2
 import api.apiRestClientDatabase as ApiRestClientDatabase
+from av import VideoFrame
 from entities.detection.trackManager import TrackerManager
 
 from service.detection.frameProccess import processFrame
@@ -29,21 +30,9 @@ def detectionThread(feedEvent:Event,feedQ:queue.Queue,trackEvent:Event,trackQ:qu
             logger.error("Error could not access camera frame.")
             break
         else:
-            humanCheck, annotatedFrame = isHumanInFrame(frame)
-            if humanCheck:
-                if feedEvent.is_set():
-                    streamFeedFrames(frame, feedQ)
-                if trackEvent.is_set():
-                    if not streamTrackFrames(annotatedFrame, trackQ):
-                        break
-            else:
-                annotatedFrame = processFrame(frame,trackers)
+            if not handel_frames(frame, trackers, feedEvent, feedQ, trackEvent, trackQ):
+                break
 
-                if feedEvent.is_set():
-                    streamFeedFrames(frame, feedQ)
-                if trackEvent.is_set():
-                    if not streamTrackFrames(annotatedFrame, trackQ):
-                        break
 
     camera.release()
     logger.info(f"Camera {source} closed.")
@@ -64,11 +53,6 @@ def streamTrackFrames(annotatedFrame,trackQ):
                b'Content-Type: image/jpeg\r\n\r\n' + frameBytes + b'\r\n')
     return True
 
-
-
-
-
-
 def initCam(camera:cv2.VideoCapture,source):
     desiredWidth = 1920
     desiredHeight = 1080
@@ -80,3 +64,20 @@ def initCam(camera:cv2.VideoCapture,source):
     frameWidth = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
     frameHeight = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
     logger.debug(f"Camera resolution:{str(source)}: {int(frameWidth)}x{int(frameHeight)}")
+
+def handel_frames(frame,trackers:TrackerManager,feedEvent:Event,feedQ:queue.Queue,trackEvent:Event,trackQ:queue.Queue):
+    humanCheck, annotatedFrame = isHumanInFrame(frame)
+    if humanCheck:
+        if feedEvent.is_set():
+            streamFeedFrames(frame, feedQ)
+        if trackEvent.is_set():
+            if not streamTrackFrames(annotatedFrame, trackQ):
+                return False
+    else:
+        annotatedFrame = processFrame(frame, trackers)
+
+        if feedEvent.is_set():
+            streamFeedFrames(frame, feedQ)
+        if trackEvent.is_set():
+            if not streamTrackFrames(annotatedFrame, trackQ):
+                return False
