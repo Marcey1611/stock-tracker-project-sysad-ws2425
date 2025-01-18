@@ -6,7 +6,7 @@ from api.boundary import api
 app = FastAPI()
 app.include_router(api.router)
 
-api.apiBf.handleCreateRequest(["person",
+api.api_bf.handle_create_request(["person",
                                "bicycle",
                                "car",
                                "motorcycle",

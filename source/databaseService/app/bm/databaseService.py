@@ -7,20 +7,20 @@ from database.databaseTableModells import Products
 from entities.models import MailResponse, AppResponse
 
 class DatabaseService:
-    databaseProvider = DatabaseProvider()
+    database_provider = DatabaseProvider()
 
     def __init__(self):
-        self.databaseProvider.initDb()
+        self.database_provider.init_db()
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def updateProductsAmount(self, add: bool ,requestIds: List[int]) -> dict:
+    def update_products_amount(self, add: bool ,request_ids: List[int]) -> dict:
         try:
-            session = DatabaseService.databaseProvider.getSession()
-            updatedProductsDict = {}
+            session = DatabaseService.database_provider.get_session()
+            updated_products_dict = {}
 
             # Check if product id exists and update amount
-            for id in requestIds:
-                product = session.query(Products).filter_by(productId=id).first()
+            for id in request_ids:
+                product = session.query(Products).filter_by(product_id=id).first()
 
                 # Raise HTTP-Exception if product doesn't exist
                 if not product:
@@ -30,24 +30,24 @@ class DatabaseService:
                     )
  
                 # Update product amount
-                product.productAmount += 1 if add else -1 
+                product.product_amount += 1 if add else -1 
 
                 # Update or append dictionary
-                if product.productId in updatedProductsDict:
-                    updatedProductsDict[product.productId].productAmountTotal = product.productAmount
-                    updatedProductsDict[product.productId].productAmountAdded += 1 if add else -1
+                if product.product_id in updated_products_dict:
+                    updated_products_dict[product.product_id].product_amount_total = product.product_amount
+                    updated_products_dict[product.product_id].product_amount_changed += 1 if add else -1
                 else:
-                    updatedProductsDict[product.productId] = MailResponse(
-                        productId=product.productId, 
-                        productName=product.productName, 
-                        productAmountTotal=product.productAmount,
-                        productAmountAdded=1
+                    updated_products_dict[product.product_id] = MailResponse(
+                        product_id=product.product_id, 
+                        product_name=product.product_name, 
+                        product_amount_total=product.product_amount,
+                        product_amount_changed=1 if add else -1
                     )
 
             # Commit changes
             session.commit()
             
-            return updatedProductsDict
+            return updated_products_dict
         
         except HTTPException as http_exception:
             session.rollback()
@@ -61,16 +61,16 @@ class DatabaseService:
         finally:
             session.close()
 
-    def resetAmounts(self):
+    def reset_amounts(self):
         try:
-            session = DatabaseService.databaseProvider.getSession()
+            session = DatabaseService.database_provider.get_session()
 
             # Get all products
             products = session.query(Products).all()
             
             # Reset product amount
             for product in products:
-                product.productAmount = 0
+                product.product_amount = 0
 
             # Commit changes 
             session.commit()
@@ -82,24 +82,24 @@ class DatabaseService:
         finally:
             session.close()
 
-    def getProducts(self) -> dict:
+    def get_products(self) -> dict:
         try:
-            productsDict = {}
-            session = DatabaseService.databaseProvider.getSession()
+            products_dict = {}
+            session = DatabaseService.database_provider.get_session()
 
             # Get all products
             products = session.query(Products).all()
 
             # Create dictionary with products
             for product in products:
-                productsDict[product.productId] = AppResponse(
-                    productId=product.productId,
-                    productName=product.productName,
-                    productPicture=None, # TODO: Send an actual picture
-                    productAmount=product.productAmount
+                products_dict[product.product_id] = AppResponse(
+                    product_id=product.product_id,
+                    product_name=product.product_name,
+                    product_picture=None, # TODO: Send an actual picture
+                    product_amount=product.product_amount
                 )
 
-            return productsDict
+            return products_dict
 
         except Exception as e:
             session.rollback()
@@ -109,18 +109,18 @@ class DatabaseService:
         finally:
             session.close()
         
-    def addProducts(self, products: List[str]):
+    def add_products(self, products: List[str]):
         try:
-            session = DatabaseService.databaseProvider.getSession()
+            session = DatabaseService.database_provider.get_session()
 
             # Create product classes in database
             for product in products:
-                newProduct = Products(
-                    productName=product,
-                    productAmount=0
+                new_product = Products(
+                    product_name=product,
+                    product_amount=0
                     )
 
-                session.add(newProduct)
+                session.add(new_product)
 
             session.commit()
         
