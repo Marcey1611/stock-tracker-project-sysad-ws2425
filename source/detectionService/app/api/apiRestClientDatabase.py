@@ -37,3 +37,13 @@ def clearAll():
             logger.error(f"Database could not process clearAll correctly")
     except Exception as e:
         logger.error(f"Error while trying to send an clearAll: {str(e)}")
+
+def init_products(model_classes, picture_string):
+    try:
+        jsonData = { "model_classes":model_classes ,
+                     "overall_picture":picture_string}
+        response = requests.put(f"{url}/init_products",json=jsonData,headers=headers)
+        if response.status_code!=200:
+            logger.error(f"Database could not process init_products correctly")
+    except Exception as e:
+        logger.error(f"Error while trying to send an init_products: {str(e)}")
