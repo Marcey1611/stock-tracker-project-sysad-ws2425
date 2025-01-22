@@ -1,4 +1,5 @@
 import base64
+import copy
 import logging
 from collections import defaultdict
 
@@ -24,7 +25,7 @@ def processFrame(frame,trackers:TrackerManager):
         currentTrackIds = updateObjectTracking(results, trackers)
     handleDisappearedObjects(currentTrackIds,trackers)
 
-    updateDatabase(trackers,len(results[0].names))
+    updateDatabase(trackers,len(results[0].names),annotatedFrame,copy.deepcopy(results))
 
     trackers.previousDetectedObjects = trackers.detectedObjects.copy()
 
@@ -115,8 +116,9 @@ def updateDatabase(trackers:TrackerManager,amountOfCls,annotatedFrame,results:[]
         if len(addDiff)>0 or len(delDiff)>0:
             class_ids = get_necessary_class_ids(trackers)
             segmented_images = {}
-            for class_id in class_ids:
-                segmented_images[class_id] = select_class_frames(class_id, results.copy())
+            if len(class_ids)>0:
+                for class_id in class_ids:
+                    segmented_images[class_id] = select_class_frames(class_id, results.copy())
             if len(addDiff)>0:
                 ApiRestClientDatabase.addItemToDatabase(addDiff,annotatedFrame,segmented_images)
             if len(delDiff)>0:
