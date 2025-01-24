@@ -115,3 +115,10 @@ def updateDatabase(trackers:TrackerManager,amountOfCls):
             ApiRestClientDatabase.addItemToDatabase(addDiff)
         if len(delDiff)>0:
             ApiRestClientDatabase.deleteItemFromDatabase(delDiff)
+
+def init_products_classes(picture):
+    classes = model.names
+    classes_array = []
+    for class_id, class_name in classes.items():
+        classes_array.extend(class_name)
+    ApiRestClientDatabase.init_products(picture, classes_array)
