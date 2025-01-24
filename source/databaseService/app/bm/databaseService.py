@@ -13,34 +13,31 @@ class DatabaseService:
         self.database_provider.init_db()
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def init_products(self) -> dict:
+    def intitalize_products(self, request: Request):
         try:
-            products_dict = {}
             session = DatabaseService.database_provider.get_session()
 
             session.query(Products).delete()
+            session.commit()
 
-            # Get all products
-            products = session.query(Products).all()
+            # Create product classes in database
+            for id in request.products:
+                new_product = Products(
+                    product_name=product,
+                    product_amount=0
+                    )
 
-            # Create dictionary with products
-            for product in products:
-                products_dict[product.product_id] = AppResponse(
-                    product_id=product.product_id,
-                    product_name=product.product_name,
-                    product_picture=None, # TODO: Send an actual picture
-                    product_amount=product.product_amount
-                )
+                session.add(new_product)
 
-            return products_dict
-
+            session.commit()
+        
         except Exception as e:
             session.rollback()
-            self.logger.error(f"Error while getting products: {e}")
-            raise HTTPException(status_code=500, detail="Error while getting products")
+            raise RuntimeError(f"An error occurred while creating products: {e}")
         
         finally:
             session.close()
+
 
     def update_products_amount(self, request: Request, add: bool) -> dict:
         try:
@@ -110,25 +107,30 @@ class DatabaseService:
         
         finally:
             session.close()
-        
-    def add_products(self, products: List[str]):
+            
+    def get_products(self) -> dict:
         try:
+            products_dict = {}
             session = DatabaseService.database_provider.get_session()
 
-            # Create product classes in database
+            # Get all products
+            products = session.query(Products).all()
+
+            # Create dictionary with products
             for product in products:
-                new_product = Products(
-                    product_name=product,
-                    product_amount=0
-                    )
+                products_dict[product.product_id] = AppResponse(
+                    product_id=product.product_id,
+                    product_name=product.product_name,
+                    product_picture=product.product_picture,
+                    product_amount=product.product_amount
+                )
 
-                session.add(new_product)
+            return products_dict
 
-            session.commit()
-        
         except Exception as e:
             session.rollback()
-            raise RuntimeError(f"An error occurred while creating products: {e}")
+            self.logger.error(f"Error while getting products: {e}")
+            raise HTTPException(status_code=500, detail="Error while getting products")
         
         finally:
             session.close()

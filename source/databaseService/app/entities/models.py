@@ -1,8 +1,14 @@
-from typing import List
+from typing import List, Dict
 from pydantic import BaseModel
 
+class Product(BaseModel):
+    name: str
+    total_amount: int
+    picture: str | None = None
+
 class Request(BaseModel):
-    ids: List[int]
+    products = Dict[int, Product]
+    overall_picture: str
 
 class Response(BaseModel):
     status_code: int
@@ -15,7 +21,5 @@ class MailResponse(BaseModel):
     error_message: str | None = None
 
 class AppResponse(BaseModel):
-    product_id: int
-    product_name: str
-    product_picture: str | None = None
-    product_amount: int
+    products = Dict[int, Product]
+    overall_picture: str
