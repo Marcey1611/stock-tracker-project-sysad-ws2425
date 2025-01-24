@@ -4,7 +4,7 @@ from fastapi import HTTPException
 
 from database.databaseProvider import DatabaseProvider
 from database.databaseTableModells import Products
-from entities.models import MailResponse, AppResponse
+from entities.models import Request, MailResponse, AppResponse
 
 class DatabaseService:
     database_provider = DatabaseProvider()
@@ -13,13 +13,42 @@ class DatabaseService:
         self.database_provider.init_db()
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def update_products_amount(self, add: bool ,request_ids: List[int]) -> dict:
+    def init_products(self) -> dict:
+        try:
+            products_dict = {}
+            session = DatabaseService.database_provider.get_session()
+
+            session.query(Products).delete()
+
+            # Get all products
+            products = session.query(Products).all()
+
+            # Create dictionary with products
+            for product in products:
+                products_dict[product.product_id] = AppResponse(
+                    product_id=product.product_id,
+                    product_name=product.product_name,
+                    product_picture=None, # TODO: Send an actual picture
+                    product_amount=product.product_amount
+                )
+
+            return products_dict
+
+        except Exception as e:
+            session.rollback()
+            self.logger.error(f"Error while getting products: {e}")
+            raise HTTPException(status_code=500, detail="Error while getting products")
+        
+        finally:
+            session.close()
+
+    def update_products_amount(self, request: Request, add: bool) -> dict:
         try:
             session = DatabaseService.database_provider.get_session()
             updated_products_dict = {}
 
             # Check if product id exists and update amount
-            for id in request_ids:
+            for id in request.products:
                 product = session.query(Products).filter_by(product_id=id).first()
 
                 # Raise HTTP-Exception if product doesn't exist
@@ -51,12 +80,12 @@ class DatabaseService:
         
         except HTTPException as http_exception:
             session.rollback()
-            self.logger.error(f"Error while searching for product: {http_exception}")
+            self.logger.error(f"DatabaseService: Error while searching for product: {http_exception}")
             raise http_exception
         
         except Exception as e:
             session.rollback()
-            raise RuntimeError(f"An error occurred while updating products amount: {e}")
+            raise RuntimeError(f"DatabaseService: An error occurred while updating products amount: {e}")
         
         finally:
             session.close()
@@ -78,33 +107,6 @@ class DatabaseService:
         except Exception as e:
             session.rollback()
             raise RuntimeError(f"An error occurred while reseting products amount: {e}")
-        
-        finally:
-            session.close()
-
-    def get_products(self) -> dict:
-        try:
-            products_dict = {}
-            session = DatabaseService.database_provider.get_session()
-
-            # Get all products
-            products = session.query(Products).all()
-
-            # Create dictionary with products
-            for product in products:
-                products_dict[product.product_id] = AppResponse(
-                    product_id=product.product_id,
-                    product_name=product.product_name,
-                    product_picture=None, # TODO: Send an actual picture
-                    product_amount=product.product_amount
-                )
-
-            return products_dict
-
-        except Exception as e:
-            session.rollback()
-            self.logger.error(f"Error while getting products: {e}")
-            raise HTTPException(status_code=500, detail="Error while getting products")
         
         finally:
             session.close()
