@@ -7,7 +7,7 @@ from entities.models import Request, Response, AppResponse
 router = APIRouter()
 api_bf = ApiBf()   
 
-@router.post("/init_products", response_model=Response)
+@router.put("/init_products", response_model=Response)
 async def init_products(request: Request):
     return api_bf.handle_init_products_request(request)
 

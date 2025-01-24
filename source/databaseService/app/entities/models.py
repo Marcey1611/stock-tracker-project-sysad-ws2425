@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 class Product(BaseModel):
     name: str
-    total_amount: int
+    amount: int
     picture: str | None = None
 
 class Request(BaseModel):
@@ -15,10 +15,10 @@ class Response(BaseModel):
     status_code: int
 
 class MailResponse(BaseModel):
-    product_id: int
-    product_name: str
-    product_amount_total: int
-    product_amount_changed: int
+    id: int
+    name: str
+    amount: int
+    changed_amount: int
     error_message: str | None = None
 
 class AppResponse(BaseModel):
