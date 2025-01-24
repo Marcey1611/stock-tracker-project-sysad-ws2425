@@ -3,7 +3,7 @@ from typing import List
 from fastapi import HTTPException
 
 from database.databaseProvider import DatabaseProvider
-from database.databaseTableModells import Products
+from database.databaseTableModells import Products, OverallPicture
 from entities.models import Request, MailResponse, AppResponse
 
 class DatabaseService:
@@ -46,6 +46,7 @@ class DatabaseService:
 
             # Check if product id exists and update amount
             for id in request.products:
+            for id in request.products:
                 product = session.query(Products).filter_by(product_id=id).first()
 
                 # Raise HTTP-Exception if product doesn't exist
@@ -58,6 +59,9 @@ class DatabaseService:
                 # Update product amount
                 product.product_amount += 1 if add else -1 
 
+                # Update product picture
+                product.product_picture = request.pictures[id]
+
                 # Update or append dictionary
                 if product.product_id in updated_products_dict:
                     updated_products_dict[product.product_id].product_amount_total = product.product_amount
@@ -69,6 +73,11 @@ class DatabaseService:
                         product_amount_total=product.product_amount,
                         product_amount_changed=1 if add else -1
                     )
+
+            # Update overall picture
+            picture = session.query(OverallPicture).first()
+            if picture:
+                picture.overall_picture = request.overall_picture
 
             # Commit changes
             session.commit()
@@ -94,9 +103,15 @@ class DatabaseService:
             # Get all products
             products = session.query(Products).all()
             
-            # Reset product amount
+            # Reset product amount and pictures
             for product in products:
                 product.product_amount = 0
+                product.product_picture = None
+                
+            # Reset overall picture
+            picture = session.query(OverallPicture).first()
+            if picture:
+                picture.overall_picture = None
 
             # Commit changes 
             session.commit()
