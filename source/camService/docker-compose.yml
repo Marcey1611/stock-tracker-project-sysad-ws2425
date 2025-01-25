@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  cam-service:
+    build: .
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    devices:
+      - "/dev/video0:/dev/video0"
+    environment:
+      - MQTT_BROKER_URL=192.168.2.226
+      - MQTT_BROKER_PORT=1883
