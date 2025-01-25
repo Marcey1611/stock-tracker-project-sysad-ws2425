@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from starlette.responses import StreamingResponse
 
-from service.apiClientDatabaseService import streamFeedFrames, streamTrackFrames
+from service.apiClientDatabaseService import streamFeedFrames
 
 router = APIRouter()
 
@@ -12,4 +12,4 @@ def videoFeed():
 @router.get("/track")
 def videoFeed():
     from main import trackEvent, trackQ
-    return StreamingResponse(streamTrackFrames(trackEvent,trackQ), media_type="multipart/x-mixed-replace; boundary=frame")
+    return StreamingResponse(streamFeedFrames(trackEvent,trackQ), media_type="multipart/x-mixed-replace; boundary=frame")

@@ -2,7 +2,7 @@ import logging
 
 from ultralytics import YOLO
 
-model = YOLO("./service/detection/yolo11l.pt")
+model = YOLO("./service/detection/yolo11m.pt")
 
 logger = logging.getLogger(__name__)
 

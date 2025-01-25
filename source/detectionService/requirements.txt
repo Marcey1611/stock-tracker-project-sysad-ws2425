@@ -2,3 +2,4 @@ fastapi
 uvicorn           # ASGI-Server für FastAPI
 ultralytics
 lap
+paho-mqtt

@@ -10,7 +10,7 @@ from entities.detection.trackManager import TrackerManager
 TOLERANCE = 10
 ADD_REMOVE_THRESHOLD = .5 * 30
 
-model = YOLO("./service/detection/yolo11l.pt")
+model = YOLO("./service/detection/yolo11m.pt")
 
 logger = logging.getLogger(__name__)
 
