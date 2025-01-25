@@ -1,8 +1,10 @@
-from typing import List
+from typing import List, Dict
 from pydantic import BaseModel
 
 class Request(BaseModel):
-    ids: List[int]
+    products: List[int]
+    pictures: Dict[int, str]
+    overall_picture: str
 
 class Response(BaseModel):
     status_code: int
