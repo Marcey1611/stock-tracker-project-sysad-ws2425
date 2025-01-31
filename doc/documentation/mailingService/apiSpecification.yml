@@ -6,7 +6,7 @@ info:
   version: 1.0.0
 
 paths:
-  /sendMailAdded:
+  /send_mail_added:
     post:
       summary: Interface for sending an email that a product was added
       description: Interface for sending an email with the given data.
@@ -15,27 +15,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MailDataArray'
+              $ref: '#/components/schemas/mail_data_array'
       responses:
         '2XX':
           description: Response of the mailing service
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONResponse'
+                $ref: '#/components/schemas/json_response'
         '4XX':
           description: Response of the mailing service
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONResponse'
+                $ref: '#/components/schemas/json_response'
         '5XX':
           description: Response of the mailing service
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONResponse'
-  /sendMailDeleted:
+                $ref: '#/components/schemas/json_response'
+  /send_mail_deleted:
     post:
       summary: Interface for sending an email that a product was deleted
       description: Interface for sending an email with the given data.
@@ -44,27 +44,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MailDataArray'
+              $ref: '#/components/schemas/mail_data_array'
       responses:
         '2XX':
           description: Response of the mailing service
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONResponse'
+                $ref: '#/components/schemas/json_response'
         '4XX':
           description: Response of the mailing service
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONResponse'
+                $ref: '#/components/schemas/json_response'
         '5XX':
           description: Response of the mailing service
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONResponse'
-  /sendErrorMail:
+                $ref: '#/components/schemas/json_response'
+  /send_error_mail:
     post:
       summary: Interface for sending an email that an error occurred
       description: Interface for sending an email with the given data.
@@ -73,75 +73,75 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ErrorMailData'
+              $ref: '#/components/schemas/error_mail_data'
       responses:
         '2XX':
           description: Response of the mailing service
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONResponse'
+                $ref: '#/components/schemas/json_response'
         '4XX':
           description: Response of the mailing service
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONResponse'
+                $ref: '#/components/schemas/json_response'
         '5XX':
           description: Response of the mailing service
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONResponse'
+                $ref: '#/components/schemas/json_response'
 
 components:
   schemas:
-    MailData:
+    mail_data:
       type: object
       required:
-        - productId
-        - productName
-        - productAmountAdded
-        - productAmountTotal
+        - product_id
+        - product_name
+        - product_amount_changed
+        - product_amount_total
       properties:
-        productId:
+        product_id:
           type: integer
           example: 1
-        productName:
+        product_name:
           type: string
           example: "Müsli"
-        productAmountAdded:
+        product_amount_changed:
           type: integer
           example: 2
-        productAmountTotal:
+        product_amount_total:
           type: integer
           example: 5
-    MailDataArray:
+    mail_data_array:
       type: array
       items:
-        $ref: '#/components/schemas/MailData'
+        $ref: '#/components/schemas/mail_data'
       description: An array of MailData objects
       example:
-        - productId: 1
-          productName: "Müsli"
-          productAmountAdded: 2
-          productAmountTotal: 5
-        - productId: 2
-          productName: "Wasser"
-          productAmountAdded: 2
-          productAmountTotal: 5
-    ErrorMailData:
+        - product_id: 1
+          product_name: "Müsli"
+          product_amount_changed: 2
+          product_amount_total: 5
+        - product_id: 2
+          product_name: "Wasser"
+          product_amount_changed: 2
+          product_amount_total: 5
+    error_mail_data:
       type: object
       required:
-        - errorMessage
+        - error_message
       properties:
-        errorMessage:
+        error_message:
           type: string
           example: "The database service couldn't save the product"
-    JSONResponse:
+    json_response:
       type: object
       properties:
-        statusCode:
+        status_code:
           type: integer
           example: 200
         message:

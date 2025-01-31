@@ -1,54 +1,61 @@
 from typing import Dict, Any
 import logging
 
-from entity.exceptions.BadRequestException import BadRequestException
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+from entity.exceptions.bad_request_exception import BadRequestException
+from entity.enums.action import Action
 
 class Validator:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def validateData(self, productList) -> Dict[str, Any]:
-        self.logger.debug("test")
+    def validate_data(self, product_list):
+        self.logger.info("Validating mail data...")
         try:
-            if len(productList) < 1:
+            if len(product_list) < 1:
                 self.logger.error("No products provided!")
                 raise BadRequestException()
-            for product in productList:
-                isDataValid = []
+            
+            check_added_or_removed = 0
+            for product in product_list:
+                is_data_valid = []
 
-                isDataValid.append("productId" in product)
-                isDataValid.append("productName" in product)
-                isDataValid.append("productAmountTotal"  in product)
-                isDataValid.append("productAmountAdded" in product)
+                is_data_valid.append("product_id" in product)
+                is_data_valid.append("product_name" in product)
+                is_data_valid.append("product_amount_total" in product)
+                is_data_valid.append("product_amount_changed" in product)
 
-                isDataValid.append(isinstance(product["productId"], int))
-                isDataValid.append(isinstance(product["productName"], str))
-                isDataValid.append(isinstance(product["productAmountTotal"], int))
-                isDataValid.append(isinstance(product["productAmountAdded"], int))
-                isDataValid.append(len(product["productName"]) > 0)
+                is_data_valid.append(isinstance(product["product_id"], int))
+                is_data_valid.append(isinstance(product["product_name"], str))
+                is_data_valid.append(isinstance(product["product_amount_total"], int))
+                is_data_valid.append(isinstance(product["product_amount_changed"], int))
+                is_data_valid.append(len(product["product_name"]) > 0)
 
-                if False in isDataValid:
-                    self.logger.error("Validation failed!")
+                check_added_or_removed += 1 if product["product_amount_changed"] > 0 else -1
+                if False in is_data_valid:
+                    self.logger.error(f"Validation failed: {product}")
                     raise BadRequestException()
-            return productList
+                
+            if len(product_list) != check_added_or_removed and len(product_list) != check_added_or_removed*-1:
+                self.logger.error(f"Added/Removed check failed! It isn't allowed to mix added and removed products in one request. {check_added_or_removed}")
+                raise BadRequestException()
+            action = Action.ADDED if check_added_or_removed > 0 else Action.DELETED
+            return product_list, action
         
         except Exception:
-            self.logger.error(f"Invalid data: {productList}")
+            self.logger.error(f"Invalid data: {product_list}")
             raise BadRequestException()
 
-    def validateErrorMessage(self, requestData: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_error_message(self, request_data):
         try:
-            isDataValid = []
-            isDataValid.append("errorMessage" in requestData)
-            isDataValid.append(isinstance(requestData["errorMessage"], str))
-            isDataValid.append(len(requestData["errorMessage"]) > 0)
-            if False in isDataValid:
-                    self.logger.error("Validation failed!")
-                    raise BadRequestException()
-            return requestData
+            is_data_valid = []
+            is_data_valid.append("error_message" in request_data)
+            is_data_valid.append(isinstance(request_data["error_message"], str))
+            is_data_valid.append(len(request_data["error_message"]) > 0)
+            if False in is_data_valid:
+                self.logger.error("Validation failed!")
+                raise BadRequestException()
+            return request_data
         
         except Exception:
-            self.logger.error(f"Invalid data: {requestData}")
+            self.logger.error(f"Invalid data: {request_data}")
             raise BadRequestException()
