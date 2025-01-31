@@ -1,5 +1,4 @@
-from typing import List, Dict
-from typing import List, Dict
+from typing import Dict
 from pydantic import BaseModel
 
 class Product(BaseModel):
