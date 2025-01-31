@@ -34,8 +34,11 @@ FROM nginx:stable-alpine
 # Kopiere das gebaute Ergebnis in das Nginx-Verzeichnis
 COPY --from=build /app/build/web /usr/share/nginx/html
 
+# Eigene Nginx-Konfiguration hinzufügen (falls du die Proxy-Weiterleitung benötigst)
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
 # Exponiere Port 80
 EXPOSE 80
 
-# Starte den Nginx-Webserver
-CMD ["nginx", "-g", "daemon off;"]
+# Starte den Nginx-Webserver  
+CMD ["nginx","-g", "daemon off;"]
