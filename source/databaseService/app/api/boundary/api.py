@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from typing import Dict, Any
 
-from fastapi import FastAPI #nutzi
-from fastapi.middleware.cors import CORSMiddleware #nutzi
+#from fastapi import FastAPI #nutzi
+#from fastapi.middleware.cors import CORSMiddleware #nutzi
 
-app = FastAPI()  #Nutzi
+#app = FastAPI()  #Nutzi
 
 from api.control.apiBF import ApiBF
 from entities.models import Request, Response, AppResponse
@@ -29,14 +29,14 @@ async def updateApp():
     return apiBf.handleAppRequest()
 
 #nutzi muss geprüft werden ob notwendig 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"], # oder zB auch http://localhost:8001
-    allow_credentials=True,
-    allow_methods= ["*"],
-    allow_headers= ["*"],
-)
+#app.add_middleware(
+ #   CORSMiddleware,
+  #  allow_origins=["*"], # oder zB auch http://localhost:8001
+   # allow_credentials=True,
+    #allow_methods= ["*"],
+    #allow_headers= ["*"],
+#)
 
-@app.get("/updateApp") 
-async def updateApp():
-    return {"message": "Test und halloooo"}
+#@app.get("/updateApp") 
+#async def updateApp():
+#    return {"message": "Test und halloooo"}

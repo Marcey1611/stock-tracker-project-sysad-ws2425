@@ -9,7 +9,7 @@ services:
     ports:
       - "8080:80"
     environment:
-      - DATABASE_SERVICE_URL="http://database-service-url"
+      - DATABASE_SERVICE_URL="http://localhost:8001/updateApp"
     networks:
       - stockTrackerDockerNetwork
 
@@ -17,19 +17,3 @@ networks:
   stockTrackerDockerNetwork:
     external: true
 
-
-
-
-#version: '3.8'
-
-#services:
- # flutter-app:
-  #  build: .
-   # container_name: flutterWebsite
-    #networks:
-     # - stockTrackerDockerNetwork  
-
-
-#networks:
- # stockTrackerDockerNetwork:
-  #  external: true  
