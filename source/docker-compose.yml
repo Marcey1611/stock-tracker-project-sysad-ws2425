@@ -48,7 +48,7 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_SERVICE_URL=http://dataBaseServiceContainer:8000
-      - MQTT_BROKER_URL=192.168.2.226
+      - MQTT_BROKER_URL=stocktracker-mosquitto
       - MQTT_BROKER_PORT=1883
     depends_on:
       database-service:
@@ -69,14 +69,18 @@ services:
 
   mosquitto:
     image: eclipse-mosquitto
-    hostname: mosquitto
-    container_name: mosquitto
+    hostname: stocktracker-mosquitto
+    container_name: stocktracker-mosquitto
+    networks:
+      - stockTrackerDockerNetwork
     restart: unless-stopped
     ports:
       - "1883:1883"
       - "9001:9001"
     volumes:
-      - ./mosquitto:/etc/mosquitto:ro
+      - ./mqttBroker/mosquitto:/etc/mosquitto
+      - ./mqttBroker/mosquitto/data:/mosquitto/data
+      - ./mqttBroker/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
 volumes:
   pgdata:

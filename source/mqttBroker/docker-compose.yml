@@ -12,3 +12,4 @@ services:
     volumes:
       - ./mosquitto:/etc/mosquitto
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mqttBroker/mosquitto/data:/mosquitto/data
