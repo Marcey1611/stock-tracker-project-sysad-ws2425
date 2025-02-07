@@ -8,3 +8,5 @@ services:
       - DATABASE_SERVICE_URL="http://database-service-url"
       - MQTT_BROKER_URL=192.168.2.226
       - MQTT_BROKER_PORT=1883
+      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11m.pt
+      - DETECTION_MODEL=./app/models/detection/yolo11m.pt

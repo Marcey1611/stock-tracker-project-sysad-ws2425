@@ -1,18 +1,19 @@
 from fastapi import APIRouter, Request, BackgroundTasks
 from starlette.responses import StreamingResponse
 
-from service.apiClientDatabaseService import videoFeedHandler
+from service.apiClientDatabaseService import stream_feed_frames
 
 router = APIRouter()
 
 @router.get("/feed")
-async def videoFeed(request: Request, background_tasks: BackgroundTasks) -> StreamingResponse:
-    from main import feedEvent, feedQ
-    return videoFeedHandler(feedEvent, feedQ, request, background_tasks)
+def videoFeed():
+    from main import feedQ, feedEvent
+    return StreamingResponse(stream_feed_frames(feedEvent,feedQ), media_type="multipart/x-mixed-replace; boundary=frame")
+
 
 
 # Route for the track endpoint
 @router.get("/track")
-async def videoTrack(request: Request, background_tasks: BackgroundTasks) -> StreamingResponse:
+async def videoTrack() -> StreamingResponse:
     from main import trackEvent, trackQ
-    return videoFeedHandler(trackEvent, trackQ, request, background_tasks)
+    return StreamingResponse(stream_feed_frames(trackEvent,trackQ), media_type="multipart/x-mixed-replace; boundary=frame")

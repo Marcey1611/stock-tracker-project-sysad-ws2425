@@ -2,18 +2,19 @@ import logging
 from collections import defaultdict
 import time
 from copy import deepcopy, copy
-
+import os
 from ultralytics import YOLO
 import api.apiRestClientDatabase as ApiRestClientDatabase
 from entities.detection.detectedObject import DetectedObject
 from entities.detection.trackManager import TrackerManager
 
+logger = logging.getLogger(__name__)
 TOLERANCE = 10
 ADD_REMOVE_THRESHOLD = .5 * 30
 
-model = YOLO("./service/detection/yolo11n.pt")
+file_location = "../../."+os.getenv('DETECTION_MODEL')
+model = YOLO(file_location)
 
-logger = logging.getLogger(__name__)
 
 def processFrame(frame,trackers:TrackerManager,count):
     #logger.debug(f"enterd for id:{count}// {time.monotonic()}")

@@ -31,21 +31,25 @@ def on_connect(client, userdata, flags, rc):
     else:
         logger.debug(f"Verbindung fehlgeschlagen. Fehlercode: {rc}")
 
+def on_disconnect(client, userdata, flags):
+    logger.info("Disconnected From MQTT Broker")
+
 if len(broker)==0 or port==0:
     logging.info("Missing values to connect to Broker")
     sys.exit()
 
 client = mqtt.Client()
 client.on_connect = on_connect
+client.on_disconnect = on_disconnect
 client.username_pw_set(username, password)
 while True:
-    try:
-        logger.info("Versuche Verbindung zum Broker...")
-        client.connect(broker, port, 60)
-        client.loop_start()  # Client im Hintergrund laufen lassen
-        break  # Wenn die Verbindung erfolgreich ist, Schleife beenden
-    except Exception as e:
-        logger.debug(f"Verbindungsfehler: {e}. Neuer Versuch in 5 Sekunden...")
-        time.sleep(5)
-
-frame_loop(client,topic)
+    while True:
+        try:
+            logger.info("Versuche Verbindung zum Broker...")
+            client.connect(broker, port, 60)
+            client.loop_start()  # Client im Hintergrund laufen lassen
+            break  # Wenn die Verbindung erfolgreich ist, Schleife beenden
+        except Exception as e:
+            logger.debug(f"Verbindungsfehler: {e}. Neuer Versuch in 5 Sekunden...")
+            time.sleep(5)
+    frame_loop(client,topic)

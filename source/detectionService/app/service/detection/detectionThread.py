@@ -31,7 +31,7 @@ def detection(feedEvent:Event,feedQ:queue.Queue,trackEvent:Event,trackQ:queue.Qu
 
 def streamFeedFrames(frame,frameBytes,feedQ:queue.Queue):
     if frameBytes is None:
-        _, buffer = cv2.imencode('.webp', frame)
+        _, buffer = cv2.imencode('.jpeg', frame)
         frameBytes = buffer.tobytes()
 
     feedQ.put_nowait(b'--frame\r\n'

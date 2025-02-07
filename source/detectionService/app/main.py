@@ -1,16 +1,9 @@
 import logging
-import sys
 import threading
 import queue
-import time
-
-import cv2
-import numpy as np
-import paho.mqtt.client as mqtt
 
 from fastapi import FastAPI
 from api.videoFeedEndpointsThreads import router as videoRouter2
-from service.detection.detectionThread import detection
 from service.mqtt.mqtt_client import mqtt_thread
 
 logging.basicConfig(

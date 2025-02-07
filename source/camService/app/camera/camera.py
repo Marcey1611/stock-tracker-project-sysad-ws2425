@@ -27,7 +27,7 @@ def frame_loop(client:mqtt.Client,topic:str):
         return  # Beende den Thread, wenn die Kamera nicht geöffnet werden kann
     init_cam(camera)
 
-    while True:
+    while client.is_connected():
         current_time = time.monotonic()
         elapsed_time = current_time - last_frame_time
 
