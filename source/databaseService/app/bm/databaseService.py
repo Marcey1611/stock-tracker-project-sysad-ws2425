@@ -1,5 +1,5 @@
-from typing import List, Dict
 from fastapi import HTTPException
+from sqlalchemy import text
 
 from database.databaseProvider import DatabaseProvider
 from database.databaseTableModells import Products, OverallPicture
@@ -16,6 +16,7 @@ class DatabaseService:
             session = DatabaseService.database_provider.get_session()
 
             session.query(Products).delete()
+            session.execute(text("ALTER SEQUENCE products_id_seq RESTART WITH 1;"))
 
             # Create product classes in database
             for id in request.products:
@@ -27,6 +28,9 @@ class DatabaseService:
 
                 session.add(new_product)
 
+            session.query(OverallPicture).delete()
+            # Reset auto-increment sequence for overall_picture table and add new picture
+            session.execute(text("ALTER SEQUENCE overall_picture_id_seq RESTART WITH 1;"))
             session.add(OverallPicture(picture=request.overall_picture))
             session.commit()
         
@@ -63,12 +67,12 @@ class DatabaseService:
                                     id=id,
                                     name=product.name,
                                     amount=product.amount,
-                                    changed_amoun=changed_amount
+                                    changed_amount=changed_amount
                 )
 
                 # Update product
                 product.amount = request.products[id].amount 
-                product.picture = request.products[id].pictures
+                product.picture = request.products[id].picture
 
                 session.commit()
 
@@ -95,23 +99,22 @@ class DatabaseService:
         try:
             session = DatabaseService.database_provider.get_session()
             products = session.query(Products).all()
-            overall_picture = session.query(OverallPicture).first()
 
-            if not products or not overall_picture:
+            if not products:
                 raise HTTPException(
                     status_code=404, 
-                    detail="Database-Service: No products or overall picture found"
+                    detail="Database-Service: No products available yet."
                 )
             
             # Reset product amount and pictures
             for product in products:
-                product.product_amount = 0
-                product.product_picture = None
+                product.amount = 0
+                product.picture = None
                 
             # Reset overall picture
             overall_picture = session.query(OverallPicture).first()
             if overall_picture:
-                overall_picture.overall_picture = None
+                overall_picture.picture = None
 
             # Commit changes 
             session.commit()
@@ -132,26 +135,26 @@ class DatabaseService:
             if not products or not overall_picture:
                 raise HTTPException(
                     status_code=404, 
-                    detail="Database-Service: No products or  found"
+                    detail="Database-Service: No products available yet."
                 )
                 
             products_dict = {}
                 
             for product in products:
                 products_dict[product.id] = Product(
-                    name=product.product_name,
-                    picture=product.product_picture,
-                    amount=product.product_amount
+                    name=product.name,
+                    amount=product.amount,
+                    picture=product.picture
                 )
 
             return AppResponse(
-                product=products_dict,
-                overall_picture=overall_picture
+                products=products_dict,
+                overall_picture=overall_picture.picture
             )
 
         except Exception as e:
             session.rollback()
-            raise HTTPException(status_code=500, detail="Error while getting products")
+            raise HTTPException(status_code=500, detail=f"Database-Service: Error while getting products: {e}")
         
         finally:
             session.close()

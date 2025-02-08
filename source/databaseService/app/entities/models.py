@@ -1,5 +1,4 @@
-from typing import List, Dict
-from typing import List, Dict
+from typing import Dict
 from pydantic import BaseModel
 
 class Product(BaseModel):
@@ -8,7 +7,7 @@ class Product(BaseModel):
     picture: str | None = None
 
 class Request(BaseModel):
-    products = Dict[int, Product]
+    products: Dict[int, Product]
     overall_picture: str
 
 class Response(BaseModel):
@@ -22,5 +21,5 @@ class MailResponse(BaseModel):
     error_message: str | None = None
 
 class AppResponse(BaseModel):
-    products = Dict[int, Product]
+    products: Dict[int, Product]
     overall_picture: str
