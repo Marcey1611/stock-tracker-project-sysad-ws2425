@@ -50,6 +50,9 @@ services:
       - "/dev/video0:/dev/video0"
     environment:
       - DATABASE_SERVICE_URL=http://dataBaseServiceContainer:8000
+    depends_on:
+      database-service:
+        condition: service_healthy
 
   mailing-service:
     build: ./mailingService

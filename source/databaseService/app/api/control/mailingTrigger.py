@@ -1,6 +1,8 @@
+import json
 import os
 import requests
 from dotenv import load_dotenv
+
 
 def trigger_mailing_service(action: str, updated_products_dict: dict):
     load_dotenv()

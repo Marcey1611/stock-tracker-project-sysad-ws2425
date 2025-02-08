@@ -7,4 +7,4 @@ services:
     devices:
       - "/dev/video2:/dev/video0"
     environment:
-      - DATABASE_SERVICE_URL=http://192.168.2.15:8181
+      - DATABASE_SERVICE_URL="http://database-service-url"
