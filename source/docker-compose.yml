@@ -50,9 +50,6 @@ services:
       - "/dev/video0:/dev/video0"
     environment:
       - DATABASE_SERVICE_URL=http://dataBaseServiceContainer:8000
-    depends_on:
-      database-service:
-        condition: service_healthy
 
   mailing-service:
     build: ./mailingService
@@ -66,6 +63,9 @@ services:
       SMTP_PORT: 587
       SMTP_USER: sysad.stock.tracker@gmail.com
       SMTP_PASSWORD: qlddayafyvqszzlt
+
+  
+  
 
 volumes:
   pgdata:
