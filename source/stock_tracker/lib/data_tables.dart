@@ -39,7 +39,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
     super.dispose();
   }
 //sollte das mit dem Timer nicht funktionieren dann diesen LifeCycle versuchen, sodass IOS auch keine probleme hat
-   /*@override
+  /*@override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
       // App wird in den Hintergrund verschoben -> Timer stoppen
@@ -59,13 +59,19 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
 
       if (response.statusCode == 200) {
         final fetchedData = jsonDecode(response.body);
+        print('Geladene Daten: $fetchedData');
         print('Erhaltene Daten: ${response.body}'); // Debug-Ausgabe
         // Konvertiere die Schlüssel-Wert-Paare in eine Liste
         setState(() {
           overallPicture = fetchedData['overall_picture']; // Bild-URL auslesen
-          stockData = (fetchedData as Map)
-              .values
-              .toList(); // JSON korrekt als Liste verarbeiten
+          stockData = (fetchedData['products'] as Map).values.map((product) {
+          return {
+            "id": int.tryParse(product["id"].toString().trim()) ?? 0,
+            "name": product["name"] ?? "Unknown",
+            "amount": int.tryParse(product["amount"].toString().trim()) ?? 0,
+            "picture": product["picture"]
+          };
+           }).toList(); // JSON korrekt als Liste verarbeiten
           isLoading = false;
         });
       } else {
@@ -92,19 +98,34 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
     return Column(
       children: [
         if (overallPicture != null)
-          (overallPicture!.startsWith('http'))
-              ? Image.network(
-                  overallPicture!,
-                  height: 200,
-                  fit: BoxFit.contain,
-                )
-              : Image.memory(
-                  base64Decode(
-                      overallPicture!.replaceAll('data:image/png;base64,', '')),
-                  height: 200,
-                  fit: BoxFit.contain,
-                ),
-        const SizedBox(height: 20),
+          (overallPicture!.startsWith('http') ||
+                  overallPicture!.startsWith('data:image'))
+              ? (overallPicture!.startsWith('http')
+                  ? Image.network(
+                      overallPicture!,
+                      height: 200,
+                      fit: BoxFit.contain,
+                    )
+                  : Image.memory(
+                      base64Decode(overallPicture!
+                          .replaceAll('data:image/png;base64,', '')),
+                      height: 200,
+                      fit: BoxFit.contain,
+                    ))
+              : Column(
+                children: [
+                  Text(
+                      overallPicture!,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10,),
+                    Image.asset('assets/images/regal.png',
+                    height: 150,
+                    fit: BoxFit.contain,
+                    ),
+                ],
+              ),
         Expanded(
           child: Scrollbar(
             thumbVisibility: true,
@@ -117,19 +138,27 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
                   scrollDirection: Axis.vertical,
                   child: DataTable(
                     columns: const [
-                      DataColumn(label: Text('Product ID')),
-                      DataColumn(label: Text('Product Name')),
-                      DataColumn(label: Text('Product Amount')),
+                      DataColumn(label: Text('ID')),
+                      DataColumn(label: Text('Name')),
+                      DataColumn(label: Text('Amount')),
                       DataColumn(label: Text('Product Picture')),
                     ],
                     rows: stockData.map((product) {
+                      print('Produktdaten: $product');
                       return DataRow(cells: [
-                        DataCell(Text(product['product_id'].toString())),
-                        DataCell(Text(product['product_name'] ?? 'Unknown')),
-                        DataCell(Text(product['product_amount'].toString())),
-                        DataCell(product['product_picture'] != null
-                            ? Image.network(product['product_picture'],
-                                height: 50, width: 50)
+                        DataCell(Text(product['id'].toString())),
+                        DataCell(Text(product['name'] ?? 'Unknown')),
+                        DataCell(Text(product['amount'].toString())),
+                        DataCell(product['picture'] != null
+                            ? Image.network(
+                                product['picture'],
+                                height: 50,
+                                width: 50,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(Icons.broken_image);
+                                },
+                              )
                             : const Text('No Picture')),
                       ]);
                     }).toList(),
