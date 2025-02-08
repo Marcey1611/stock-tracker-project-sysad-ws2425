@@ -22,4 +22,4 @@ class MailResponse(BaseModel):
 
 class AppResponse(BaseModel):
     products: Dict[int, Product]
-    overall_picture: str
+    overall_picture: str | None = None

@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy import text
+from typing import Dict
 
 from database.databaseProvider import DatabaseProvider
 from database.databaseTableModells import Products, OverallPicture
@@ -10,6 +11,18 @@ class DatabaseService:
 
     def __init__(self):
         self.database_provider.init_db()
+
+    def update_products(self, request: Request) -> tuple:
+        try:
+            if request.products[1].picture == None:
+                self.intitalize_products(request)
+            else:
+                return self.update_products_amount(request)
+        
+            return None
+
+        except Exception as e:
+            raise RuntimeError(f"{e}")
 
     def intitalize_products(self, request: Request):
         try:
@@ -41,10 +54,25 @@ class DatabaseService:
         finally:
             session.close()
 
-    def update_products_amount(self, request: Request, add: bool) -> dict:
+    def update_products_amount(self, request: Request) -> Dict[int, MailResponse]:
         try:
             updated_products = {}
             session = DatabaseService.database_provider.get_session()
+
+            # Check if the amount of any product was reduced to zero
+            products = session.query(Products).all()
+            removed_products = [product for product in products if product.id not in request.products]
+            for product in removed_products:
+                product.amount = 0
+                product.picture = None
+                session.commit()
+
+                updated_products[product.id] = MailResponse(
+                                    id=product.id,
+                                    name=product.name,
+                                    amount=0,
+                                    changed_amount=product.amount * -1
+                )
 
             # Check if product id exists and update amount
             for id in request.products:
@@ -57,11 +85,10 @@ class DatabaseService:
                         detail=f"Database-Service: Error couldn't find product with id {id}"
                     )
  
-                # Add updated product to mail response
-                if add:
+                if request.products[id].amount >= product.amount:
                     changed_amount = request.products[id].amount - product.amount
                 else:
-                    changed_amount = product.amount - request.products[id].amount
+                    changed_amount = (product.amount - request.products[id].amount) * -1
 
                 updated_products[id] = MailResponse(
                                     id=id,
@@ -72,7 +99,11 @@ class DatabaseService:
 
                 # Update product
                 product.amount = request.products[id].amount 
-                product.picture = request.products[id].picture
+
+                if request.products[id].amount == 0:
+                    product.picture = None
+                else:
+                    product.picture = request.products[id].picture
 
                 session.commit()
 
@@ -95,37 +126,6 @@ class DatabaseService:
         finally:
             session.close()            
 
-    def reset_amounts(self):
-        try:
-            session = DatabaseService.database_provider.get_session()
-            products = session.query(Products).all()
-
-            if not products:
-                raise HTTPException(
-                    status_code=404, 
-                    detail="Database-Service: No products available yet."
-                )
-            
-            # Reset product amount and pictures
-            for product in products:
-                product.amount = 0
-                product.picture = None
-                
-            # Reset overall picture
-            overall_picture = session.query(OverallPicture).first()
-            if overall_picture:
-                overall_picture.picture = None
-
-            # Commit changes 
-            session.commit()
-        
-        except Exception as e:
-            session.rollback()
-            raise RuntimeError(f"Database-Service: Error while reseting products amount: {e}")
-        
-        finally:
-            session.close()
-            
     def get_products(self) -> AppResponse:
         try:
             session = DatabaseService.database_provider.get_session()
