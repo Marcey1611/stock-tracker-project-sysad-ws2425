@@ -7,30 +7,12 @@ from entities.models import Request, Response, AppResponse
 router = APIRouter()
 api_bf = ApiBF()  
 
-<<<<<<< HEAD
 @router.post("/update_products", response_model=Response)
 async def init_products(request: Request):
     return api_bf.handle_update_products_request(request)
-=======
-@router.post("/addItem", response_model=Response)
-async def add_item(request: Request):
-    return api_bf.handle_update_request(request, True)
 
-@router.post("/removeItem", response_model=Response)
-async def remove_item(request: Request):
-    return api_bf.handle_update_request(request, False)
-
-@router.get("/clearAll", response_model=Response)
-async def clear_all():
-    return api_bf.handle_reset_request()
->>>>>>> parent of d1423c4 (Merge branch 'SYSAD-71_init_request_DetectionService-&gt;DatabaseService' into 'SYSAD-87-flutter_website_connect_to_project')
-
-@router.get("/updateApp", response_model=Dict[Any, dict])
+@router.get("/update_app", response_model=AppResponse)
 async def update_app():
-<<<<<<< HEAD
-    return api_bf.handle_app_request()
-=======
-    print("es funktioniert")
     return api_bf.handle_app_request()
 
 
@@ -50,11 +32,11 @@ origins = [
 # CORS-Middleware hinzufügen
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Erlaubte Ursprünge || origins
+    allow_origins=["*"], # oder zB auch http://localhost:8001
     allow_credentials=True,
-    allow_methods=["*"],  # Erlaubte HTTP-Methoden
-    allow_headers=["*"],  # Erlaubte Header
+    allow_methods= ["*"],
+    allow_headers= ["*"],
 )
 
 app.include_router(router)
->>>>>>> parent of d1423c4 (Merge branch 'SYSAD-71_init_request_DetectionService-&gt;DatabaseService' into 'SYSAD-87-flutter_website_connect_to_project')
+
