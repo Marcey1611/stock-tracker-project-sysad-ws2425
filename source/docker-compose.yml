@@ -64,6 +64,9 @@ services:
       SMTP_USER: sysad.stock.tracker@gmail.com
       SMTP_PASSWORD: qlddayafyvqszzlt
 
+  
+  
+
 volumes:
   pgdata:
 
