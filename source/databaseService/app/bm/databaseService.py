@@ -12,7 +12,7 @@ class DatabaseService:
     def __init__(self):
         self.database_provider.init_db()
 
-    def update_products(self, request: Request) -> tuple:
+    def update_products(self, request: Request) -> Dict[int, MailResponse]:
         try:
             if request.products[1].picture == None:
                 self.intitalize_products(request)
