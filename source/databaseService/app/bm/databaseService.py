@@ -15,7 +15,19 @@ class DatabaseService:
         self.database_provider.init_db()
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def update_products_amount(self, add: bool, request: Request):
+    def update_products(self, request: Request) -> Dict[int, MailResponse]:
+        try:
+            if request.products[1].picture == None:
+                self.intitalize_products(request)
+            else:
+                return self.update_products_amount(request)
+        
+            return None
+
+        except Exception as e:
+            raise RuntimeError(f"{e}")
+
+    def intitalize_products(self, request: Request):
         try:
             session = DatabaseService.database_provider.get_session()
             updated_products_dict = {}
