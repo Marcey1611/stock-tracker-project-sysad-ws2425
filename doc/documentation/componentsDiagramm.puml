@@ -17,15 +17,13 @@ node database {
 
         portin getDataIN
 
-        portout sendMailAddedOUT
-        portout sendMailDeletedOUT
+        portout sendUpdateMailOUT
         portout sendErrorMailOUT
     }
 }
 node mail {
     component mailService{
-        portin sendMailAddedIN
-        portin sendMailDeletedIN
+        portin sendUpdateMailIN
         portin sendErrorMailIN
     }
 }
@@ -47,8 +45,7 @@ getDataOUT -down-> getDataIN
 feedOUT -right-> feedIN
 trackOUT -right-> trackIN
 
-sendMailAddedOUT -down-> sendMailAddedIN 
-sendMailDeletedOUT -down-> sendMailDeletedIN
+sendUpdateMailOUT -down-> sendUpdateMailIN
 sendErrorMailOUT -down-> sendErrorMailIN
 
 databaseService -left-> postgresDatabase
