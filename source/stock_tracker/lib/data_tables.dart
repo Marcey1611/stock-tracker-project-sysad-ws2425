@@ -66,7 +66,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
           overallPicture = fetchedData['overall_picture']; // Bild-URL auslesen
           stockData = (fetchedData['products'] as Map).values.map((product) {
           return {
-            "id": int.tryParse(product["id"].toString().trim()) ?? 0,
+            //"id": int.tryParse(product["id"].toString().trim()) ?? 0,
             "name": product["name"] ?? "Unknown",
             "amount": int.tryParse(product["amount"].toString().trim()) ?? 0,
             "picture": product["picture"]
@@ -138,7 +138,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
                   scrollDirection: Axis.vertical,
                   child: DataTable(
                     columns: const [
-                      DataColumn(label: Text('ID')),
+                      //DataColumn(label: Text('ID')),
                       DataColumn(label: Text('Name')),
                       DataColumn(label: Text('Amount')),
                       DataColumn(label: Text('Product Picture')),
@@ -146,7 +146,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
                     rows: stockData.map((product) {
                       print('Produktdaten: $product');
                       return DataRow(cells: [
-                        DataCell(Text(product['id'].toString())),
+                        //DataCell(Text(product['id'].toString())),
                         DataCell(Text(product['name'] ?? 'Unknown')),
                         DataCell(Text(product['amount'].toString())),
                         DataCell(product['picture'] != null

@@ -34,7 +34,7 @@ services:
       stock_tracker_postgres_db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/updateApp || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/update_app || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -50,6 +50,20 @@ services:
       - "/dev/video0:/dev/video0"
     environment:
       - DATABASE_SERVICE_URL=http://dataBaseServiceContainer:8000
+    depends_on:
+      database-service:
+        condition: service_healthy
+    
+
+  stock-tracker:
+    container_name: stock_tracker_container
+    build: ./stock_tracker
+    networks:
+      - stockTrackerDockerNetwork
+    ports:
+      - "8080:80"
+    environment:
+      - DATABASE_SERVICE_URL="http://localhost:8001/update_app"
 
   mailing-service:
     build: ./mailingService

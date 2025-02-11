@@ -23,7 +23,7 @@ class ApiBf:
             return Response(status_code=200)
 
         except Exception as e:
-            self.logger.error(f"Api-Bf: Error while initializing products: {e}")
+            self.logger.error(f"Api-Bf: Error while updating products: {e}")
             # trigger_mailing_service("send_error_mail", None)
             return Response(status_code = 500)
 
