@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy import text
 from typing import Dict
+import logging
 
 from database.databaseProvider import DatabaseProvider
 from database.databaseTableModells import Products, OverallPicture
@@ -11,17 +12,28 @@ class DatabaseService:
 
     def __init__(self):
         self.database_provider.init_db()
+        self.logger = logging.getLogger(self.__class__.__name__)
+
 
     def update_products(self, request: Request) -> Dict[int, MailResponse]:
+        self.logger.info("Updating products.....................................................................................................................")
         try:
-            if request.products[1].picture == None:
+            self.logger.info("1")
+            self.logger.info(request)
+            self.logger.info("1.1")
+            if not request.products[0].picture:
+                self.logger.info("2")
                 self.intitalize_products(request)
+                self.logger.info("3")
+            
             else:
+                self.logger.info("4")
                 return self.update_products_amount(request)
-        
+            self.logger.info("5")
             return None
 
         except Exception as e:
+            self.logger.error(f"Database-Service: Error while updating products: {e}")
             raise RuntimeError(f"{e}")
 
     def intitalize_products(self, request: Request):
@@ -44,8 +56,9 @@ class DatabaseService:
             session.query(OverallPicture).delete()
             # Reset auto-increment sequence for overall_picture table and add new picture
             session.execute(text("ALTER SEQUENCE overall_picture_id_seq RESTART WITH 1;"))
-            session.add(OverallPicture(picture=request.overall_picture))
+            session.add(OverallPicture(picture="test"))
             session.commit()
+            self.logger.info("SUCCESS")
         
         except Exception as e:
             session.rollback()

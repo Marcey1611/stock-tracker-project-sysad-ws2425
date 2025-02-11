@@ -11,7 +11,8 @@ def trigger_mailing_service(action: str, updated_products_dict: dict):
             mailing_service_response = requests.post(os.getenv("MAILING_SERVICE_URL") + action, json=generate_mailing_json(updated_products_dict))
             if mailing_service_response.status_code == 200: break
         else:
-            mailing_service_response = requests.post(os.getenv("MAILING_SERVICE_URL") + action, json="An error occurred while updating products")
+            data = {"error_message": "An error occurred while updating products"}
+            mailing_service_response = requests.post(os.getenv("MAILING_SERVICE_URL") + action, json=data)
             if mailing_service_response.status_code == 200: break
 
 def generate_mailing_json(updated_products_dict: dict):
