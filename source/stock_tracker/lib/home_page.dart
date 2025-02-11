@@ -41,7 +41,7 @@ class HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.trending_up),
-            label: 'Aktuell',
+            label: 'Aktualisieren',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),

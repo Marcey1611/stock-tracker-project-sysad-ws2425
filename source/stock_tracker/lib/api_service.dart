@@ -12,6 +12,7 @@ Future<List<dynamic>> getDataFromApi() async {
       final data = json.decode(response.body);
       return data['products'] ?? []; // Anpassung je nach API-Struktur
     } else {
+      print("GEHT nicht!");
       throw Exception('Fehler beim Laden der Daten: ${response.statusCode}');
     }
   } catch (e) {

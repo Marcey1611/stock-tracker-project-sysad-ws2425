@@ -9,7 +9,7 @@ services:
     ports:
       - "8080:80"
     environment:
-      - DATABASE_SERVICE_URL="http://localhost:8001/updateApp"
+      - DATABASE_SERVICE_URL="http://localhost:8001/update_app"
     networks:
       - stockTrackerDockerNetwork
 

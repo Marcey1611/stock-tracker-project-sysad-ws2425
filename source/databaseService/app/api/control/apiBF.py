@@ -23,7 +23,8 @@ class ApiBF:
             return Response(status_code = http_exception.status_code)
 
         except Exception as e:
-            self.logger.error(f"Error while updating products amount: {e}")
+            self.logger.error(f"Api-Bf: Error while updating products: {e}")
+            # trigger_mailing_service("send_error_mail", None)
             return Response(status_code = 500)
       
     def handle_reset_request(self) -> Response: 
