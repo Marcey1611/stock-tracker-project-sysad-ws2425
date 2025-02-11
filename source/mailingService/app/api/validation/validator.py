@@ -47,7 +47,6 @@ class Validator:
 
     def validate_error_message(self, request_data):
         try:
-            self.logger.info(request_data)
             is_data_valid = []
             is_data_valid.append("error_message" in request_data)
             is_data_valid.append(isinstance(request_data["error_message"], str))

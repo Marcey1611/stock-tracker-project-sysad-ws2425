@@ -19,16 +19,15 @@ class DatabaseService:
         self.logger.info("Updating products.....................................................................................................................")
         try:
             self.logger.info("1")
-            self.logger.info(request)
+            self.logger.info(request.products)
             self.logger.info("1.1")
-            if not request.products[0].picture:
-                self.logger.info("2")
-                self.intitalize_products(request)
-                self.logger.info("3")
-            
+            if not request.products == {}:
+                if not next(iter(request.products.values())).picture:
+                    self.intitalize_products(request)
+                else:
+                    return self.update_products_amount(request) 
             else:
-                self.logger.info("4")
-                return self.update_products_amount(request)
+                return self.update_products_amount(request) 
             self.logger.info("5")
             return None
 
@@ -56,7 +55,7 @@ class DatabaseService:
             session.query(OverallPicture).delete()
             # Reset auto-increment sequence for overall_picture table and add new picture
             session.execute(text("ALTER SEQUENCE overall_picture_id_seq RESTART WITH 1;"))
-            session.add(OverallPicture(picture="test"))
+            session.add(OverallPicture(picture=request.overall_picture))
             session.commit()
             self.logger.info("SUCCESS")
         
@@ -76,16 +75,18 @@ class DatabaseService:
             products = session.query(Products).all()
             removed_products = [product for product in products if product.id not in request.products]
             for product in removed_products:
-                product.amount = 0
-                product.picture = None
-                session.commit()
+                if product.amount is not 0:
+                    
+                    product.amount = 0
+                    product.picture = None
+                    session.commit()
 
-                updated_products[product.id] = MailResponse(
-                                    id=product.id,
-                                    name=product.name,
-                                    amount=0,
-                                    changed_amount=product.amount * -1
-                )
+                    updated_products[product.id] = MailResponse(
+                                        id=product.id,
+                                        name=product.name,
+                                        amount=0,
+                                        changed_amount=product.amount * -1
+                    )
 
             # Check if product id exists and update amount
             for id in request.products:

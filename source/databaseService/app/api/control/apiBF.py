@@ -18,7 +18,8 @@ class ApiBf:
         try:
             self.logger.info("1")
             mail_response = ApiBf.database_service.update_products(request)
-            self.logger.info("2")
+            self.logger.info(mail_response)
+            self.logger.info("2..................................................................................................................................")
 
             if mail_response:
                 self.logger.info("3")

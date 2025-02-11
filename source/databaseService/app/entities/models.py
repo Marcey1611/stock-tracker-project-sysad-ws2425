@@ -18,7 +18,6 @@ class MailResponse(BaseModel):
     name: str
     amount: int
     changed_amount: int
-    error_message: str | None = None
 
 class AppResponse(BaseModel):
     products: Dict[int, Product]

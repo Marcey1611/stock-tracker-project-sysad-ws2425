@@ -15,7 +15,9 @@ async def init_products(request: Request):
 
 @router.get("/update_app", response_model=AppResponse)
 async def update_app():
-    return api_bf.handle_app_request()
+    response =  api_bf.handle_app_request()
+    logger.info(f"Handling update app request: {response}")
+    return response
 
 @router.get("/healthcheck")
 async def healthcheck():
