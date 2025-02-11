@@ -1,6 +1,5 @@
 from enum import Enum
 
 class Action(Enum):
-    ADDED = 1
-    DELETED = 0
+    CHANGED = 1
     ERROR = -1

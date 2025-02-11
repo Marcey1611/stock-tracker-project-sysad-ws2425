@@ -5,7 +5,7 @@ from email.mime.image import MIMEImage
 import logging
 from jinja2 import Template
 
-from entity.models.mail_data import MailData
+from entity.models.mail_data import MailUpdateData
 from entity.exceptions.internal_error_exception import InternalErrorException
 from entity.enums.action import Action
 from bm.mail_sending_service_ba import MailSendingServiceBa
@@ -19,7 +19,7 @@ class MailPreparingServiceBa:
     def prepare_mail(self, mail_data, action: Action):
         self.logger.info(f"Preparing email...")
         try:
-            if action == Action.ADDED or action == Action.DELETED:
+            if action == Action.CHANGED:
                 subject, body = self.set_mail_data(mail_data, action)
             elif action == Action.ERROR:
                 subject, body = self.set_error_mail_data(mail_data)
@@ -33,7 +33,7 @@ class MailPreparingServiceBa:
             raise InternalErrorException()
         
         
-    def set_mail_data(self, mail_data_list: list[MailData], action: Action):
+    def set_mail_data(self, mail_data_list: list[MailUpdateData], action: Action):
         try:
             with open("email_template.html", "r") as email_template:
                 template_content = email_template.read()
@@ -41,29 +41,21 @@ class MailPreparingServiceBa:
             
             products = [
                 {
-                    "product_id": mail_data.product_id,
-                    "product_name": mail_data.product_name,
-                    "product_amount_changed": mail_data.product_amount_changed,
-                    "product_amount_total": mail_data.product_amount_total,
+                    "product_id": mail_data.id,
+                    "product_name": mail_data.name,
+                    "product_amount_changed": mail_data.changed_amount,
+                    "product_amount_total": mail_data.amount,
                 }
                 for mail_data in mail_data_list
             ]
 
-            if action == Action.ADDED:
+            if action == Action.CHANGED:
                 body = template.render(
-                    title="Products Successfully Added",
-                    message="The following products were detected and added:",
+                    title="Products Successfully Added/Deleted",
+                    message="The following products were detected and added or deleted:",
                     products=products,
                 )
-                subject = "Products Successfully Added" 
-
-            elif action == Action.DELETED:
-                body = template.render(
-                    title="Products Successfully Deleted",
-                    message="The following products were detected and deleted:",
-                    products=products,
-                )
-                subject = "Products Successfully Deleted" 
+                subject = "Products Successfully Added/Deleted" 
 
             else:
                 self.logger.error("Unexpected action!")
