@@ -7,7 +7,9 @@ import numpy as np
 import paho.mqtt.client as mqtt
 import sys
 
-from service.detection.detectionThread import detection
+from entities.detection.track_manager import TrackerManager
+from service.detection.detection_thread import detection
+from service.http_request.http_request_service import init_database
 
 logger = logging.getLogger(__name__)
 
@@ -27,23 +29,27 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     # Das Topic identifiziert die Kamera
-    feedEvent, feedQ, trackEvent, trackQ,count = userdata
+    feed_event, feed_q, track_event, track_q, trackers,count,model_cls_names = userdata
 
     camera_id = msg.topic.split('/')[1]  # Extrahiere 'cam1', 'cam2', etc.
     frameBytes = msg.payload  # Die Nachricht dekodieren
     nparr = np.frombuffer(frameBytes, np.uint8)
     frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    detection(feedEvent,feedQ,trackEvent,trackQ,frame,frameBytes,count)
-    count = count +1
-
+    if count == 0:
+        init_database(frame,model_cls_names)
+    detection(feed_event,feed_q,track_event,track_q,frame,frameBytes,trackers)
+    count = count + 1
     logger.info(f"Nachricht von {camera_id}")
+    client.user_data_set((feed_event, feed_q, track_event, track_q,trackers,count,model_cls_names))
 
-def mqtt_thread(feedEvent,feedQ,trackEvent,trackQ):
-    count = 0
+def mqtt_thread(feed_event,feed_q,track_event,track_q):
+    from service.detection.frame_processess import model_cls_names
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
-    client.user_data_set((feedEvent, feedQ, trackEvent, trackQ,count))
+    trackers = TrackerManager()
+    count = 0
+    client.user_data_set((feed_event, feed_q, track_event, track_q,trackers,count,model_cls_names))
     client.username_pw_set(username, password)
 
     if len(broker)==0 or port==0:

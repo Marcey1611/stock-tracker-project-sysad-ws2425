@@ -4,24 +4,24 @@ from threading import Event
 
 logger = logging.getLogger('databaseService')
 
-def streamFeedFrames(feedEvent:Event,feedQ:queue.Queue):
-    feedEvent.set()
+def streamFeedFrames(feed_event:Event,feed_q:queue.Queue):
+    feed_event.set()
     try:
         while True:
-            frame = feedQ.get()
+            frame = feed_q.get()
             if frame is None:
                 break
             yield frame
     finally:
-        feedEvent.clear()
+        feed_event.clear()
 
-def streamTrackFrames(trackEvent:Event,trackQ:queue.Queue):
-    trackEvent.set()
+def streamTrackFrames(track_event:Event,track_q:queue.Queue):
+    track_event.set()
     try:
         while True:
-            frame = trackQ.get()
+            frame = track_q.get()
             if frame is None:
                 break
             yield frame
     finally:
-        trackEvent.clear()
+        track_event.clear()
