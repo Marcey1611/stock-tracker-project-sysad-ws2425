@@ -1,27 +1,19 @@
 import logging
+from asyncio import sleep
 import queue
 from threading import Event
 
 logger = logging.getLogger('databaseService')
 
-def streamFeedFrames(feedEvent:Event,feedQ:queue.Queue):
+def stream_feed_frames(feedEvent:Event,feedQ:queue.Queue):
     feedEvent.set()
     try:
         while True:
             frame = feedQ.get()
             if frame is None:
-                break
+                sleep(0.1)
+                continue
             yield frame
+            sleep(0.1)
     finally:
         feedEvent.clear()
-
-def streamTrackFrames(trackEvent:Event,trackQ:queue.Queue):
-    trackEvent.set()
-    try:
-        while True:
-            frame = trackQ.get()
-            if frame is None:
-                break
-            yield frame
-    finally:
-        trackEvent.clear()

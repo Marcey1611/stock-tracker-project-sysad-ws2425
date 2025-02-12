@@ -1,32 +1,40 @@
 import logging
 from collections import defaultdict
+import time
 from copy import deepcopy, copy
-
+import os
 from ultralytics import YOLO
 import api.apiRestClientDatabase as ApiRestClientDatabase
 from entities.detection.detectedObject import DetectedObject
 from entities.detection.trackManager import TrackerManager
 
+logger = logging.getLogger(__name__)
 TOLERANCE = 10
 ADD_REMOVE_THRESHOLD = .5 * 30
 
-model = YOLO("./service/detection/yolo11l.pt")
+file_location = "../../."+os.getenv('DETECTION_MODEL')
+model = YOLO(file_location)
 
-logger = logging.getLogger(__name__)
 
-def processFrame(frame,trackers:TrackerManager):
+def processFrame(frame,trackers:TrackerManager,count):
+    #logger.debug(f"enterd for id:{count}// {time.monotonic()}")
     results = model.track(frame, conf=0.55, imgsz=640, verbose=False)
     annotatedFrame = results[0].plot()
+    #logger.debug(f"done YOLO for id:{count}// {time.monotonic()}")
 
     currentTrackIds = set()
     if results[0].boxes is not None and results[0].boxes.id is not None:
         currentTrackIds = updateObjectTracking(results, trackers)
     handleDisappearedObjects(currentTrackIds,trackers)
+    #logger.debug(f"done tracking for id:{count}// {time.monotonic()}")
+
 
     updateDatabase(trackers,len(results[0].names))
+    #logger.debug(f"done databaseUpdate for id:{count}// {time.monotonic()}")
+
 
     trackers.previousDetectedObjects = trackers.detectedObjects.copy()
-
+    #logger.debug(f"done for id:{count}// {time.monotonic()}")
     return annotatedFrame
 
 def updateObjectTracking(results, trackers:TrackerManager):

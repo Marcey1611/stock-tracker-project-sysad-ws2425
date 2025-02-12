@@ -4,7 +4,16 @@ import queue
 
 from fastapi import FastAPI
 from api.videoFeedEndpointsThreads import router as videoRouter2
-from service.detection.detectionThread import detectionThread
+from service.mqtt.mqtt_client import mqtt_thread
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(filename)s - %(funcName)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    handlers=[logging.StreamHandler()]  # Ausgabe in die Konsole
+)
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 feedEvent = threading.Event()  # Event zum Starten und Stoppen des Streams
@@ -15,15 +24,12 @@ addQ = queue.Queue()  # Queue für Tracking-Daten (optional)
 removeQ = queue.Queue()  # Queue für Tracking-Daten (optional)
 
 
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(filename)s - %(funcName)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    handlers=[logging.StreamHandler()]  # Ausgabe in die Konsole
-)
-
-detection_thread = threading.Thread(target=detectionThread, args=(feedEvent, feedQ, trackEvent, trackQ, 0))
-detection_thread.daemon = True  # Daemon-Thread, wird beendet, wenn das Hauptprogramm beendet wird
-detection_thread.start()
+topic ="camera/+/image"
 app.include_router(videoRouter2, prefix="/thread", tags=["video"])
+
+thread_mqtt=threading.Thread(target=mqtt_thread,args=(feedEvent,feedQ,trackEvent,trackQ))
+thread_mqtt.daemon = True
+thread_mqtt.start()
+
+
+

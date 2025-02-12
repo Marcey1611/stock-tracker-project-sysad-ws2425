@@ -1,10 +1,13 @@
 import logging
+import os
 
 from ultralytics import YOLO
 
-model = YOLO("./service/detection/yolo11l.pt")
-
 logger = logging.getLogger(__name__)
+
+file_location = "../../."+os.getenv('HUMAN_CHECK_MODEL')
+model = YOLO(file_location)
+
 
 def isHumanInFrame(frame):
     results = model.predict(frame, conf=0.55, imgsz=640, verbose=False)
