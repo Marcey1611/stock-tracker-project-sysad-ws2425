@@ -1,10 +1,3 @@
-import logging
-
-from ultralytics import YOLO
-
-model = YOLO("./service/detection/yolo11l.pt")
-
-logger = logging.getLogger(__name__)
 
 
 def is_human_in_frame(frame):
