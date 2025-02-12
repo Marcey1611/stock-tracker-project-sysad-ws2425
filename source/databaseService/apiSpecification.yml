@@ -6,125 +6,105 @@ info:
   version: 1.0.0
 
 paths:
-  /addItem:
+  /update_products:
     post:
-      summary: Add new item
-      description: Create a new item in the database, create product when item does not have existing product-type.
+      summary: Initialise products or update product amount
+      description: When used for initialising, then products-types are added to the database. Used to update products amoutn, pictures and overall-picture.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StockLog'
+              $ref: '#/components/schemas/Request'
       responses:
         '2XX':
-          description: Succesfully added item
+          description: Succesfully updated item
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StockLogResponse'
+                $ref: '#/components/schemas/Response'
         '4XX':
           description: Client Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StockLogResponse'
+                $ref: '#/components/schemas/Response'
         '5XX':
           description: Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StockLogResponse'
-  /deleteItem:
-    post:
-      summary: Mark item as removed
-      description: If an item was removed, set SystemOutTime, this marks the item as removed.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/StockLog'
-      responses:
-        '2XX':
-          description: Successfully removed item 
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StockLogResponse'
-        '4XX':
-          description: Client Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StockLogResponse'
-        '5XX':
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StockLogResponse'
-  /getNextId:
+                $ref: '#/components/schemas/Response'
+
+  /update_app:
     get:
-      summary: Return next id
-      description: Return the next available id.
+      summary: Sends products update to app
+      description: The app can use this to get updates on products regarding amount, picture and overall-picture.
       responses:
         '2XX':
-          description: Next id was returned
+          description: Succesfully sent update
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetNextIdResponse'
+                $ref: '#/components/schemas/AppResponse'
         '4XX':
           description: Client Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetNextIdResponse'
+                $ref: '#/components/schemas/AppResponse'
         '5XX':
           description: Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetNextIdResponse'
+                $ref: '#/components/schemas/AppResponse'
     
 components:
   schemas:
-    StockLog:
+    Product:
       type: object
+      properties:
+        name:
+          type: string
+        amount:
+          type: integer
+        picture:
+          type: string
+          nullable: true
       required:
-        - id
-        - classId
-        - SystemInTime
-        - SystemOutTime
-      properties:
-        id:
-          type: integer
-          example: 123
-        classId:
-          type: integer
-          example: 123
-        SystemInTime:
-          type: object
-          example: "DD.MM.YYYY hh:mm:ss"
-        SystemOutTime:
-          type: object
-          example: "DD.MM.YYYY hh:mm:ss"
-    StockLogResponse:
+        - name
+        - amount
+
+    Request:
       type: object
       properties:
-        statusCode:
-          type: integer #enum value for http status code
-          example: badRequest
-        message:
-          type: string 
-          example: "Id already exists"
-    GetNextIdResponse:
+        products:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Product'
+        overall_picture:
+          type: string
+      required:
+       - products
+       - overall_picture
+
+    Response:
+      type: object 
+      properties:
+        status_code:
+          type: integer
+      required:
+       - status_code
+
+    AppResponse:
       type: object
       properties:
-        statusCode:
-          type: integer #enum value for http status code
-          example: success
-        message:
-          type: integer
-          example: 22
+        products:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Product'
+        overall_picture:
+          type: string
+      required:
+       - products
