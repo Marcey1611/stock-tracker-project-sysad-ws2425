@@ -14,7 +14,6 @@ class DatabaseService:
         self.database_provider.init_db()
         self.logger = logging.getLogger(self.__class__.__name__)
 
-
     def update_products(self, request: Request) -> Dict[int, MailResponse]:
         self.logger.info("Updating products.....................................................................................................................")
         try:
@@ -45,6 +44,7 @@ class DatabaseService:
             # Create product classes in database
             for id in request.products:
                 new_product = Products(
+                    type_id=id,
                     name=request.products[id].name,
                     amount=request.products[id].amount,
                     picture=request.products[id].picture
@@ -73,24 +73,24 @@ class DatabaseService:
 
             # Check if the amount of any product was reduced to zero
             products = session.query(Products).all()
-            removed_products = [product for product in products if product.id not in request.products]
+            removed_products = [product for product in products if product.type_id not in request.products]
             for product in removed_products:
-                if product.amount is not 0:
-                    
+                if product.amount != 0:
+                    changed_amount = product.amount * -1
                     product.amount = 0
                     product.picture = None
                     session.commit()
 
-                    updated_products[product.id] = MailResponse(
-                                        id=product.id,
+                    updated_products[product.type_id] = MailResponse(
+                                        id=product.type_id,
                                         name=product.name,
                                         amount=0,
-                                        changed_amount=product.amount * -1
+                                        changed_amount=changed_amount
                     )
 
             # Check if product id exists and update amount
             for id in request.products:
-                product = session.query(Products).filter_by(id=id).first()
+                product = session.query(Products).filter_by(type_id=id).first()
 
                 # Raise HTTP-Exception if product doesn't exist
                 if not product:
@@ -99,27 +99,21 @@ class DatabaseService:
                         detail=f"Database-Service: Error couldn't find product with id {id}"
                     )
  
-                if request.products[id].amount >= product.amount:
-                    changed_amount = request.products[id].amount - product.amount
-                else:
-                    changed_amount = (product.amount - request.products[id].amount) * -1
-
-                updated_products[id] = MailResponse(
-                                    id=id,
-                                    name=product.name,
-                                    amount=product.amount,
-                                    changed_amount=changed_amount
-                )
+                changed_amount = request.products[id].amount - product.amount
 
                 # Update product
                 product.amount = request.products[id].amount 
-
-                if request.products[id].amount == 0:
-                    product.picture = None
-                else:
-                    product.picture = request.products[id].picture
+                product.picture = request.products[id].picture
 
                 session.commit()
+
+                if changed_amount != 0:
+                    updated_products[id] = MailResponse(
+                                        id=id,
+                                        name=product.name,
+                                        amount=product.amount,
+                                        changed_amount=changed_amount
+                    )
 
             # Update overall picture or add one if it doesn't exist
             overall_picture = session.query(OverallPicture).first()
@@ -155,7 +149,7 @@ class DatabaseService:
             products_dict = {}
                 
             for product in products:
-                products_dict[product.id] = Product(
+                products_dict[product.type_id] = Product(
                     name=product.name,
                     amount=product.amount,
                     picture=product.picture
@@ -172,3 +166,7 @@ class DatabaseService:
         
         finally:
             session.close()
+
+
+
+# TODO: nur die Produkte an den Mailing-Service schicken bei denen sich auch etwas geändert hat
