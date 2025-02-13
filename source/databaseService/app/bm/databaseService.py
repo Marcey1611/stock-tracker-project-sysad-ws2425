@@ -75,7 +75,7 @@ class DatabaseService:
             products = session.query(Products).all()
             removed_products = [product for product in products if product.type_id not in request.products]
             for product in removed_products:
-                if product.amount is not 0:
+                if product.amount != 0:
                     changed_amount = product.amount * -1
                     product.amount = 0
                     product.picture = None
@@ -99,17 +99,15 @@ class DatabaseService:
                         detail=f"Database-Service: Error couldn't find product with id {id}"
                     )
  
-                if request.products[id].amount >= product.amount:
-                    changed_amount = request.products[id].amount - product.amount
-                else:
-                    changed_amount = (product.amount - request.products[id].amount) * -1
+                changed_amount = request.products[id].amount - product.amount
 
-                updated_products[id] = MailResponse(
-                                    id=id,
-                                    name=product.name,
-                                    amount=product.amount,
-                                    changed_amount=changed_amount
-                )
+                if changed_amount != 0:
+                    updated_products[id] = MailResponse(
+                                        id=id,
+                                        name=product.name,
+                                        amount=product.amount,
+                                        changed_amount=changed_amount
+                    )
 
                 # Update product
                 product.amount = request.products[id].amount 
@@ -168,3 +166,7 @@ class DatabaseService:
         
         finally:
             session.close()
+
+
+
+# TODO: nur die Produkte an den Mailing-Service schicken bei denen sich auch etwas geändert hat
