@@ -76,7 +76,7 @@ class DatabaseService:
             removed_products = [product for product in products if product.type_id not in request.products]
             for product in removed_products:
                 if product.amount is not 0:
-                    
+                    changed_amount = product.amount * -1
                     product.amount = 0
                     product.picture = None
                     session.commit()
@@ -85,7 +85,7 @@ class DatabaseService:
                                         id=product.type_id,
                                         name=product.name,
                                         amount=0,
-                                        changed_amount=product.amount * -1
+                                        changed_amount=changed_amount
                     )
 
             # Check if product id exists and update amount
