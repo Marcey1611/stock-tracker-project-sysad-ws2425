@@ -7,7 +7,7 @@ participant "MailPreparingServiceBa" as MailPreparingService
 participant "MailSendingServiceBa" as MailSendingService
 participant "Gmail" as Gmail
 
-Database -> API: POST /sendMailAdded
+Database -> API: POST /send_update_mail
 API -> API: Validate request
 API -> ApiBF: Prepare mailing data
 ApiBF -> MailPreparingService: Prepare mail

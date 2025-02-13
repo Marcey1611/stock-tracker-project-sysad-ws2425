@@ -10,7 +10,7 @@ The Mailing Service is responsible for sending automated emails based on the inf
 
 The Mailing Service is modular in design. Its main components include:
 - **API:** The interface that processes and validates incoming requests.
-- **Business Logic (ApiBF):** Responsible for preparing the data for email creation.
+- **Business Facade (ApiBF):** Responsible for preparing the data for email creation.
 - **Mailing Logic (MailSendingServiceBA):** Manages the actual email sending, including configuration and message dispatch.
 
 (Partially generated with ChatGPT)
