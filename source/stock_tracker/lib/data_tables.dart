@@ -4,6 +4,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'api_config.dart';
+import 'package:logger/logger.dart';
+
+final Logger logger = Logger();
 
 class StockDataTableWidget extends StatefulWidget {
   const StockDataTableWidget({super.key});
@@ -27,7 +30,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
 
   void _startTimerNew() {
     _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
-      print("Daten werden alle 30sec aktualisiert");
+      logger.i("Daten werden alle 30sec aktualisiert");
       _fetchStockData();
     });
   }
@@ -40,27 +43,30 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
 
   Future<void> _fetchStockData() async {
     try {
+      
       final apiUrl = ApiConfig.getBaseUrl();
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
         String responseBody = utf8.decode(response.bodyBytes);
         final fetchedData = jsonDecode(responseBody);
-        print('Geladene Daten: $fetchedData\n');
+        logger.i('Geladene Daten: $fetchedData\n');
 
         setState(() {
           overallPicture = fetchedData['overall_picture'];
 
           if (overallPicture != null && overallPicture!.contains('base64')) {
-            overallPicture = base64Decode(
-              overallPicture!.replaceAll('data:image/png;base64,', ''),
-            );
+            overallPicture =
+                'data:image/webp;base64,${overallPicture!.replaceAll('data:image/png;base64,', '')}';
           }
           stockData = (fetchedData['products'] as Map).values.map((product) {
             return {
               "name": product["name"] ?? "Unknown",
               "amount": int.tryParse(product["amount"].toString().trim()) ?? 0,
-              "picture": product["picture"]
+              "picture": (product["picture"] != null &&
+                      product["picture"].contains('base64'))
+                  ? 'data:image/webp;base64,${product["picture"].replaceAll('data:image/png;base64,', '')}'
+                  : product["picture"]
             };
           }).toList();
           isLoading = false;
@@ -72,7 +78,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
       setState(() {
         isLoading = false;
       });
-      print('Error fetching stock data: $e');
+      logger.e('Error fetching stock data: $e');
     }
   }
 
@@ -92,7 +98,6 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
               overallPicture is Uint8List
                   ? Image.memory(
                       overallPicture!,
-                      
                       height: 200,
                       fit: BoxFit.contain,
                     )
