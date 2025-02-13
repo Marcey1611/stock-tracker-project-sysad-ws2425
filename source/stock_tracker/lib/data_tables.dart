@@ -54,17 +54,23 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
         setState(() {
           overallPicture = fetchedData['overall_picture'];
 
-          if (overallPicture != null) {
+          try {
+            Uint8List decodedImage = base64Decode(overallPicture!);
             overallPicture =
-                'data:image/webp;base64,${overallPicture!.replaceAll('data:image/png;base64,', '')}';
+                decodedImage; 
+          } catch (e) {
+            overallPicture = "Fehler beim Dekodieren des Bildes";
           }
           stockData = (fetchedData['products'] as Map).values.map((product) {
-            String? picture = product["picture"];
+            dynamic picture = product["picture"];
 
             if (picture != null) {
-              if (picture.length > 30) {
+              try {
+                Uint8List decodedImage = base64Decode(picture);
                 picture =
-                    'data:image/webp;base64,${base64Encode(utf8.encode(picture))}';
+                    decodedImage; 
+              } catch (e) {
+                picture = "Fehler beim Dekodieren des Bildes";
               }
             }
             return {
