@@ -43,7 +43,6 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
 
   Future<void> _fetchStockData() async {
     try {
-      
       final apiUrl = ApiConfig.getBaseUrl();
       final response = await http.get(Uri.parse(apiUrl));
 
@@ -55,18 +54,23 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
         setState(() {
           overallPicture = fetchedData['overall_picture'];
 
-          if (overallPicture != null && overallPicture!.contains('base64')) {
+          if (overallPicture != null) {
             overallPicture =
                 'data:image/webp;base64,${overallPicture!.replaceAll('data:image/png;base64,', '')}';
           }
           stockData = (fetchedData['products'] as Map).values.map((product) {
+            String? picture = product["picture"];
+
+            if (picture != null) {
+              if (picture.length > 30) {
+                picture =
+                    'data:image/webp;base64,${base64Encode(utf8.encode(picture))}';
+              }
+            }
             return {
               "name": product["name"] ?? "Unknown",
               "amount": int.tryParse(product["amount"].toString().trim()) ?? 0,
-              "picture": (product["picture"] != null &&
-                      product["picture"].contains('base64'))
-                  ? 'data:image/webp;base64,${product["picture"].replaceAll('data:image/png;base64,', '')}'
-                  : product["picture"]
+              "picture": picture
             };
           }).toList();
           isLoading = false;
