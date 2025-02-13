@@ -15,23 +15,17 @@ model = YOLO(file_location)
 model_cls_names = model.names
 
 def process_frame(frame,trackers:TrackerManager):
-    #logger.debug(f"enterd for id:{count}// {time.monotonic()}")
-    results = model.track(frame, conf=0.55, imgsz=640, verbose=False)
+    results = model.track(frame, conf=0.55, imgsz=640, verbose=False,persist=True)
     annotated_frame = results[0].plot()
-    #logger.debug(f"done YOLO for id:{count}// {time.monotonic()}")
 
     current_track_ids = set()
     if results[0].boxes is not None and results[0].boxes.id is not None:
         current_track_ids = update_object_tracking(results, trackers)
     handle_disappeared_objects(current_track_ids,trackers)
-    #logger.debug(f"done tracking for id:{count}// {time.monotonic()}")
-
 
     update_database(trackers,annotated_frame,frame)
-    #logger.debug(f"done databaseUpdate for id:{count}// {time.monotonic()}")
 
     trackers.previous_detected_objects = trackers.detected_objects.copy()
 
     trackers.previous_detected_objects = trackers.detected_objects.copy()
-    #logger.debug(f"done for id:{count}// {time.monotonic()}")
     return annotated_frame
