@@ -101,6 +101,12 @@ class DatabaseService:
  
                 changed_amount = request.products[id].amount - product.amount
 
+                # Update product
+                product.amount = request.products[id].amount 
+                product.picture = request.products[id].picture
+
+                session.commit()
+
                 if changed_amount != 0:
                     updated_products[id] = MailResponse(
                                         id=id,
@@ -108,12 +114,6 @@ class DatabaseService:
                                         amount=product.amount,
                                         changed_amount=changed_amount
                     )
-
-                # Update product
-                product.amount = request.products[id].amount 
-                product.picture = request.products[id].picture
-
-                session.commit()
 
             # Update overall picture or add one if it doesn't exist
             overall_picture = session.query(OverallPicture).first()
