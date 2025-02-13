@@ -55,7 +55,6 @@ services:
     depends_on:
       database-service:
         condition: service_healthy
-    
 
   stock-tracker:
     container_name: stock_tracker_container

@@ -151,11 +151,11 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
                             DataCell(Text(product['name'] ?? 'Unknown')),
                             DataCell(Text(product['amount'].toString())),
                             DataCell(product['picture'] != null
-                                ? Image.network(
+                                ? Image.memory(
                                     product['picture'],
                                     height: 50,
                                     width: 50,
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.contain,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Row(
                                         children: [
