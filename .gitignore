@@ -27,8 +27,8 @@ source/**/dist/
 source/**/downloads/
 source/**/eggs/
 source/**/.eggs/
-source/**/lib/
-source/**/lib64/
+# source/**/lib/
+# source/**/lib64/
 source/**/parts/
 source/**/sdist/
 source/**/var/

@@ -1,10 +1,11 @@
-import logging
-from typing import List
 from fastapi import HTTPException
+from sqlalchemy import text
+from typing import Dict
+import logging
 
 from database.databaseProvider import DatabaseProvider
 from database.databaseTableModells import Products, OverallPicture
-from entities.models import Request, MailResponse, AppResponse
+from entities.models import Request, MailResponse, AppResponse, Product
 
 class DatabaseService:
     database_provider = DatabaseProvider()
@@ -13,137 +14,161 @@ class DatabaseService:
         self.database_provider.init_db()
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def update_products_amount(self, add: bool, request: Request):
+
+    def update_products(self, request: Request) -> Dict[int, MailResponse]:
+        self.logger.info("Updating products.....................................................................................................................")
+        try:
+            self.logger.info("1")
+            self.logger.info(request.products)
+            self.logger.info("1.1")
+            if not request.products == {}:
+                if not next(iter(request.products.values())).picture:
+                    self.intitalize_products(request)
+                else:
+                    return self.update_products_amount(request) 
+            else:
+                return self.update_products_amount(request) 
+            self.logger.info("5")
+            return None
+
+        except Exception as e:
+            self.logger.error(f"Database-Service: Error while updating products: {e}")
+            raise RuntimeError(f"{e}")
+
+    def intitalize_products(self, request: Request):
         try:
             session = DatabaseService.database_provider.get_session()
-            updated_products_dict = {}
+
+            session.query(Products).delete()
+            session.execute(text("ALTER SEQUENCE products_id_seq RESTART WITH 1;"))
+
+            # Create product classes in database
+            for id in request.products:
+                new_product = Products(
+                    name=request.products[id].name,
+                    amount=request.products[id].amount,
+                    picture=request.products[id].picture
+                    )
+
+                session.add(new_product)
+
+            session.query(OverallPicture).delete()
+            # Reset auto-increment sequence for overall_picture table and add new picture
+            session.execute(text("ALTER SEQUENCE overall_picture_id_seq RESTART WITH 1;"))
+            session.add(OverallPicture(picture=request.overall_picture))
+            session.commit()
+            self.logger.info("SUCCESS")
+        
+        except Exception as e:
+            session.rollback()
+            raise RuntimeError(f"Database-Service: Error while initializing tables: {e}")
+        
+        finally:
+            session.close()
+
+    def update_products_amount(self, request: Request) -> Dict[int, MailResponse]:
+        try:
+            updated_products = {}
+            session = DatabaseService.database_provider.get_session()
+
+            # Check if the amount of any product was reduced to zero
+            products = session.query(Products).all()
+            removed_products = [product for product in products if product.id not in request.products]
+            for product in removed_products:
+                if product.amount is not 0:
+                    
+                    product.amount = 0
+                    product.picture = None
+                    session.commit()
+
+                    updated_products[product.id] = MailResponse(
+                                        id=product.id,
+                                        name=product.name,
+                                        amount=0,
+                                        changed_amount=product.amount * -1
+                    )
 
             # Check if product id exists and update amount
             for id in request.products:
-                product = session.query(Products).filter_by(product_id=id).first()
+                product = session.query(Products).filter_by(id=id).first()
 
                 # Raise HTTP-Exception if product doesn't exist
                 if not product:
                     raise HTTPException(
                         status_code=404,
-                        detail=id
+                        detail=f"Database-Service: Error couldn't find product with id {id}"
                     )
  
-                # Update product amount
-                product.product_amount += 1 if add else -1 
-
-                # Update product picture
-                product.product_picture = request.pictures[id]
-
-                # Update or append dictionary
-                if product.product_id in updated_products_dict:
-                    updated_products_dict[product.product_id].product_amount_total = product.product_amount
-                    updated_products_dict[product.product_id].product_amount_changed += 1 if add else -1
+                if request.products[id].amount >= product.amount:
+                    changed_amount = request.products[id].amount - product.amount
                 else:
-                    updated_products_dict[product.product_id] = MailResponse(
-                        product_id=product.product_id, 
-                        product_name=product.product_name, 
-                        product_amount_total=product.product_amount,
-                        product_amount_changed=1 if add else -1
-                    )
+                    changed_amount = (product.amount - request.products[id].amount) * -1
 
-            # Update overall picture
-            picture = session.query(OverallPicture).first()
-            if picture:
-                picture.overall_picture = request.overall_picture
-
-            # Commit changes
-            session.commit()
-            
-            return updated_products_dict
-        
-        except HTTPException as http_exception:
-            session.rollback()
-            self.logger.error(f"Error while searching for product: {http_exception}")
-            raise http_exception
-        
-        except Exception as e:
-            session.rollback()
-            raise RuntimeError(f"An error occurred while updating products amount: {e}")
-        
-        finally:
-            session.close()
-
-    def reset_amounts(self):
-        try:
-            session = DatabaseService.database_provider.get_session()
-
-            # Get all products
-            products = session.query(Products).all()
-            
-            # Reset product amount and pictures
-            for product in products:
-                product.product_amount = 0
-                product.product_picture = None
-                
-            # Reset overall picture
-            picture = session.query(OverallPicture).first()
-            if picture:
-                picture.overall_picture = None
-
-            # Commit changes 
-            session.commit()
-        
-        except Exception as e:
-            session.rollback()
-            raise RuntimeError(f"An error occurred while reseting products amount: {e}")
-        
-        finally:
-            session.close()
-
-    def get_products(self) -> dict:
-        try:
-            products_dict = {}
-            session = DatabaseService.database_provider.get_session()
-
-            # Get all products
-            products = session.query(Products).all()
-
-            # Create dictionary with products
-            for product in products:
-                products_dict[product.product_id] = AppResponse(
-                    product_id=product.product_id,
-                    product_name=product.product_name,
-                    product_picture=product.product_picture,
-                    product_amount=product.product_amount
+                updated_products[id] = MailResponse(
+                                    id=id,
+                                    name=product.name,
+                                    amount=product.amount,
+                                    changed_amount=changed_amount
                 )
 
-            return products_dict
+                # Update product
+                product.amount = request.products[id].amount 
 
-        except Exception as e:
-            session.rollback()
-            self.logger.error(f"Error while getting products: {e}")
-            raise HTTPException(status_code=500, detail="Error while getting products")
-        
-        finally:
-            session.close()
-        
-    def add_products(self, products: List[str]):
-        try:
-            session = DatabaseService.database_provider.get_session()
+                if request.products[id].amount == 0:
+                    product.picture = None
+                else:
+                    product.picture = request.products[id].picture
 
-            # Create product classes in database
-            for product in products:
-                new_product = Products(
-                    product_name=product,
-                    product_picture=None,
-                    product_amount=0
-                    )
+                session.commit()
 
-                session.add(new_product)
-
-            session.add(OverallPicture(overall_picture=None))
+            # Update overall picture or add one if it doesn't exist
+            overall_picture = session.query(OverallPicture).first()
+            if overall_picture:
+                overall_picture.picture = request.overall_picture
+            else:
+                new_overall_picture = OverallPicture(picture=request.overall_picture)
+                session.add(new_overall_picture)
 
             session.commit()
+                
+            return updated_products
         
         except Exception as e:
             session.rollback()
-            raise RuntimeError(f"An error occurred while creating products: {e}")
+            raise RuntimeError(f"Database-Service: Error while updating products amount: {e}")
+        
+        finally:
+            session.close()            
+
+    def get_products(self) -> AppResponse:
+        try:
+            session = DatabaseService.database_provider.get_session()
+            products = session.query(Products).all()
+            overall_picture = session.query(OverallPicture).first()
+            
+            if not products or not overall_picture:
+                raise HTTPException(
+                    status_code=404, 
+                    detail="Database-Service: No products available yet."
+                )
+                
+            products_dict = {}
+                
+            for product in products:
+                products_dict[product.id] = Product(
+                    name=product.name,
+                    amount=product.amount,
+                    picture=product.picture
+                )
+
+            return AppResponse(
+                products=products_dict,
+                overall_picture=overall_picture.picture
+            )
+
+        except Exception as e:
+            session.rollback()
+            raise HTTPException(status_code=500, detail=f"Database-Service: Error while getting products: {e}")
         
         finally:
             session.close()
