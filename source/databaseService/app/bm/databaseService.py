@@ -14,7 +14,6 @@ class DatabaseService:
         self.database_provider.init_db()
         self.logger = logging.getLogger(self.__class__.__name__)
 
-
     def update_products(self, request: Request) -> Dict[int, MailResponse]:
         self.logger.info("Updating products.....................................................................................................................")
         try:
@@ -45,6 +44,7 @@ class DatabaseService:
             # Create product classes in database
             for id in request.products:
                 new_product = Products(
+                    type_id=id,
                     name=request.products[id].name,
                     amount=request.products[id].amount,
                     picture=request.products[id].picture
@@ -73,7 +73,7 @@ class DatabaseService:
 
             # Check if the amount of any product was reduced to zero
             products = session.query(Products).all()
-            removed_products = [product for product in products if product.id not in request.products]
+            removed_products = [product for product in products if product.type_id not in request.products]
             for product in removed_products:
                 if product.amount is not 0:
                     
@@ -81,8 +81,8 @@ class DatabaseService:
                     product.picture = None
                     session.commit()
 
-                    updated_products[product.id] = MailResponse(
-                                        id=product.id,
+                    updated_products[product.type_id] = MailResponse(
+                                        id=product.type_id,
                                         name=product.name,
                                         amount=0,
                                         changed_amount=product.amount * -1
@@ -90,7 +90,7 @@ class DatabaseService:
 
             # Check if product id exists and update amount
             for id in request.products:
-                product = session.query(Products).filter_by(id=id).first()
+                product = session.query(Products).filter_by(type_id=id).first()
 
                 # Raise HTTP-Exception if product doesn't exist
                 if not product:
@@ -113,11 +113,7 @@ class DatabaseService:
 
                 # Update product
                 product.amount = request.products[id].amount 
-
-                if request.products[id].amount == 0:
-                    product.picture = None
-                else:
-                    product.picture = request.products[id].picture
+                product.picture = request.products[id].picture
 
                 session.commit()
 
@@ -155,7 +151,7 @@ class DatabaseService:
             products_dict = {}
                 
             for product in products:
-                products_dict[product.id] = Product(
+                products_dict[product.type_id] = Product(
                     name=product.name,
                     amount=product.amount,
                     picture=product.picture
