@@ -15,7 +15,7 @@ class ApiBf:
     async def prepare_mailing_data(self, mail_data_list: list[MailUpdateData], action: Action):
         try:
             self.mail_preparing_service.prepare_mail(mail_data_list, action)
-            return JSONResponse(content={"message": "Successfully sent mail"}, status_code=200)
+            return JSONResponse(content={"message": "Successfully sent update mail"}, status_code=200)
         
         except Exception as exception:
             self.logger.error(f"Exception: {exception}")

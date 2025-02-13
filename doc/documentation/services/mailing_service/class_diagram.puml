@@ -11,7 +11,7 @@ package api {
         }
 
         +class ExceptionHandler {
-            +logger : logger
+            +logger : Logger
 
             +register_exception_handler(fast_api : app) : JSONResponse
             +response(detail : str, status_code : int) : JSONResponse
@@ -20,7 +20,9 @@ package api {
 
     package control {
         +class ApiBf {
-            - logger: Logger
+            +logger: Logger
+            +mail_preparing_service : MailPreparingServiceBa
+
 
             +__init__() : None
             +prepare_mailing_data(mail_data_list : Request, action : Action) : None
@@ -36,6 +38,8 @@ package bm {
         - receiver_email : str
 
         + __init__() : None
+        + start_scheduled_mail_sending() : None
+        + send_scheduled_mail() : None
         + prepare_mail(mail_data : object, action : Action) : None
         + set_mail_data(mail_data_list : list<MailUpdateData>, action : Action) : str, str
         + set_error_mail_data(error_message : str) : str, str
