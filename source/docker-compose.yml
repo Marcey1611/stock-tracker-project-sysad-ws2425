@@ -11,7 +11,7 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - stockTrackerDockerNetwork
     healthcheck:
@@ -72,7 +72,7 @@ services:
     networks:
       - stockTrackerDockerNetwork
     ports:
-      - "8080:80"
+      - "8081:80"
     environment:
       - DATABASE_SERVICE_URL="http://localhost:8001/update_app"
     depends_on:
