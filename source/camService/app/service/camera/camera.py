@@ -4,6 +4,7 @@ import time
 import paho.mqtt.client as mqtt
 import cv2
 
+
 logger = logging.getLogger(__name__)
 
 resolutions = [
@@ -16,7 +17,8 @@ resolutions = [
 
 frame_interval = 0.5  # 2 FPS = 1 Frame alle 0.5 Sekunden
 
-def frame_loop(client:mqtt.Client,topic:str):
+def frame_loop():
+    from service.mqtt.mqt_client import is_client_connected, publish_image
     last_frame_time = time.monotonic()
 
     camera = cv2.VideoCapture(0)
@@ -27,32 +29,19 @@ def frame_loop(client:mqtt.Client,topic:str):
         return  # Beende den Thread, wenn die Kamera nicht geöffnet werden kann
     init_cam(camera)
 
-    while client.is_connected():
-        current_time = time.monotonic()
-        elapsed_time = current_time - last_frame_time
-
-        if elapsed_time < frame_interval:
-            time.sleep(frame_interval - elapsed_time)  # Wartezeit einfügen
-
-        last_frame_time = time.monotonic()  # Zeit aktualisieren
-
-        success, frame = camera.read()
-        if not success:
-            logger.error("Fehler: Kamera liefert kein Bild")
+    while is_client_connected():
+        success, frame ,last_frame_time = capture_image(camera,last_frame_time)
+        if success:
+            _, buffer = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_WEBP_QUALITY, 80])
+            publish_image(buffer.tobytes())
+        else:
             break
-
-        _, buffer = cv2.imencode('.webp', frame, [cv2.IMWRITE_WEBP_QUALITY, 80])
-        frameBytes = buffer.tobytes()
-        logger.debug(f"length : {len(frameBytes)}")
-        client.publish(topic, payload=frameBytes)
-        logger.debug(f"Published frame at: {time.monotonic()}")  # Zeit loggen
 
 
 def init_cam(camera:cv2.VideoCapture):
-    desired_fps = .5
     set_resolution(camera)
     camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'YUYV'))
-    camera.set(cv2.CAP_PROP_FPS, desired_fps)
+    camera.set(cv2.CAP_PROP_FPS, frame_interval)
     actual_fps = camera.get(cv2.CAP_PROP_FPS)
     logger.debug(f"Kamera-FPS: {actual_fps}")
 
@@ -69,3 +58,18 @@ def set_resolution(camera:cv2.VideoCapture):
         if actual_width == width and actual_height == height:
             print(f"Camera resolution: {actual_width}x{actual_height}")
             break
+
+def capture_image(camera:cv2.VideoCapture,last_frame_time):
+    current_time = time.monotonic()
+    elapsed_time = current_time - last_frame_time
+
+    if elapsed_time < frame_interval:
+        time.sleep(frame_interval - elapsed_time)
+
+    last_frame_time = time.monotonic()
+
+    success, frame = camera.read()
+    if not success:
+        logger.error("Fehler: Kamera liefert kein Bild")
+        return False, None, 0
+    return True, frame, last_frame_time

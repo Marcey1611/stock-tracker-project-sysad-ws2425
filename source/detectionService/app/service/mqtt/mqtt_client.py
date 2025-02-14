@@ -19,6 +19,7 @@ port=int(os.getenv('MQTT_BROKER_PORT'))
 username = "sysAdmin"
 password = "sysAd2024"
 topic ="camera/+/image"
+count = 0
 
 
 def on_connect(client, userdata, flags, rc):
@@ -28,17 +29,17 @@ def on_connect(client, userdata, flags, rc):
         logger.info(f"Verbindung fehlgeschlagen. Fehlercode: {rc}")
 
 def on_message(client, userdata, msg):
-    feed_event, feed_q, track_event, track_q, trackers,count,model_cls_names = userdata
+    feed_event, feed_q, track_event, track_q, trackers,inner_count,model_cls_names = userdata
     camera_id = msg.topic.split('/')[1]
     frame_bytes = msg.payload
     np_arr = np.frombuffer(frame_bytes, np.uint8)
     frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-    if count == 0:
+    if inner_count == 0:
         init_database(frame,model_cls_names)
     detection(feed_event,feed_q,track_event,track_q,frame,frame_bytes,trackers)
-    count = count + 1
+    inner_count = inner_count + 1
     logger.debug(f"Nachricht von {camera_id}")
-    client.user_data_set((feed_event, feed_q, track_event, track_q,trackers,count,model_cls_names))
+    client.user_data_set((feed_event, feed_q, track_event, track_q,trackers,inner_count,model_cls_names))
 
 def mqtt_thread(feed_event,feed_q,track_event,track_q):
     from service.detection.frame_processess import model_cls_names
@@ -46,7 +47,6 @@ def mqtt_thread(feed_event,feed_q,track_event,track_q):
     client.on_connect = on_connect
     client.on_message = on_message
     trackers = TrackerManager()
-    count = 0
     client.user_data_set((feed_event, feed_q, track_event, track_q,trackers,count,model_cls_names))
     client.username_pw_set(username, password)
 

@@ -1,0 +1,6 @@
+@startuml
+class main
+class mqtt_client
+class camera
+
+@enduml
