@@ -11,7 +11,7 @@ TOLERANCE = 10
 ADD_REMOVE_THRESHOLD = .5 * 30
 
 file_location = "../../."+os.getenv('DETECTION_MODEL')
-model = YOLO(file_location)
+model = YOLO(file_location).to('cuda')
 model_cls_names = model.names
 
 def process_frame(frame,trackers:TrackerManager):

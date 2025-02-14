@@ -6,7 +6,7 @@ from ultralytics import YOLO
 logger = logging.getLogger(__name__)
 
 file_location = "../../."+os.getenv('HUMAN_CHECK_MODEL')
-model = YOLO(file_location)
+model = YOLO(file_location).to('cuda')
 
 
 def is_human_in_frame(frame):
