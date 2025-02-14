@@ -53,7 +53,6 @@ services:
             - driver: nvidia
               count: all
               capabilities: [ gpu ]
-    runtime: nvidia
     environment:
       - QT_X11_NO_MITSHM: "1"
       - NVIDIA_VISIBLE_DEVICES: all
