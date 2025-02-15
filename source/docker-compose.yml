@@ -77,10 +77,11 @@ services:
     ports:
       - "8002:8000"
     environment:
-      SMTP_SERVER: smtp.gmail.com
-      SMTP_PORT: 587
-      SMTP_USER: sysad.stock.tracker@gmail.com
-      SMTP_PASSWORD: qlddayafyvqszzlt
+      - SMTP_SERVER=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_MAIL=sysad.stock.tracker@gmail.com
+      - SMTP_PASS=tihs holh clyi dlai
+      - RECV_MAIL=sysad.project.ws2425@gmail.com
 
   mosquitto:
     image: eclipse-mosquitto

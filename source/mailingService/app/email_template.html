@@ -91,10 +91,10 @@
             <tbody>
                 {% for product in products %}
                 <tr>
-                    <td>{{ product.product_id }}</td>
-                    <td>{{ product.product_name }}</td>
-                    <td>{{ product.product_amount_changed }}</td>
-                    <td>{{ product.product_amount_total }}</td>
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.changed_amount }}</td>
+                    <td>{{ product.amount }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

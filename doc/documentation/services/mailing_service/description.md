@@ -18,7 +18,6 @@ Futhermore there are some additional components:
 - **[Exception Handler](../../../../source/mailingService/app/api/boundary/exception_handler.py):** A simple FastAPI exception handler which handle the two custom exceptions and all other exceptions and comunicates these exceptions to the outside.
 - **[Action Enum](../../../../source/mailingService/app/entity/enums/):** Enum with the values CHNAGED and DELETED which seperates the the two different types of emails sent by this service.
 - **[Internal Error Exception](../../../../source/mailingService/app/entity/exceptions/internal_error_exception.py):** Custom exception for errors at the client side.
-- **[Bad Request Exception](../../../../source/mailingService/app/entity/exceptions/bad_request_exception.py):** Custom exception for errors at the client side.
 - **[Models for the mailing data](../../../../source/mailingService/app/entity/models/mail_data.py):** Two models, one for the update and one for the error mails. Among other things, these models are used for validation which is possible because of the use of FastAPI.
 
 There are some more files which are used from the MailingService:
