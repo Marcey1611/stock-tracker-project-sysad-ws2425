@@ -62,7 +62,7 @@ services:
     networks:
       - stockTrackerDockerNetwork
     ports:
-      - "8080:80"
+      - "8081:8081"
     environment:
       - DATABASE_SERVICE_URL="http://localhost:8001/update_app"
     depends_on:

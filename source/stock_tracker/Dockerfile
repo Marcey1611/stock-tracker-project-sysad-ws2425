@@ -38,7 +38,7 @@ COPY --from=build /app/build/web /usr/share/nginx/html
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Exponiere Port 80
-EXPOSE 80
+EXPOSE 8081
 
 # Starte den Nginx-Webserver  
 CMD ["nginx","-g", "daemon off;"]
