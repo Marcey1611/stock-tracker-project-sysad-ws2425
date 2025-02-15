@@ -39,22 +39,22 @@ services:
       timeout: 5s
       retries: 5
 
-  detection-service:
-    container_name: detectionServiceContainer
-    build: ./detectionService
-    networks:
-      - stockTrackerDockerNetwork
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_SERVICE_URL=http://dataBaseServiceContainer:8000
-      - MQTT_BROKER_URL=stocktracker-mosquitto
-      - MQTT_BROKER_PORT=1883
-      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11m.pt
-      - DETECTION_MODEL=./app/models/detection/yolo11m.pt
-    depends_on:
-      database-service:
-        condition: service_healthy
+  #detection-service:
+   # container_name: detectionServiceContainer
+    #build: ./detectionService
+    #networks:
+     # - stockTrackerDockerNetwork
+    #ports:
+     # - "8000:8000"
+    #environment:
+     # - DATABASE_SERVICE_URL=http://dataBaseServiceContainer:8000
+     # - MQTT_BROKER_URL=stocktracker-mosquitto
+     # - MQTT_BROKER_PORT=1883
+     # - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11m.pt
+     # - DETECTION_MODEL=./app/models/detection/yolo11m.pt
+    #depends_on:
+     # database-service:
+      #  condition: service_healthy
 
   stock-tracker:
     container_name: stock_tracker_container

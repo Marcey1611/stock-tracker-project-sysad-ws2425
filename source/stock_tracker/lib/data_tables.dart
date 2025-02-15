@@ -97,7 +97,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    double fontSize = screenWidth * 0.03;
+    double fontSize = screenWidth * 0.02;
 
     return Scaffold(
       body: Container(
@@ -111,7 +111,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
               overallPicture is Uint8List
                   ? Image.memory(
                       overallPicture!,
-                      height: screenHeight * 0.2,
+                      height: screenHeight * 0.3,
                       fit: BoxFit.contain,
                     )
                   : Column(
@@ -159,7 +159,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
                                   'Name',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: fontSize),
+                                      fontSize: (fontSize * 0.8)),
                                 ),
                               ),
                               Padding(
@@ -168,7 +168,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
                                   'Amount',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: fontSize),
+                                      fontSize: (fontSize * 0.8)),
                                 ),
                               ),
                               Padding(
@@ -178,7 +178,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
                                     'Product Picture',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: fontSize),
+                                        fontSize: (fontSize * 0.8)),
                                   ),
                                 ),
                               ),
@@ -186,9 +186,9 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
                           ),
                           TableRow(
                             children: [
-                              Container(height: 4, color: Colors.black),
-                              Container(height: 4, color: Colors.black),
-                              Container(height: 4, color: Colors.black),
+                              Container(height: 3, color: Colors.black),
+                              Container(height: 3, color: Colors.black),
+                              Container(height: 3, color: Colors.black),
                             ],
                           ),
                           ...stockData.map(
@@ -206,7 +206,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
                                     child: Text(
                                       product['name'] ?? 'Unknown',
                                       style:
-                                          TextStyle(fontSize: fontSize * 0.9),
+                                          TextStyle(fontSize: fontSize * 0.7),
                                     ),
                                   ),
                                   Padding(
@@ -214,7 +214,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
                                     child: Text(
                                       product['amount'].toString(),
                                       style:
-                                          TextStyle(fontSize: fontSize * 0.9),
+                                          TextStyle(fontSize: fontSize * 0.7),
                                     ),
                                   ),
                                   Padding(
@@ -228,17 +228,18 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
                                               width: screenWidth * 0.15,
                                               fit: BoxFit.contain,
                                             )
-                                          : const Row(
+                                          : Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Icon(Icons.no_photography,
-                                                    size: 24,
+                                                    size: (fontSize * 0.7),
                                                     color: Colors.red),
-                                                SizedBox(width: 5),
+                                                const SizedBox(width: 5),
                                                 Text(
                                                   'No Picture',
                                                   style: TextStyle(
-                                                      fontSize: 18,
+                                                      fontSize:
+                                                          (fontSize * 0.7),
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
