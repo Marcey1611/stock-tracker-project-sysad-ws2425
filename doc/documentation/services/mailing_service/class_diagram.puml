@@ -78,10 +78,6 @@ package entity {
     +class InternalErrorException {
         + __init__(detail : str = "Internal Server Error", status_code : int = 500) : None
     }
-
-    +class BadRequestException {
-        +__init__(detail : str = "Bad Request", status_code : int = 400) : None
-    }
 }
 
 +class Main {

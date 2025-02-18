@@ -24,7 +24,7 @@ There are some more files which are used from the MailingService:
 - **[Update Email HTML Template](../../../../source/mailingService/app/email_template.html) and [Error Email HTML Template](../../../../source/mailingService/app/error_email_template.html):** There are also two html templates that the emails sent by the service looking good. For the better lookingf there is also a [logo](../../../../source/mailingService/app/logo.png) in each email.
 - **[main.py](../../../../source/mailingService/app/main.py):** The main python file of the project.
 - **[requirements](../../../../source/mailingService/requirements.txt):** Here are the requirements which are needed and will be installed by docker.
-- **[Dockerfile](../../../../source/mailingService/Dockerfile):** Finally there is a docker file.
+- **[Dockerfile](../../../../source/mailingService/Dockerfile):** Finally there is a docker file for the mailing-service.
 
 The email to which the update/error mails are sent can be set in the main docker-compose file. The smtp server and port, in our case gmail, and also the mail address with which the emails should be sent and the password for its mail-account can also be set in the main docker-compose file.
 
