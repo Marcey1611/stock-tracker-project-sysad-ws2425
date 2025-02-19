@@ -83,41 +83,62 @@ paths:
     
 components:
   schemas:
-    StockLog:
+    Request:
       type: object
       required:
-        - id
-        - classId
-        - SystemInTime
-        - SystemOutTime
+        - products
+        - overall_picture
       properties:
-        id:
-          type: integer
-          example: 123
-        classId:
-          type: integer
-          example: 123
-        SystemInTime:
+        products:
           type: object
-          example: "DD.MM.YYYY hh:mm:ss"
-        SystemOutTime:
-          type: object
-          example: "DD.MM.YYYY hh:mm:ss"
-    StockLogResponse:
+          additionalProperties:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Bottle"
+              amount:
+                type: integer
+                example: 2
+              picture:
+                type: string
+                example: "picture"
+                nullable: true
+        overall_picture:
+          type: string
+          exmaple: "picture"
+
+    Response: 
       type: object
+      required:
+        - status_code
       properties:
-        statusCode:
-          type: integer #enum value for http status code
-          example: badRequest
-        message:
-          type: string 
-          example: "Id already exists"
-    GetNextIdResponse:
-      type: object
-      properties:
-        statusCode:
-          type: integer #enum value for http status code
-          example: success
-        message:
+        status_code:
           type: integer
-          example: 22
+          example: 200
+
+    AppResponse:
+      type: object
+      required:
+        - products
+        - overall_picture
+      properties:
+        type: object
+          additionalProperties:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Bottle"
+              amount:
+                type: integer
+                example: 2
+              picture:
+                type: string
+                example: "picture"
+                nullable: true
+        overall_picture:
+          type: string
+          exmaple: "picture"
+          nullable: true
+
