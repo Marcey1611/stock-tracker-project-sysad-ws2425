@@ -1,24 +1,43 @@
-from fastapi import APIRouter
-from typing import Dict, Any
+from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import logging
 
-from api.control.apiBF import ApiBF
+from api.control.api_bf import ApiBf
 from entities.models import Request, Response, AppResponse
 
 router = APIRouter()
-api_bf = ApiBF()  
+api_bf = ApiBf()   
 
-@router.post("/addItem", response_model=Response)
-async def add_item(request: Request):
-    return api_bf.handle_update_request(request, True)
+app = FastAPI()
 
-@router.post("/removeItem", response_model=Response)
-async def remove_item(request: Request):
-    return api_bf.handle_update_request(request, False)
+origins = [
+    "http://localhost:8080", 
+    "http://127.0.0.1:8080",
+    "http://10.0.2.2:8001"
+]
 
-@router.get("/clearAll", response_model=Response)
-async def clear_all():
-    return api_bf.handle_reset_request()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # or http://localhost:8001
+    allow_credentials=True,
+    allow_methods= ["*"],
+    allow_headers= ["*"],
+)
 
-@router.get("/updateApp", response_model=Dict[Any, dict])
+app.include_router(router)
+
+logger = logging.getLogger(__name__)
+
+@router.post("/update_products", response_model=Response)
+async def init_products(request: Request):
+    return api_bf.handle_update_products_request(request)
+
+@router.get("/update_app", response_model=AppResponse)
 async def update_app():
-    return api_bf.handle_app_request()
+    response =  api_bf.handle_app_request()
+    logger.info(f"Handling update app request: {response}")
+    return response
+
+@router.get("/healthcheck")
+async def healthcheck():
+    return {"message": "API is running"}
