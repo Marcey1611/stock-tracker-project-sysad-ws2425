@@ -6,6 +6,8 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from api.video_feed_endpoints import router as videoRouter2
+from service.detection.detection_thread import detection
+from service.http_request.response_thread import response_thread
 from service.mqtt.mqtt_client import mqtt_thread
 
 logging.basicConfig(
@@ -28,14 +30,23 @@ app.add_middleware(
 )
 feed_q = Queue(maxsize=1)  # Queue für das Feed (Frames)
 track_q = Queue(maxsize=1)  # Queue für Tracking-Daten (optional)
+image_q = Queue()
+response_q = Queue(maxsize=1)
 
 
 topic ="camera/+/image"
 app.include_router(videoRouter2, prefix="/video", tags=["video"])
 
-thread_mqtt=threading.Thread(target=mqtt_thread,args=(feed_event,feed_q,track_event,track_q))
+detection_process = Process(target=detection, args=(feed_q,track_q,image_q,response_q))
+detection_process.start()
+
+thread_mqtt=threading.Thread(target=mqtt_thread,args=(image_q,))
 thread_mqtt.daemon = True
 thread_mqtt.start()
+
+thread_response=threading.Thread(target=response_thread,args=(response_q,))
+thread_response.daemon = True
+thread_response.start()
 
 
 

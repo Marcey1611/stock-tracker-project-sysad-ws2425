@@ -1,9 +1,14 @@
+import logging
+from multiprocessing import Queue
+
 from entities.detection.detected_object import DetectedObject
 from entities.detection.track_manager import TrackerManager
 from service.http_request.http_request_service import http_request_service
 
 TOLERANCE = 10
 ADD_REMOVE_THRESHOLD = .5 * 30
+
+logger = logging.getLogger(__name__)
 
 def update_object_tracking(results, trackers: TrackerManager):
     boxes = results[0].boxes.xywh.cpu()
@@ -62,9 +67,9 @@ def handle_disappeared_objects(current_track_ids, trackers: TrackerManager):
         del trackers.detected_objects[track_id]
 
 
-def update_database(trackers: TrackerManager, annotated_frame,frame):
+def update_database(trackers: TrackerManager, annotated_frame,frame,response_q:Queue):
     if len(trackers.detected_objects.items())!=len(trackers.previous_detected_objects.items()):
         if len(trackers.detected_objects.items())==0 and len(trackers.previous_detected_objects.items())>1:
-            http_request_service(trackers,annotated_frame,None)
+            http_request_service(trackers,annotated_frame,None,response_q)
         else:
-            http_request_service(trackers,annotated_frame,frame)
+            http_request_service(trackers,annotated_frame,frame,response_q)

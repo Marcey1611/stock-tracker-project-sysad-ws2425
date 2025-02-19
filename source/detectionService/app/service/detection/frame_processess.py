@@ -1,6 +1,8 @@
 import base64
 import logging
 import os
+from queue import Queue
+
 import cv2
 from ultralytics import YOLO
 from entities.detection.track_manager import TrackerManager
@@ -16,7 +18,7 @@ device = os.getenv('DEVICE_TO_RUN_MODELDEVICE_TO_RUN_MODEL')
 model = YOLO(file_location).to(device)
 model_cls_names = model.names
 
-def process_frame(frame,trackers:TrackerManager):
+def process_frame(frame,trackers:TrackerManager,response_q:Queue):
     results = model.track(frame, conf=0.55, imgsz=640, verbose=False,persist=True)
     annotated_frame = results[0].plot()
 
@@ -25,7 +27,7 @@ def process_frame(frame,trackers:TrackerManager):
         current_track_ids = update_object_tracking(results, trackers)
     handle_disappeared_objects(current_track_ids,trackers)
 
-    update_database(trackers,annotated_frame,frame)
+    update_database(trackers,annotated_frame,frame,response_q)
 
     trackers.previous_detected_objects = trackers.detected_objects.copy()
 
