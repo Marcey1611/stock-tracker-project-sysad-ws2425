@@ -1,53 +1,47 @@
 @startuml
-
-node detection {
-    component camera
-    component detectionService {
-        portout addItemsOUT
-        portout deleteItemsOUT
-        portout feedIN
-        portout trackIN
+node Detection {
+    component DetectionService {
+        portout update_products_OUT
     }
+    component MQTTBrocker
 }
-node database {
-    database postgresDatabase
-    component databaseService{
-        portin addItemsIN
-        portin deleteItemsIN
+node Database {
+    database PostgresDatabase
+    component DatabaseService{
+        portin update_products_IN
 
-        portin getDataIN
+        portin update_app_IN
 
         portout send_update_mail_OUT
         portout send_error_mail_OUT
     }
 }
-node mail {
-    component mailService{
+node Camera {
+    component CameraService
+}
+
+node Mail {
+    component MailService{
         portin send_update_mail_IN
         portin send_error_mail_IN
     }
 }
-node appWebsite {
-    component flutterApp {
-        portout getDataOUT
-        portin feedOUT
-        portin trackOUT
+node Flutter {
+    component FlutterApp {
+        portout update_app_OUT
     }
 }
 
-camera -down-> detectionService
+CameraService -left-> MQTTBrocker
 
-addItemsOUT -down-> addItemsIN
-deleteItemsOUT -down-> deleteItemsIN
+MQTTBrocker -left-> DetectionService
 
-getDataOUT -down-> getDataIN
+update_products_OUT -down-> update_products_IN
 
-feedOUT -right-> feedIN
-trackOUT -right-> trackIN
+update_app_OUT -left-> update_app_IN
 
 send_update_mail_OUT -down-> send_update_mail_IN
 send_error_mail_OUT -down-> send_error_mail_IN
 
-databaseService -left-> postgresDatabase
-
+DatabaseService -left-> PostgresDatabase
 @enduml
