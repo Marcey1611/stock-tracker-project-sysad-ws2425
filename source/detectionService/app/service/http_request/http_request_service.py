@@ -1,32 +1,29 @@
 import copy
-import logging
-from multiprocessing.queues import Queue
 from typing import Dict
 
 from api import api_rest_client_database
 from entities.detection.product import Product
 from entities.detection.track_manager import TrackerManager
 from entities.http.database_models import DatabaseUpdateRequest
-from service.detection.frame_Codings import encode_frame
+from service.detection.frame_encoding import encode_frame
 from service.detection.frame_drawings import draw_bounding_box
 
-logger = logging.getLogger(__name__)
-def init_database(frame):
-    from service.detection.frame_processess import model_cls_names
+
+def init_database(frame,names):
     all_products: Dict[int, Product] = {}
-    for index, name in enumerate(model_cls_names.values()):
+    for index, name in enumerate(names.values()):
         all_products[index] = Product(name=name,amount=0,picture=None)
     http_database_request = DatabaseUpdateRequest(overall_picture=encode_frame(frame), products=all_products)
     return api_rest_client_database.update_database_products(http_database_request)
 
 
-def http_request_service(trackers: TrackerManager, annotated_frame,frame,response_q:Queue):
+def http_request_service(trackers: TrackerManager, annotated_frame,frame):
     http_database_request = DatabaseUpdateRequest(overall_picture=encode_frame(annotated_frame), products={})
     if frame is None:
-        response_q.put_nowait(http_database_request)
+        api_rest_client_database.update_database_products(http_database_request)
     else:
         http_database_request.products = generate_products(trackers, frame)
-        response_q.put_nowait(http_database_request)
+        api_rest_client_database.update_database_products(http_database_request)
 
 def generate_products(trackers: TrackerManager, frame):
     from service.detection.frame_processess import model_cls_names
