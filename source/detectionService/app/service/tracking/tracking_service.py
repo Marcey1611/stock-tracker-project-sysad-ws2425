@@ -1,9 +1,12 @@
+import time
+
 from entities.detection.detected_object import DetectedObject
 from entities.detection.track_manager import TrackerManager
 from service.http_request.http_request_service import http_request_service
 
 TOLERANCE = 10
 ADD_REMOVE_THRESHOLD = .5 * 30
+UPDATE_INTERVALL = 15
 
 def update_object_tracking(results, trackers: TrackerManager):
     boxes = results[0].boxes.xywh.cpu()
@@ -62,9 +65,11 @@ def handle_disappeared_objects(current_track_ids, trackers: TrackerManager):
         del trackers.detected_objects[track_id]
 
 
-def update_database(trackers: TrackerManager, annotated_frame,frame):
-    if len(trackers.detected_objects.items())!=len(trackers.previous_detected_objects.items()):
+def update_database(trackers: TrackerManager, annotated_frame, frame):
+    current_time = time.monotonic()
+    if len(trackers.detected_objects.items())!=len(trackers.previous_detected_objects.items()) or current_time-trackers.last_update > UPDATE_INTERVALL:
         if len(trackers.detected_objects.items())==0 and len(trackers.previous_detected_objects.items())>1:
             http_request_service(trackers,annotated_frame,None)
         else:
             http_request_service(trackers,annotated_frame,frame)
+        trackers.last_update = current_time
