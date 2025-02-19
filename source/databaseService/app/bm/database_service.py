@@ -24,7 +24,7 @@ class DatabaseService:
                 return self.update_products_amount(request)
 
         except Exception as e:
-            self.logger.error(f"Database-Service: Error while updating products: {e}")
+            self.logger.error(f"Error while updating products: {e}")
             raise RuntimeError(f"{e}")
 
     def intitalize_products(self, request: Request):
@@ -41,10 +41,11 @@ class DatabaseService:
                 # Add new products
                 new_products = [
                     Products(
+                        type_id=id,
                         name=product.name,
                         amount=product.amount,
                         picture=product.picture
-                    ) for product in request.products.values()
+                    ) for id, product in request.products.items()
                 ]
                 session.add_all(new_products)
 
@@ -52,10 +53,10 @@ class DatabaseService:
                 session.add(OverallPicture(picture=request.overall_picture))
 
                 session.commit()
-                self.logger.info("Database-Service: Products initialized successfully.")
+                self.logger.info(f"Successfully initialized:\n\nProducts\n{request.products}\n\nOverall-Picture\n{request.overall_picture}\n")
 
         except Exception as e:
-            self.logger.error(f"Database-Service: Error while initializing tables: {e}")
+            self.logger.error(f"Error while initializing tables: {e}")
             raise RuntimeError(f"Database-Service: Error while initializing tables: {e}")
 
     def update_products_amount(self, request: Request) -> Dict[int, MailResponse]:
@@ -85,37 +86,40 @@ class DatabaseService:
                         product.amount = 0
                         product.picture = None
 
+                self.logger.info(f"Successfully removed:\n\nProducts\n{updated_products}\n")    
+
                 # Update products
                 for product_in_db in products_in_db:
-                    changed_amount = request.products.amount - product_in_db.amount
+                    changed_amount = request.products[product_in_db.type_id].amount - product_in_db.amount
 
-                    product.amount = request.products[id].amount 
-                    product.picture = request.products[id].picture
+                    product_in_db.amount = request.products[product_in_db.type_id].amount 
+                    product_in_db.picture = request.products[product_in_db.type_id].picture
 
-                if changed_amount != 0:
-                    updated_products[id] = MailResponse(
-                                        id=id,
-                                        name=product.name,
-                                        amount=product.amount,
-                                        changed_amount=changed_amount
-                    )
+                    if changed_amount != 0:
+                        updated_products[id] = MailResponse(
+                                            id=product_in_db.type_id,
+                                            name=product_in_db.name,
+                                            amount=product_in_db.amount,
+                                            changed_amount=changed_amount
+                        )
 
                 # Update overall picture
-                overall_picture = session.query(OverallPicture).all()
+                overall_picture = session.query(OverallPicture).first()
                 if overall_picture:
-                    overall_picture.picture = request.overall_picture
+                    overall_picture = request.overall_picture
                 else:
                     session.add(OverallPicture(picture=request.overall_picture))
 
                 session.commit()
                 
+            self.logger.info(f"Successfully updated:\n\nProducts\n{request.products}\n\nOverall-Picture\n{request.overall_picture}\n")    
             return updated_products
         
         except HTTPException as e:
             self.logger.error(e)
             raise e
         except Exception as e:
-            self.logger.error(f"Database-Service: Error while updating products amount: {e}")
+            self.logger.error(f"Error while updating products amount: {e}")
             raise RuntimeError(f"Database-Service: Error while updating products amount: {e}")           
 
     def get_products(self) -> AppResponse:
