@@ -62,7 +62,7 @@ services:
       - MQTT_BROKER_PORT=1883
       - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11m.pt
       - DETECTION_MODEL=./app/models/detection/yolo11m.pt
-      - DEVICE_TO_RUN_MODEL='cuda' # cuda or cpu
+      - DEVICE_TO_RUN_MODEL=cuda # cuda or cpu
       - SERVER_IP=192.168.2.15
     depends_on:
      database-service:

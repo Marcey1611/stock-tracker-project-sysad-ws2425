@@ -1,6 +1,6 @@
 import logging
 import threading
-from multiprocessing import Process, Queue
+from multiprocessing import Queue
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
@@ -33,7 +33,7 @@ track_q = Queue(maxsize=1)  # Queue für Tracking-Daten (optional)
 topic ="camera/+/image"
 app.include_router(videoRouter2, prefix="/video", tags=["video"])
 
-thread_mqtt=threading.Thread(target=mqtt_thread,args=(feed_event,feed_q,track_event,track_q))
+thread_mqtt=threading.Thread(target=mqtt_thread,args=(feed_q,track_q))
 thread_mqtt.daemon = True
 thread_mqtt.start()
 
