@@ -60,9 +60,10 @@ services:
       - DATABASE_SERVICE_URL= http://dataBaseServiceContainer:8000
       - MQTT_BROKER_URL=stocktracker-mosquitto
       - MQTT_BROKER_PORT=1883
-      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11x.pt
-      - DETECTION_MODEL=./app/models/detection/yolo11x.pt
+      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11m.pt
+      - DETECTION_MODEL=./app/models/detection/yolo11m.pt
       - DEVICE_TO_RUN_MODEL='cuda' # cuda or cpu
+      - SERVER_IP=192.168.2.15
     depends_on:
      database-service:
       condition: service_healthy

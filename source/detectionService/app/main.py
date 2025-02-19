@@ -1,8 +1,10 @@
 import logging
 import threading
-import queue
+from multiprocessing import Process, Queue
 
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
+
 from api.video_feed_endpoints import router as videoRouter2
 from service.mqtt.mqtt_client import mqtt_thread
 
@@ -16,10 +18,16 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-feed_event = threading.Event()  # Event zum Starten und Stoppen des Streams
-feed_q = queue.Queue()  # Queue für das Feed (Frames)
-track_event = threading.Event()  # Event für Tracking (optional)
-track_q = queue.Queue()  # Queue für Tracking-Daten (optional)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Erlaubt Anfragen von allen Ursprüngen (vorsichtig)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+feed_q = Queue(maxsize=1)  # Queue für das Feed (Frames)
+track_q = Queue(maxsize=1)  # Queue für Tracking-Daten (optional)
 
 
 topic ="camera/+/image"
