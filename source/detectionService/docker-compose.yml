@@ -1,12 +1,29 @@
-version: "3.9"
 services:
   detection-service:
+    extends: .common
+
+  .common:
     build: .
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_SERVICE_URL="http://database-service-url"
-      - MQTT_BROKER_URL=192.168.2.226
+      - DATABASE_SERVICE_URL= http://dataBaseServiceContainer:8000
+      - MQTT_BROKER_URL=stocktracker-mosquitto
       - MQTT_BROKER_PORT=1883
-      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11m.pt
-      - DETECTION_MODEL=./app/models/detection/yolo11m.pt
+      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11x.pt
+      - DETECTION_MODEL=./app/models/detection/yolo11x.pt
+      - DEVICE_TO_RUN_MODEL='cpu' # cuda or cpu
+
+  .comon_nvidia:
+    extends: .common
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    environment:
+      - QT_X11_NO_MITSHM= 1
+      - NVIDIA_VISIBLE_DEVICES= all
+      - NVIDIA_DRIVER_CAPABILITIES= compute,video,utility,graphics
