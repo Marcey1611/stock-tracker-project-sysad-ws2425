@@ -1,7 +1,5 @@
 from pydantic import BaseModel
 
-from entity.enums.action import Action
-
 class MailUpdateData(BaseModel):
     id: int
     name: str

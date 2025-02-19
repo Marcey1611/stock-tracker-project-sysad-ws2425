@@ -1,23 +1,19 @@
-import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 import logging
 from jinja2 import Template
+import os
+import threading
 
 from entity.models.mail_data import MailUpdateData
 from entity.exceptions.internal_error_exception import InternalErrorException
 from entity.enums.action import Action
 from bm.mail_sending_service_ba import MailSendingServiceBa
 
-import threading
-import time
-
 class MailPreparingServiceBa:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.sender_email = "sysad.stock.tracker@gmail.com"
-        self.receiver_email = "sysad.project.ws2425@gmail.com"
         self.mail_data_list = []
         self.mail_sending_service_ba = MailSendingServiceBa()
         self.mail_sending_timer = None
@@ -26,24 +22,18 @@ class MailPreparingServiceBa:
     def start_scheduled_mail_sending(self):
         if self.mail_sending_timer:
             self.mail_sending_timer.cancel()
-
         self.mail_sending_timer = threading.Timer(120, self.send_scheduled_mail)
         self.mail_sending_timer.start()
 
     def send_scheduled_mail(self):
-        """Sendet eine E-Mail, wenn es Elemente in `mail_data_list` gibt."""
         if self.mail_data_list:
-            self.logger.info("Sending scheduled email...")
             subject, body = self.set_mail_data(self.mail_data_list, Action.CHANGED)
             self.mail_sending_service_ba.send_mail(self.config_message(subject, body))
             self.mail_data_list.clear()
-        else:
-            self.logger.info("No pending emails to send.")
-
         self.start_scheduled_mail_sending()
 
     def prepare_mail(self, new_mail_data_list, action: Action):
-        self.logger.info(f"Preparing email...")
+        self.logger.info(f"Preparing mail data...")
         try:
             if action == Action.CHANGED:
                 for new_mail_data in new_mail_data_list:
@@ -77,10 +67,10 @@ class MailPreparingServiceBa:
             
             products = [
                 {
-                    "product_id": mail_data.id,
-                    "product_name": mail_data.name,
-                    "product_amount_changed": mail_data.changed_amount,
-                    "product_amount_total": mail_data.amount,
+                    "id": mail_data.id,
+                    "name": mail_data.name,
+                    "changed_amount": mail_data.changed_amount,
+                    "amount": mail_data.amount,
                 }
                 for mail_data in mail_data_list
             ]
@@ -122,8 +112,8 @@ class MailPreparingServiceBa:
     def config_message(self, subject: str, body: str) -> MIMEMultipart:
         try:
             message = MIMEMultipart()
-            message["From"] = self.sender_email
-            message["To"] = self.receiver_email
+            message["From"] = os.getenv("SMTP_MAIL")
+            message["To"] = os.getenv("RECV_MAIL")
             message["Subject"] = subject
             message.attach(MIMEText(body, "html"))
 
