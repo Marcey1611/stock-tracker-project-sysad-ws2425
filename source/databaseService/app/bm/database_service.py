@@ -17,7 +17,7 @@ class DatabaseService:
     def update_products(self, request: Request) -> Dict[int, MailResponse]:
         try:
             # Check if request is initialization or update
-            if all(product.picture is None for product in request.products.values()):
+            if request.products and all(product.picture is None for product in request.products.values()):
                 self.intitalize_products(request)
                 return {}
             else:
@@ -105,8 +105,8 @@ class DatabaseService:
 
                 # Update overall picture
                 overall_picture = session.query(OverallPicture).first()
-                if overall_picture:
-                    overall_picture = request.overall_picture
+                if overall_picture.picture:
+                    overall_picture.picture = request.overall_picture
                 else:
                     session.add(OverallPicture(picture=request.overall_picture))
 
