@@ -7,7 +7,7 @@ class ApiConfig {
       return 'http://192.168.1.192:40105/api/update_app';
     } else {
       // for the Emulator
-      return 'http://10.0.2.2:40105/api/update_app';
+      return 'http://192.168.1.192:40105/api/update_app';
     }
   }
 }
