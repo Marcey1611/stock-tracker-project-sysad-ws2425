@@ -1,7 +1,7 @@
 # cam_service
 
-The CamService is designed to capture images using a camera and seamlessly transmit them via the [MQTT Brocker](https://google.com) to the 
-[detction_service](https://google.com). for further processing.
+The cam_service is designed to capture images using a camera and seamlessly transmit them via the [MQTT-Broker](../mqtt_broker/Readme.md) to the 
+[detction_service](../detection_service/Readme.md). for further processing.
 
 
 ## [Docker Compose File](../../../../source/cam_service/docker-compose.yml)
@@ -25,8 +25,8 @@ services:
    - `/dev/video2:/dev/video0` => Should be the camera with which you want to capture images.
 
  - **environment**:
-   - `MQTT_BROKER_URL` => The IP of the Server where [MQTTBrocker](https://google.com) is running.
-   - `MQTT_BROKER_PORT` => The PORT of the Server where the [MQTTBrocker](https://google.com) can be reached.
+   - `MQTT_BROKER_URL` => The IP of the Server where [MQTT-Broker](../mqtt_broker/Readme.md) is running.
+   - `MQTT_BROKER_PORT` => The PORT of the Server where the [MQTT-Broker](../mqtt_broker/Readme.md) can be reached.
    - `MQTT_USERNAME` => The username for the MQTT-Broker. If not needed remove it.
    - `MQTT_PASSWORD` => The password for the MQTT-Broker. If not needed remove it.
 
