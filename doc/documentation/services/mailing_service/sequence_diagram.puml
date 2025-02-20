@@ -1,6 +1,6 @@
 @startuml
 
-actor "DatabaseService" as Database
+participant "Database Service" as Database
 participant "Api" as API
 participant "ApiBF" as ApiBF
 participant "MailPreparingServiceBa" as MailPreparingService
