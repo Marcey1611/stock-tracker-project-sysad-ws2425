@@ -108,3 +108,28 @@ API calls: http package
 Data processing: JSON parsing
 
 Error messages: console output with logger
+
+
+**Limitations of making changes to the StockTracker website & app**
+
+Small changes to the website or app are possible, but they are not testable without installing the necessary development tools and support is limited.
+
+Tools required for major changes
+
+To make more extensive changes and test the code before deployment, it is recommended to install the following tools:
+
+Flutter SDK: For developing and customizing the app
+
+Android Studio: For testing and debugging on Android devices and emulators
+
+A suitable code editor (e.g. Visual Studio Code or IntelliJ IDEA)
+
+Limitations without installation
+
+Changes to the source code can only be made without direct testing.
+
+The app and website cannot be run locally or checked for errors.
+
+Functions that rely on API requests or Flutter-specific components cannot be validated.
+
+For detailed installation instructions, see: [Insert link to installation instructions here]
