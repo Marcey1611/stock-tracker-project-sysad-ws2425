@@ -11,7 +11,7 @@ TOLERANCE = 10
 ADD_REMOVE_THRESHOLD = 10
 
 file_location = "../../."+os.getenv('DETECTION_MODEL')
-device = os.getenv('DEVICE_TO_RUN_MODELDEVICE_TO_RUN_MODEL')
+device = os.getenv('DEVICE_TO_RUN_MODEL')
 
 model = YOLO(file_location).to(device)
 model_cls_names = model.names

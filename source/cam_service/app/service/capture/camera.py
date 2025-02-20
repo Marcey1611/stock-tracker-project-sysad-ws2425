@@ -4,7 +4,6 @@ import time
 import paho.mqtt.client as mqtt
 import cv2
 
-
 logger = logging.getLogger(__name__)
 
 resolutions = [
@@ -19,7 +18,7 @@ resolutions = [
 def frame_loop():
     from service.mqtt.mqtt_client import is_client_connected, publish_image
 
-    camera = cv2.VideoCapture(0,cv2.CAP_V4L2)
+    camera = cv2.VideoCapture(0)
     if camera.isOpened():
         logger.info(f"Camera {0} opend.")
     else:
@@ -34,7 +33,6 @@ def frame_loop():
             publish_image(buffer.tobytes())
         else:
             break
-
 
 def init_cam(camera:cv2.VideoCapture):
     set_resolution(camera)
