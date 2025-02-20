@@ -50,8 +50,6 @@ paths:
           description: Client Error
         '5XX':
           description: Server Error
-
-  paths:
   /healthcheck:
     get:
       summary: Needed for Docker
@@ -61,7 +59,7 @@ paths:
         - Health
       responses:
         "200":
-          description: API is running successfully.
+          description: API is running.
           content:
             application/json:
               schema:
@@ -106,7 +104,7 @@ components:
                 nullable: true
         overall_picture:
           type: string
-          exmaple: "picture"
+          example: "Picture"
 
     Response: 
       type: object
@@ -123,7 +121,8 @@ components:
         - products
         - overall_picture
       properties:
-        type: object
+        products:
+          type: object
           additionalProperties:
             type: object
             properties:
@@ -139,6 +138,6 @@ components:
                 nullable: true
         overall_picture:
           type: string
-          exmaple: "picture"
+          example: "picture"
           nullable: true
 
