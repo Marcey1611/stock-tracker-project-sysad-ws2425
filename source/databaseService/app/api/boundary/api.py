@@ -1,31 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-from api.control.apiBF import ApiBf
+from api.control.api_bf import ApiBf
 from entities.models import Request, Response, AppResponse
 
 router = APIRouter()
 api_bf = ApiBf()   
-
-logger = logging.getLogger(__name__)
-
-@router.post("/update_products", response_model=Response)
-async def init_products(request: Request):
-    return api_bf.handle_update_products_request(request)
-
-@router.get("/update_app", response_model=AppResponse)
-async def update_app():
-    response =  api_bf.handle_app_request()
-    logger.info(f"Handling update app request: {response}")
-    return response
-
-@router.get("/healthcheck")
-async def healthcheck():
-    return {"message": "API is running"}
-
-#do not delete! It's neccessary for the stocktracker APP
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -44,3 +25,19 @@ app.add_middleware(
 )
 
 app.include_router(router)
+
+logger = logging.getLogger(__name__)
+
+@router.post("/update_products", response_model=Response)
+async def init_products(request: Request):
+    return api_bf.handle_update_products_request(request)
+
+@router.get("/update_app", response_model=AppResponse)
+async def update_app():
+    response =  api_bf.handle_app_request()
+    logger.info(f"Handling update app request: {response}")
+    return response
+
+@router.get("/healthcheck")
+async def healthcheck():
+    return {"message": "API is running"}
