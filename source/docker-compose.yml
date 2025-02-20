@@ -43,7 +43,7 @@ services:
     networks:
       - stockTrackerDockerNetwork
 
-  stock-tracker-mosquitto:
+  mosquitto:
     extends:
       file: ./mqtt_broker/docker-compose.yml
       service: mosquitto
