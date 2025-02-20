@@ -8,7 +8,7 @@ services:
 
   database-service:
     extends:
-      file: ./database_service/docker-compose.yml
+      file: ./databaseService/docker-compose.yml
       service: database-service
     networks:
       - stockTrackerDockerNetwork
@@ -18,7 +18,7 @@ services:
 
   detection-service:
     extends:
-      file: ./detection_service/docker-compose.yml
+      file: ./detectionService/docker-compose.yml
       service: detection-service
     networks:
       - stockTrackerDockerNetwork
@@ -38,14 +38,14 @@ services:
 
   mailing-service:
     extends:
-      file: ./mailing_service/docker-compose.yml
+      file: ./mailingService/docker-compose.yml
       service: mailing-service
     networks:
       - stockTrackerDockerNetwork
 
   mosquitto:
     extends:
-      file: ./mqtt_broker/docker-compose.yml
+      file: ./mqttBroker/docker-compose.yml
       service: mosquitto
     networks:
       - stockTrackerDockerNetwork
