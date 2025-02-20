@@ -4,6 +4,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'api_config.dart';
+import 'package:logger/logger.dart';
+
+final Logger logger = Logger();
 
 class StockDataTableWidget extends StatefulWidget {
   const StockDataTableWidget({super.key});
@@ -18,6 +21,9 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
   dynamic overallPicture;
   Timer? _timer;
 
+  final ScrollController _verticalScrollController = ScrollController();
+  final ScrollController _horizontalScrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -27,7 +33,6 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
 
   void _startTimerNew() {
     _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
-      print("Daten werden alle 30sec aktualisiert");
       _fetchStockData();
     });
   }
@@ -35,6 +40,8 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
   @override
   void dispose() {
     _timer?.cancel();
+    _verticalScrollController.dispose();
+    _horizontalScrollController.dispose();
     super.dispose();
   }
 
@@ -46,21 +53,31 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
       if (response.statusCode == 200) {
         String responseBody = utf8.decode(response.bodyBytes);
         final fetchedData = jsonDecode(responseBody);
-        print('Geladene Daten: $fetchedData\n');
 
         setState(() {
           overallPicture = fetchedData['overall_picture'];
 
-          if (overallPicture != null && overallPicture!.contains('base64')) {
-            overallPicture = base64Decode(
-              overallPicture!.replaceAll('data:image/png;base64,', ''),
-            );
+          try {
+            Uint8List decodedImage = base64Decode(overallPicture!);
+            overallPicture = decodedImage;
+          } catch (e) {
+            overallPicture = null;
           }
           stockData = (fetchedData['products'] as Map).values.map((product) {
+            dynamic picture = product["picture"];
+
+            if (picture != null) {
+              try {
+                Uint8List decodedImage = base64Decode(picture);
+                picture = decodedImage;
+              } catch (e) {
+                picture = null;
+              }
+            }
             return {
               "name": product["name"] ?? "Unknown",
               "amount": int.tryParse(product["amount"].toString().trim()) ?? 0,
-              "picture": product["picture"]
+              "picture": picture
             };
           }).toList();
           isLoading = false;
@@ -72,18 +89,20 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
       setState(() {
         isLoading = false;
       });
-      print('Error fetching stock data: $e');
+      logger.e('Error fetching stock data: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double fontSize = screenWidth * 0.02;
+
     return Scaffold(
       body: Container(
-        width: double.infinity, // Volle Breite des Bildschirms nutzen
-        height: MediaQuery.of(context)
-            .size
-            .height, // Dynamische Höhe basierend auf Bildschirmgröße
+        width: screenWidth,
+        height: screenHeight,
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -92,75 +111,147 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
               overallPicture is Uint8List
                   ? Image.memory(
                       overallPicture!,
-                      
-                      height: 200,
+                      height: screenHeight * 0.3,
                       fit: BoxFit.contain,
                     )
                   : Column(
                       children: [
                         Text(
                           overallPicture!,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: fontSize, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 10),
                         Image.asset(
                           'assets/images/regal.png',
-                          height: 150,
+                          height: screenHeight * 0.15,
                           fit: BoxFit.contain,
                         ),
                       ],
                     ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 25),
             Expanded(
               child: Scrollbar(
                 thumbVisibility: true,
+                controller: _verticalScrollController,
                 child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minWidth: MediaQuery.of(context)
-                          .size
-                          .width, // Dynamische Breite basierend auf dem Bildschirm
-                    ),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: DataTable(
-                        columns: const [
-                          DataColumn(label: Text('Name')),
-                          DataColumn(label: Text('Amount')),
-                          DataColumn(label: Text('Product Picture')),
+                  controller: _verticalScrollController,
+                  scrollDirection: Axis.vertical,
+                  child: SingleChildScrollView(
+                    controller: _horizontalScrollController,
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: screenWidth * 0.95,
+                      ),
+                      child: Table(
+                        columnWidths: {
+                          0: const FlexColumnWidth(),
+                          1: FixedColumnWidth(screenWidth * 0.2),
+                          2: FixedColumnWidth(screenWidth * 0.3),
+                        },
+                        children: [
+                          TableRow(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Name',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: (fontSize * 0.8)),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Amount',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: (fontSize * 0.8)),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(
+                                  child: Text(
+                                    'Product Picture',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: (fontSize * 0.8)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          TableRow(
+                            children: [
+                              Container(height: 3, color: Colors.black),
+                              Container(height: 3, color: Colors.black),
+                              Container(height: 3, color: Colors.black),
+                            ],
+                          ),
+                          ...stockData.map(
+                            (product) {
+                              return TableRow(
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: Colors.black26, width: 2),
+                                  ),
+                                ),
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      product['name'] ?? 'Unknown',
+                                      style:
+                                          TextStyle(fontSize: fontSize * 0.7),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      product['amount'].toString(),
+                                      style:
+                                          TextStyle(fontSize: fontSize * 0.7),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: product['picture'] != null
+                                          ? Image.memory(
+                                              product['picture'],
+                                              height: screenHeight * 0.1,
+                                              width: screenWidth * 0.15,
+                                              fit: BoxFit.contain,
+                                            )
+                                          : Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(Icons.no_photography,
+                                                    size: (fontSize * 0.7),
+                                                    color: Colors.red),
+                                                const SizedBox(width: 5),
+                                                Text(
+                                                  'No Picture',
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          (fontSize * 0.7),
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
                         ],
-                        rows: stockData.map((product) {
-                          return DataRow(cells: [
-                            DataCell(Text(product['name'] ?? 'Unknown')),
-                            DataCell(Text(product['amount'].toString())),
-                            DataCell(product['picture'] != null
-                                ? Image.network(
-                                    product['picture'],
-                                    height: 50,
-                                    width: 50,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Row(
-                                        children: [
-                                          const Icon(Icons.no_photography,
-                                              size: 24),
-                                          const SizedBox(width: 10),
-                                          Text(
-                                            product['picture'] ?? 'No Picture',
-                                            style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Color.fromARGB(
-                                                    255, 77, 69, 69)),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  )
-                                : const Text('No Picture')),
-                          ]);
-                        }).toList(),
                       ),
                     ),
                   ),

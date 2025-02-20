@@ -1,0 +1,144 @@
+openapi: 3.0.3
+
+info:
+  title: Database-Service API
+  description: This is the API-Specification for the Database-Service
+  version: 1.0.0
+
+paths:
+  /update_products:
+    post:
+      summary: Initialize or update products
+      description: Add product-types to the database products-table or update already existing ones.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Request'
+      responses:
+        '2XX':
+          description: Succesfully initialized/updated products 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '4XX':
+          description: Client Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '5XX':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /update_app:
+    get:
+      summary: On App-request send update
+      description: Sends an update to app which contains all products, regardless if the amount is zero
+      responses:
+        '2XX':
+          description: Sending update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppResponse'
+        '4XX':
+          description: Client Error
+        '5XX':
+          description: Server Error
+
+  paths:
+  /healthcheck:
+    get:
+      summary: Needed for Docker
+      description: Ensures the API is up and running before other containers start.
+      operationId: healthcheck
+      tags:
+        - Health
+      responses:
+        "200":
+          description: API is running successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "API is running"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Internal Server Error"
+    
+components:
+  schemas:
+    Request:
+      type: object
+      required:
+        - products
+        - overall_picture
+      properties:
+        products:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Bottle"
+              amount:
+                type: integer
+                example: 2
+              picture:
+                type: string
+                example: "picture"
+                nullable: true
+        overall_picture:
+          type: string
+          exmaple: "picture"
+
+    Response: 
+      type: object
+      required:
+        - status_code
+      properties:
+        status_code:
+          type: integer
+          example: 200
+
+    AppResponse:
+      type: object
+      required:
+        - products
+        - overall_picture
+      properties:
+        type: object
+          additionalProperties:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Bottle"
+              amount:
+                type: integer
+                example: 2
+              picture:
+                type: string
+                example: "picture"
+                nullable: true
+        overall_picture:
+          type: string
+          exmaple: "picture"
+          nullable: true
+

@@ -6,38 +6,9 @@ info:
   version: 1.0.0
 
 paths:
-  /send_mail_added:
+  /send_update_mail:
     post:
-      summary: Interface for sending an email that a product was added
-      description: Interface for sending an email with the given data.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/mail_data_array'
-      responses:
-        '2XX':
-          description: Response of the mailing service
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/json_response'
-        '4XX':
-          description: Response of the mailing service
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/json_response'
-        '5XX':
-          description: Response of the mailing service
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/json_response'
-  /send_mail_deleted:
-    post:
-      summary: Interface for sending an email that a product was deleted
+      summary: Interface for sending an email that a product amount was updated
       description: Interface for sending an email with the given data.
       requestBody:
         required: true

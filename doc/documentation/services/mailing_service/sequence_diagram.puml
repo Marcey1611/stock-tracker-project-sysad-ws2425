@@ -7,16 +7,28 @@ participant "MailPreparingServiceBa" as MailPreparingService
 participant "MailSendingServiceBa" as MailSendingService
 participant "Gmail" as Gmail
 
-Database -> API: POST /sendMailAdded
-API -> API: Validate request
-API -> ApiBF: Prepare mailing data
-ApiBF -> MailPreparingService: Prepare mail
-MailPreparingService -> MailSendingService: Send mail
-MailSendingService -> Gmail: Send email with configured message
-Gmail --> MailSendingService: Email sent confirmation
-MailSendingService --> MailPreparingService: Success
-MailPreparingService --> ApiBF: Success
-ApiBF --> API: Success response
-API --> Database: JSONResponse (email sent)
+Database -> API: POST /send_update_mail
+API -> API: Validate update mail request
+API -> ApiBF: Unpack update mail data
+ApiBF -> MailPreparingService: Prepare and save update mail data
+MailPreparingService -> MailSendingService: Send update mail all two minutes if new data is available
+MailSendingService -> Gmail: Send update mail with configured message
+Gmail --> MailSendingService: Update mail sent confirmation
+MailSendingService --> MailPreparingService: Successfully sent update mail
+MailPreparingService --> ApiBF: Successfully sent update mail
+ApiBF --> API: Successfully sent update mail response
+API --> Database: JSONResponse (update mail sent)
+
+Database -> API: POST /send_error_mail
+API -> API: Validate error mail request
+API -> ApiBF: Unpack error mail data
+ApiBF -> MailPreparingService: Prepare error mail
+MailPreparingService -> MailSendingService: Send error mail
+MailSendingService -> Gmail: Send error mail with configured message
+Gmail --> MailSendingService: Error mail sent confirmation
+MailSendingService --> MailPreparingService: Successfully sent error mail
+MailPreparingService --> ApiBF: Successfully sent error mail
+ApiBF --> API: Successfully sent error mail response
+API --> Database: JSONResponse (error mail sent)
 
 @enduml

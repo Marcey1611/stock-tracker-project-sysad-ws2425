@@ -1,9 +1,10 @@
-import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 import logging
 from jinja2 import Template
+import os
+import threading
 
 from entity.models.mail_data import MailUpdateData
 from entity.exceptions.internal_error_exception import InternalErrorException
@@ -13,25 +14,50 @@ from bm.mail_sending_service_ba import MailSendingServiceBa
 class MailPreparingServiceBa:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.sender_email = "sysad.stock.tracker@gmail.com"
-        self.receiver_email = "sysad.project.ws2425@gmail.com"
+        self.mail_data_list = []
+        self.mail_sending_service_ba = MailSendingServiceBa()
+        self.mail_sending_timer = None
+        self.start_scheduled_mail_sending()
 
-    def prepare_mail(self, mail_data, action: Action):
-        self.logger.info(f"Preparing email...")
+    def start_scheduled_mail_sending(self):
+        if self.mail_sending_timer:
+            self.mail_sending_timer.cancel()
+        self.mail_sending_timer = threading.Timer(120, self.send_scheduled_mail)
+        self.mail_sending_timer.start()
+
+    def send_scheduled_mail(self):
+        if self.mail_data_list:
+            subject, body = self.set_mail_data(self.mail_data_list, Action.CHANGED)
+            self.mail_sending_service_ba.send_mail(self.config_message(subject, body))
+            self.mail_data_list.clear()
+        self.start_scheduled_mail_sending()
+
+    def prepare_mail(self, new_mail_data_list, action: Action):
+        self.logger.info(f"Preparing mail data...")
         try:
             if action == Action.CHANGED:
-                subject, body = self.set_mail_data(mail_data, action)
+                for new_mail_data in new_mail_data_list:
+                    existent = False
+                    for mail_data in self.mail_data_list:
+
+                        if mail_data.id == new_mail_data.id:
+                            mail_data.changed_amount += new_mail_data.changed_amount
+                            mail_data.amount = new_mail_data.amount
+                            existent = True
+                            break
+
+                    if not existent:
+                        self.mail_data_list.append(new_mail_data)
+
             elif action == Action.ERROR:
-                subject, body = self.set_error_mail_data(mail_data)
+                subject, body = self.set_error_mail_data(new_mail_data_list)
+                self.mail_sending_service_ba.send_mail(self.config_message(subject, body))
             else:
                 raise InternalErrorException()
-            mail_sending_service_ba = MailSendingServiceBa()
-            mail_sending_service_ba.send_mail(self.config_message(subject, body))
-        
+    
         except Exception as exception:
             self.logger.error(f"Exception: {exception}")
             raise InternalErrorException()
-        
         
     def set_mail_data(self, mail_data_list: list[MailUpdateData], action: Action):
         try:
@@ -41,10 +67,10 @@ class MailPreparingServiceBa:
             
             products = [
                 {
-                    "product_id": mail_data.id,
-                    "product_name": mail_data.name,
-                    "product_amount_changed": mail_data.changed_amount,
-                    "product_amount_total": mail_data.amount,
+                    "id": mail_data.id,
+                    "name": mail_data.name,
+                    "changed_amount": mail_data.changed_amount,
+                    "amount": mail_data.amount,
                 }
                 for mail_data in mail_data_list
             ]
@@ -86,8 +112,8 @@ class MailPreparingServiceBa:
     def config_message(self, subject: str, body: str) -> MIMEMultipart:
         try:
             message = MIMEMultipart()
-            message["From"] = self.sender_email
-            message["To"] = self.receiver_email
+            message["From"] = os.getenv("SMTP_MAIL")
+            message["To"] = os.getenv("RECV_MAIL")
             message["Subject"] = subject
             message.attach(MIMEText(body, "html"))
 

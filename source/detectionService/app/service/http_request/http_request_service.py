@@ -5,12 +5,12 @@ from api import api_rest_client_database
 from entities.detection.product import Product
 from entities.detection.track_manager import TrackerManager
 from entities.http.database_models import DatabaseUpdateRequest
-from service.detection.frame_processess import draw_bounding_box, encode_frame
+from service.detection.frame_encoding import encode_frame
+from service.detection.frame_drawings import draw_bounding_box
 
 
-def init_database(frame,model):
+def init_database(frame,names):
     all_products: Dict[int, Product] = {}
-    names = model.names
     for index, name in enumerate(names.values()):
         all_products[index] = Product(name=name,amount=0,picture=None)
     http_database_request = DatabaseUpdateRequest(overall_picture=encode_frame(frame), products=all_products)
@@ -26,7 +26,7 @@ def http_request_service(trackers: TrackerManager, annotated_frame,frame):
         api_rest_client_database.update_database_products(http_database_request)
 
 def generate_products(trackers: TrackerManager, frame):
-    from service.detection.detection_thread import model_cls_names
+    from service.detection.frame_processess import model_cls_names
     tmp_detected_objects = copy.deepcopy(trackers.detected_objects)
     all_products: Dict[int, Product] = {}
     detected_objects_list = list(tmp_detected_objects.values())

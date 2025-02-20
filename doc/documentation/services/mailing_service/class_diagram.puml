@@ -5,14 +5,13 @@ package api {
         +class Api {
             +api_bf : ApiBf
             +api_router : apiRouter
-            +validator : validator
 
-            +send_update_mail(request : Request) : JSONResponse
-            +send_error_mail(request : Request) : JSONResponse
+            +send_update_mail(request : MailUpdateData) : JSONResponse
+            +send_error_mail(request : MailErrorData) : JSONResponse
         }
 
         +class ExceptionHandler {
-            +logger : logger
+            +logger : Logger
 
             +register_exception_handler(fast_api : app) : JSONResponse
             +response(detail : str, status_code : int) : JSONResponse
@@ -21,21 +20,13 @@ package api {
 
     package control {
         +class ApiBf {
-            - logger: Logger
+            +logger: Logger
+            +mail_preparing_service : MailPreparingServiceBa
+
 
             +__init__() : None
-            +prepare_mailing_data(valid_data : Request, action : Action) : None
-            +prepare_mailing_data_error(valid_data : Request) : None
-        }
-    }
-
-    package validation {
-        +class Validator {
-            - logger: Logger
-
-            + __init__() : None
-            + validate_data(product_list : list<dict<str, int | str>>) : list<dict<str, int | str>>
-            + validate_error_message(request_data : list<dict<str, int | str>>) : list<dict<str, int | str>>
+            +prepare_mailing_data(mail_data_list : Request, action : Action) : None
+            +prepare_mailing_data_error(data : Request) : None
         }
     }
 }
@@ -47,8 +38,10 @@ package bm {
         - receiver_email : str
 
         + __init__() : None
-        + prepare_mail(mail_data_list : list<MailData>, action : Action) : None
-        + set_mail_data(mail_data_list : list<MailData>, action : Action) : str, str
+        + start_scheduled_mail_sending() : None
+        + send_scheduled_mail() : None
+        + prepare_mail(mail_data : object, action : Action) : None
+        + set_mail_data(mail_data_list : list<MailUpdateData>, action : Action) : str, str
         + set_error_mail_data(error_message : str) : str, str
         + config_message(subject : str, body : str) : MIMEMultipart
     }
@@ -66,26 +59,24 @@ package bm {
 }
 
 package entity {
-    +class MailData {
-        + product_id : int
-        + product_name : str
-        + product_amount_changed : int
-        + product_amount_total : int
-        + action : Action
+    +class MailUpdateData {
+        + id : int
+        + name : str
+        + changed_amount : int
+        + amount : int
+    }
+
+    +class MailErrorData {
+        + error_message : str
     }
 
     +enum Action {
-        ADDED
-        DELETED
+        CHANGED
         ERROR
     }
 
     +class InternalErrorException {
         + __init__(detail : str = "Internal Server Error", status_code : int = 500) : None
-    }
-
-    +class BadRequestException {
-        +__init__(detail : str = "Bad Request", status_code : int = 400) : None
     }
 }
 
@@ -96,24 +87,10 @@ package entity {
 Main ..> ExceptionHandler
 Main ..> Api
 
-Api ..> Validator
 Api ..> ApiBf
-Api ..> Action
 
-ApiBf ..> MailData
 ApiBf ..> MailPreparingServiceBa
-ApiBf ..> InternalErrorException
-ApiBf ..> Action
-
-Validator ..> BadRequestException
 
 MailPreparingServiceBa ..> MailSendingServiceBa
-MailPreparingServiceBa ..> Action
-MailPreparingServiceBa ..> InternalErrorException
-MailPreparingServiceBa ..> MailData
-
-MailSendingServiceBa ..> Action
-MailSendingServiceBa ..> InternalErrorException
-MailSendingServiceBa ..> MailData
 
 @enduml

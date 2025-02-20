@@ -11,7 +11,7 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - stockTrackerDockerNetwork
     healthcheck:
@@ -43,19 +43,29 @@ services:
     container_name: detectionServiceContainer
     build: ./detectionService
     networks:
-      - stockTrackerDockerNetwork
+     - stockTrackerDockerNetwork
     ports:
       - "8000:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
     environment:
-      - DATABASE_SERVICE_URL=http://dataBaseServiceContainer:8000
+      - QT_X11_NO_MITSHM= 1
+      - NVIDIA_VISIBLE_DEVICES= all
+      - NVIDIA_DRIVER_CAPABILITIES= compute,video,utility,graphics
+      - DATABASE_SERVICE_URL= http://dataBaseServiceContainer:8000
       - MQTT_BROKER_URL=stocktracker-mosquitto
       - MQTT_BROKER_PORT=1883
-      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11m.pt
-      - DETECTION_MODEL=./app/models/detection/yolo11m.pt
+      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11x.pt
+      - DETECTION_MODEL=./app/models/detection/yolo11x.pt
+      - DEVICE_TO_RUN_MODEL='cuda' # cuda or cpu
     depends_on:
-      database-service:
-        condition: service_healthy
-    
+     database-service:
+      condition: service_healthy
 
   stock-tracker:
     container_name: stock_tracker_container
@@ -63,7 +73,7 @@ services:
     networks:
       - stockTrackerDockerNetwork
     ports:
-      - "8080:80"
+      - "8081:8081"
     environment:
       - DATABASE_SERVICE_URL="http://localhost:8001/update_app"
     depends_on:
@@ -78,10 +88,11 @@ services:
     ports:
       - "8002:8000"
     environment:
-      SMTP_SERVER: smtp.gmail.com
-      SMTP_PORT: 587
-      SMTP_USER: sysad.stock.tracker@gmail.com
-      SMTP_PASSWORD: qlddayafyvqszzlt
+      - SMTP_SERVER=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_MAIL=sysad.stock.tracker@gmail.com
+      - SMTP_PASS=tihs holh clyi dlai
+      - RECV_MAIL=sysad.project.ws2425@gmail.com
 
   mosquitto:
     image: eclipse-mosquitto
@@ -95,7 +106,6 @@ services:
       - "9001:9001"
     volumes:
       - ./mqttBroker/mosquitto:/etc/mosquitto
-      - ./mqttBroker/mosquitto/data:/mosquitto/data
       - ./mqttBroker/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
 volumes:
