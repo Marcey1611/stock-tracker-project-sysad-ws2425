@@ -2,12 +2,12 @@ import time
 
 from entities.detection.detected_object import DetectedObject
 from entities.detection.track_manager import TrackerManager
-from service.http_request.http_request_service import http_request_service
+from service.http_request.http_request_service import generate_http_request
 
 TOLERANCE = 10
 ADD_REMOVE_THRESHOLD = .5 * 30
 UPDATE_INTERVALL = 15
-
+# Tracks Objects
 def update_object_tracking(results, trackers: TrackerManager):
     boxes = results[0].boxes.xywh.cpu()
     track_ids = results[0].boxes.id.int().cpu().tolist()
@@ -21,7 +21,7 @@ def update_object_tracking(results, trackers: TrackerManager):
             trackers.previous_detected_objects[track_id].position = (x, y, w, h)
             trackers.detected_objects[track_id] = trackers.previous_detected_objects[track_id]
         else :
-            # Aktualisiere Klassenhistorie
+            # Update
             trackers.cls_id_history[track_id][cls_id] += 1
 
             # Berechne Entfernung und aktualisiere Verweilzeit
@@ -42,7 +42,7 @@ def update_object_tracking(results, trackers: TrackerManager):
                 trackers.detected_objects[track_id] = DetectedObject(track_id, cls_id, position)
                 trackers.disappearance_time[track_id] = 0
 
-            # Speichere Positionshistorie
+            # Saves position-history
             trackers.track_history[track_id].append((x, y))
             if len(trackers.track_history[track_id]) > 30:
                 trackers.track_history[track_id].pop(0)
@@ -69,7 +69,7 @@ def update_database(trackers: TrackerManager, annotated_frame, frame):
     current_time = time.monotonic()
     if len(trackers.detected_objects.items())!=len(trackers.previous_detected_objects.items()) or current_time-trackers.last_update > UPDATE_INTERVALL:
         if len(trackers.detected_objects.items())==0 and len(trackers.previous_detected_objects.items())>1:
-            http_request_service(trackers,annotated_frame,None)
+            generate_http_request(trackers, annotated_frame, None)
         else:
-            http_request_service(trackers,annotated_frame,frame)
+            generate_http_request(trackers, annotated_frame, frame)
         trackers.last_update = current_time

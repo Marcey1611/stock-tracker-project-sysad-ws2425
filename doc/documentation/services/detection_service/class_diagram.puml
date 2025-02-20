@@ -1,0 +1,174 @@
+@startuml
+
+package app {
+class main{
+  FastAPI app
+  Queue feed_q
+  Queue tracck_q
+  Thread thread_mq
+  }
+}
+
+package app.service.mqtt{
+class mqtt_client{
+  + String url
+  + String username
+  + String password
+  + String topic
+  + String uuid
+  + MqttClient client
+
+  + on_connect()
+  + on_disconnect()
+  + on_message()
+  + init_mqtt_clinet()
+  + try_connecting()
+  + is_client_connected()
+  + mqtt_thread()
+  }
+  main ..> mqtt_client
+}
+
+package app.service.detection{
+
+  class frame_handling{
+  + frame_handling()
+  + put_frames_into_queue()
+  }
+
+  class frame_drawings{
+  + draw_bounding_box()
+  }
+
+  class frame_codings{
+  + encode_frame()
+  + decode_frame()
+  }
+
+  frame_codings<..app.service.http_request.http_request_service
+  frame_codings<.. app.service.mqtt.mqtt_client
+
+
+  class frame_detecting{
+  + YOLO model
+  + String file_location
+  + Array model_cls_names
+  + String device
+  + frame_detection()
+  }
+
+    class human_checking{
+  + YOLO model
+  + String file_location
+  + String device
+  + is_human_in_frame()
+  }
+
+  mqtt_client..>frame_handling
+  frame_handling..>frame_detecting
+  frame_handling..>human_checking
+  frame_handling..>app.api.video_feed_endpoints
+  frame_detecting..>app.service.tracking.tracking_service
+  frame_drawings..>app.service.http_request.http_request_service
+}
+package app.service.http_request{
+
+  class http_request_service{
+  + init_database()
+  + generate_http_request()
+  + generate_products()
+  }
+  http_request_service..>app.api.api_rest_client_database
+}
+
+package app.service.tracking{
+  class tracking_service{
+  + int TOLERANCE
+  + int ADD_REMOVE_THRESHOLD
+  + int UPDATE_INTERVALL
+  + update_object_tracking()
+  + handle_disappeared_objects()
+  + update_database()
+  }
+  tracking_service..>app.service.http_request.http_request_service
+}
+
+package app.entities.detection{
+
+  class detectec_object{
+  + int track_id
+  + int cls_id
+  + (int,int,int,int,int) position
+  + get_cls_id()
+  + get_track_id()
+  + set_position()
+  + get_track_id()
+  + get_cls_id()
+  }
+
+  detectec_object<--track_manager
+  detectec_object<--app.service.tracking.tracking_service
+
+  class product{
+  + String name
+  + int amount
+  + String | None picture
+  }
+
+  product <|-- BaseModel
+  product<--app.entities.http.database_models.DatabaseUpdateRequest
+  product<--app.service.http_request.http_request_service
+
+  class track_manager{
+  + Dict track_history
+  + Dict stay_time
+  + Dict detected_objects
+  + Dict previous_detected_objects
+  + Dict disappearance_time
+  + Dict cls_id_history
+  + int last_update
+  }
+
+  track_manager<--app.service.detection.frame_detecting
+  track_manager<-- app.service.detection.frame_handling
+  track_manager<-- app.service.http_request.http_request_service
+  track_manager<-- app.service.mqtt.mqtt_client
+  track_manager<-- app.service.tracking.tracking_service
+
+}
+package app.entities.http{
+  class database_models.DatabaseUpdateRequest{
+    + Dict products
+    + String overall_picture
+  }
+
+  DatabaseUpdateRequest <|-- BaseModel
+  DatabaseUpdateRequest <-- app.service.http_request.http_request_service
+
+  class database_models.DatabaseUpdateResponse{
+    + String status_code
+  }
+  DatabaseUpdateResponse <|-- BaseModel
+
+}
+
+package app.api{
+  class video_feed_endpoints{
+  + APIRouter router
+  + Set client
+  + String ip_address
+  + get() track
+  + get() feed
+  + websocket_endpoint() track
+  + websocket_endpoint() feed
+  }
+  class api_rest_client_database{
+  + String url
+  + Object headers
+  + update_database_products()
+  }
+  api_rest_client_database --> app.entities.http.database_models.DatabaseUpdateResponse
+  api_rest_client_database --> app.entities.http.database_models.DatabaseUpdateRequest
+}
+
+@enduml

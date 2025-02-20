@@ -26,15 +26,15 @@ async def get():
 async def websocket_endpoint(websocket: WebSocket):
     from main import feed_q
     await websocket.accept()
-    clients.add(websocket)  # Füge den neuen Client zur Liste hinzu
+    clients.add(websocket)
     logger.info("New client connected")
 
     try:
         while True:
-            frame = feed_q.get()  # blockiert, bis ein Bild verfügbar ist
-            if frame:  # Überprüfen, ob das Frame existiert
-                await websocket.send_bytes(frame)  # Sende das Bild an den Client
-            await asyncio.sleep(0.03)  # Verzögerung, um Bandbreite zu sparen
+            frame = feed_q.get()
+            if frame:
+                await websocket.send_bytes(frame)
+            await asyncio.sleep(0.03)
 
     except WebSocketDisconnect:
         # Wenn der Client die Verbindung trennt
@@ -61,21 +61,19 @@ async def get():
 async def websocket_endpoint(websocket: WebSocket):
     from main import track_q
     await websocket.accept()
-    clients.add(websocket)  # Füge den neuen Client zur Liste hinzu
+    clients.add(websocket)
     logger.info("New client connected")
 
     try:
         while True:
-            # Warte auf das neueste Bild aus der Queue
-            frame = track_q.get()  # blockiert, bis ein Bild verfügbar ist
-            if frame:  # Überprüfen, ob das Frame existiert
-                await websocket.send_bytes(frame)  # Sende das Bild an den Client
-            await asyncio.sleep(0.03)  # Verzögerung, um Bandbreite zu sparen
+            frame = track_q.get()
+            if frame:
+                await websocket.send_bytes(frame)
+            await asyncio.sleep(0.03)
 
     except WebSocketDisconnect:
-        # Wenn der Client die Verbindung trennt
         logger.info("Client disconnected")
-        clients.remove(websocket)  # Entferne den Client aus der Liste
+        clients.remove(websocket)
         await websocket.close()
 
     except Exception as e:
