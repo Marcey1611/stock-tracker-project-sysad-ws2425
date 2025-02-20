@@ -2,7 +2,7 @@
 This repository should not contain more than 100MB.
 This README contains only a template at the moment.
 
-# Title
+# Stock Tracker
 - One short paragraph as repository description
 - Should contain the basic functionalities
 
@@ -22,9 +22,10 @@ This README contains only a template at the moment.
 - E.g. in the object recognition repository list the kinect2 node
 
 ## Authors
-- List all participants
-- Add to each participant what they are responsible for
-- E.g.: Max Musterman - _Initial work_ - [Link to gitlab user (@...)]
+- Noah Preyer - Cam-Service, Detection-Service, MQTT-Broker - @np-223996
+- Mike Lachmuth - Database-Service, Database - @ml-224300
+- Marcel Eichelberger - Initial work, Mailing-Service - @me-223965
+- Manuel Walser - Stock Tracker App - @mw-224023
 
 ## License
 What license is applied to this repository in case of open sourcing.
