@@ -27,21 +27,28 @@ class mqtt_client{
   + mqtt_thread()
   }
   main ..> mqtt_client
-  mqtt_client..>app.service.detection.frame_codings
 }
 
 package app.service.detection{
+
   class frame_handling{
   + frame_handling()
   + put_frames_into_queue()
   }
+
   class frame_drawings{
   + draw_bounding_box()
   }
+
   class frame_codings{
   + encode_frame()
   + decode_frame()
   }
+
+  frame_codings<..app.service.http_request.http_request_service
+  frame_codings<.. app.service.mqtt.mqtt_client
+
+
   class frame_detecting{
   + YOLO model
   + String file_location
@@ -49,21 +56,23 @@ package app.service.detection{
   + String device
   + frame_detection()
   }
+
     class human_checking{
   + YOLO model
   + String file_location
   + String device
   + is_human_in_frame()
   }
+
   mqtt_client..>frame_handling
   frame_handling..>frame_detecting
   frame_handling..>human_checking
   frame_handling..>app.api.video_feed_endpoints
   frame_detecting..>app.service.tracking.tracking_service
-  frame_codings..>app.service.http_request.http_request_service
   frame_drawings..>app.service.http_request.http_request_service
 }
 package app.service.http_request{
+
   class http_request_service{
   + init_database()
   + generate_http_request()
@@ -85,6 +94,7 @@ package app.service.tracking{
 }
 
 package app.entities.detection{
+
   class detectec_object{
   + int track_id
   + int cls_id
@@ -95,13 +105,20 @@ package app.entities.detection{
   + get_track_id()
   + get_cls_id()
   }
-  track_manager-->detectec_object
-  app.service.tracking.tracking_service-->detectec_object
+
+  detectec_object<--track_manager
+  detectec_object<--app.service.tracking.tracking_service
+
   class product{
   + String name
   + int amount
   + String | None picture
   }
+
+  product <|-- BaseModel
+  product<--app.entities.http.database_models.DatabaseUpdateRequest
+  product<--app.service.http_request.http_request_service
+
   class track_manager{
   + Dict track_history
   + Dict stay_time
@@ -111,8 +128,12 @@ package app.entities.detection{
   + Dict cls_id_history
   + int last_update
   }
-  product <|-- BaseModel
-  api_rest_client_database --> app.service.http_request.http_request_service
+
+  track_manager<--app.service.detection.frame_detecting
+  track_manager<-- app.service.detection.frame_handling
+  track_manager<-- app.service.http_request.http_request_service
+  track_manager<-- app.service.mqtt.mqtt_client
+  track_manager<-- app.service.tracking.tracking_service
 
 }
 package app.entities.http{
@@ -120,10 +141,13 @@ package app.entities.http{
     + Dict products
     + String overall_picture
   }
+
+  DatabaseUpdateRequest <|-- BaseModel
+  DatabaseUpdateRequest <-- app.service.http_request.http_request_service
+
   class database_models.DatabaseUpdateResponse{
     + String status_code
   }
-  DatabaseUpdateRequest <|-- BaseModel
   DatabaseUpdateResponse <|-- BaseModel
 
 }
