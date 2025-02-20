@@ -5,22 +5,23 @@ Our goal is to track what is inside a shelf (fridge) and determine what has been
 
 ## Must-Have Requirements
 
-### Detection
-- A product must be identified using a camera, and the correct product must be recognized. (Implemented)
+### Detection (Implemented)
+- A product must be identified using a camera, and the correct product must be recognized. 
 
-### Storage
-- The data should be stored in a database and be retrievable. (Implemented)
+### Storage (Implemented)
+- The data should be stored in a database and be retrievable. 
 
-### Event Handling
-- After an action (adding/removing a product), the user should receive an email with the updated product list. (Implemented)
+### Event Handling (Implemented)
+- After an action (adding/removing a product), the user should receive an email with the updated product list. 
 
 ## Should-Have Requirements
 
 ### Web Interface
 - A website or an app should display the current inventory. (Implemented both)
+- Additional the website/app should show a history. (Not Implemented)
 
-### Confirmation
-- An LED on the camera should light up when the system correctly recognizes a product. (Not implemented)
+### Confirmation (Not implemented)
+- An LED on the camera should light up when the system correctly recognizes a product. 
 
 ## Nice-to-Have Requirements
 
