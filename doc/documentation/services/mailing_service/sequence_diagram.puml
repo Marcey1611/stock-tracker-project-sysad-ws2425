@@ -11,7 +11,7 @@ Database -> API: POST /send_update_mail
 API -> ApiBF: Validated update mail request
 ApiBF -> MailPreparingService: Unpacked mailing data
 MailPreparingService -> MailPreparingService: Prepare and save update mail data
-MailPreparingService -> MailSendingService: Update mailing data all 2 seconds
+MailPreparingService -> MailSendingService: Update mailing data all 2 minutes
 MailSendingService -> Gmail: Send update mail
 Gmail --> MailSendingService: Update mail sent confirmation
 MailSendingService --> MailPreparingService: Successfully sent update mail
