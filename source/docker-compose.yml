@@ -40,33 +40,14 @@ services:
       retries: 5
 
   detection-service:
-    container_name: detectionServiceContainer
-    build: ./detectionService
+    extends:
+      file: ./detectionService/docker-compose.yml
+      service: detection-service
     networks:
-     - stockTrackerDockerNetwork
-    ports:
-      - "8000:8000"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [ gpu ]
-    environment:
-      - QT_X11_NO_MITSHM= 1
-      - NVIDIA_VISIBLE_DEVICES= all
-      - NVIDIA_DRIVER_CAPABILITIES= compute,video,utility,graphics
-      - DATABASE_SERVICE_URL= http://dataBaseServiceContainer:8000
-      - MQTT_BROKER_URL=stocktracker-mosquitto
-      - MQTT_BROKER_PORT=1883
-      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11m.pt
-      - DETECTION_MODEL=./app/models/detection/yolo11m.pt
-      - DEVICE_TO_RUN_MODEL=cuda # cuda or cpu
-      - SERVER_IP=192.168.2.15
+      - stockTrackerDockerNetwork
     depends_on:
-     database-service:
-      condition: service_healthy
+      database-service:
+        condition: service_healthy
 
   stock-tracker:
     container_name: stock_tracker_container
