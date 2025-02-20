@@ -8,10 +8,12 @@ from service.tracking.tracking_service import handle_disappeared_objects, update
 
 logger = logging.getLogger(__name__)
 TOLERANCE = 10
-ADD_REMOVE_THRESHOLD = .5 * 30
+ADD_REMOVE_THRESHOLD = 10
 
 file_location = "../../."+os.getenv('DETECTION_MODEL')
-model = YOLO(file_location)
+device = os.getenv('DEVICE_TO_RUN_MODELDEVICE_TO_RUN_MODEL')
+
+model = YOLO(file_location).to(device)
 model_cls_names = model.names
 
 def process_frame(frame,trackers:TrackerManager):

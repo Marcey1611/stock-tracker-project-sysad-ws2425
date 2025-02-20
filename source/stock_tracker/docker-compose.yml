@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: stock_tracker_container
     ports:
-      - "8080:80"
+      - "40105:40105"
     environment:
       - DATABASE_SERVICE_URL="http://localhost:8001/update_app"
     networks:

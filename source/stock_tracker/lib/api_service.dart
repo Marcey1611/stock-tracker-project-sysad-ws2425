@@ -1,5 +1,3 @@
-
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'api_config.dart';
@@ -10,9 +8,8 @@ Future<List<dynamic>> getDataFromApi() async {
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      return data['products'] ?? []; // Anpassung je nach API-Struktur
+      return data['products'] ?? []; 
     } else {
-      print("GEHT nicht!");
       throw Exception('Fehler beim Laden der Daten: ${response.statusCode}');
     }
   } catch (e) {

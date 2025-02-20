@@ -18,8 +18,8 @@ class HomePageState extends State<HomePage> {
   }
 
   final List<Widget> _pages = [
-    const StockDataTableWidget(), // Tabelle mit den Stock-Daten
-    const Center(child: Text('Historie (noch nicht implementiert)')), // Platzhalter für Historie
+    const StockDataTableWidget(), 
+    const Center(child: Text('Historie (noch nicht implementiert)')), 
   ];
 
   @override
@@ -34,7 +34,7 @@ class HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: _pages[_selectedIndex], // Aktive Seite basierend auf _selectedIndex
+      body: _pages[_selectedIndex], 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

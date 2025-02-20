@@ -3,7 +3,7 @@ from entities.detection.track_manager import TrackerManager
 from service.http_request.http_request_service import http_request_service
 
 TOLERANCE = 10
-ADD_REMOVE_THRESHOLD = .5 * 30
+ADD_REMOVE_THRESHOLD = 10
 
 def update_object_tracking(results, trackers: TrackerManager):
     boxes = results[0].boxes.xywh.cpu()
