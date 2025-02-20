@@ -1,6 +1,6 @@
 services:
   detection-service:
-    extends: .common
+    extends: .common_nvidia
 
   .common:
     build: .
@@ -10,11 +10,11 @@ services:
       - DATABASE_SERVICE_URL= http://dataBaseServiceContainer:8000
       - MQTT_BROKER_URL=stocktracker-mosquitto
       - MQTT_BROKER_PORT=1883
-      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11x.pt
-      - DETECTION_MODEL=./app/models/detection/yolo11x.pt
+      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11n.pt
+      - DETECTION_MODEL=./app/models/detection/yolo11n.pt
       - DEVICE_TO_RUN_MODEL=cuda # cuda or cpu
 
-  .comon_nvidia:
+  .common_nvidia:
     extends: .common
     deploy:
       resources:
