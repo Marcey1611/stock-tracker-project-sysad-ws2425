@@ -3,4 +3,4 @@ Das Original finden sie unter:
 https://universe.roboflow.com/daojingtutorial/freiburg-groceries-djizd/dataset/2
 Da die zip zu groß ist um diese auf gitlab hochzuladen können Sie uns unter np-223996@rwu.de erreichen. Wir schicken ihnen dann den Datensatz.
 Sie können Ihn auch hier herunterladen:
-https://preyercloud.duckdns.org/s/d9ZCHHFLgjX3NWM
+https://preyer-cloud.duckdns.org/s/d9ZCHHFLgjX3NWM

@@ -21,4 +21,4 @@ Additional components:
 - **[Models](../../../../source/databaseService/app/entities/models.py):** Provides all classes needed for communication with other Services. The models inherit from the BaseModel of the pydantic library, this ensures that all requests are validatet.
 - **[Main](../../../../source/databaseService/app/main.py):** Serves as the entrypoint for the Database Service project.
 
-(The project was created with the help of LLMs mainly ChatGPT)
+(The project was created with the help of LLMs like ChatGPT)
