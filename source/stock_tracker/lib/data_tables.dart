@@ -32,7 +32,7 @@ class StockDataTableWidgetState extends State<StockDataTableWidget> {
   }
 
   void _startTimerNew() {
-    _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       _fetchStockData();
     });
   }

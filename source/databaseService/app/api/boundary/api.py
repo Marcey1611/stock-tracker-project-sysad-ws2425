@@ -29,7 +29,7 @@ app.include_router(router)
 logger = logging.getLogger(__name__)
 
 @router.post("/update_products", response_model=Response)
-async def init_products(request: Request):
+async def update_products(request: Request):
     return api_bf.handle_update_products_request(request)
 
 @router.get("/update_app", response_model=AppResponse)

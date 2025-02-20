@@ -1,0 +1,20 @@
+@startuml
+main.py -> mqtt_client.py:init mqtt-client
+mqtt_client.py -> main.py:mqtt-client
+loop Initialisierung
+    loop Versuche verbinden
+        main.py -> mqtt_client.py:try connecting
+        mqtt_client.py -> main.py: success
+    end
+    main.py -> camera.py:frame capture loop
+    camera.py -> camera.py: init camera
+        loop mqtt-client is connected
+            camera.py -> camera.py:capture Frame
+            alt success image captured
+                camera.py -> mqtt_client.py:publish image
+            else
+                break loop
+            end
+        end
+end
+@endboard

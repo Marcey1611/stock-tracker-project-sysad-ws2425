@@ -5,7 +5,7 @@ from api import api_rest_client_database
 from entities.detection.product import Product
 from entities.detection.track_manager import TrackerManager
 from entities.http.database_models import DatabaseUpdateRequest
-from service.detection.frame_encoding import encode_frame
+from service.detection.frame_codings import encode_frame
 from service.detection.frame_drawings import draw_bounding_box
 
 
@@ -17,7 +17,7 @@ def init_database(frame,names):
     return api_rest_client_database.update_database_products(http_database_request)
 
 
-def http_request_service(trackers: TrackerManager, annotated_frame,frame):
+def generate_http_request(trackers: TrackerManager, annotated_frame, frame):
     http_database_request = DatabaseUpdateRequest(overall_picture=encode_frame(annotated_frame), products={})
     if frame is None:
         api_rest_client_database.update_database_products(http_database_request)
@@ -26,7 +26,7 @@ def http_request_service(trackers: TrackerManager, annotated_frame,frame):
         api_rest_client_database.update_database_products(http_database_request)
 
 def generate_products(trackers: TrackerManager, frame):
-    from service.detection.frame_processess import model_cls_names
+    from service.detection.frame_detecting import model_cls_names
     tmp_detected_objects = copy.deepcopy(trackers.detected_objects)
     all_products: Dict[int, Product] = {}
     detected_objects_list = list(tmp_detected_objects.values())

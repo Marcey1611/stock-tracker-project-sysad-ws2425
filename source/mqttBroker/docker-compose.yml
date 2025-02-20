@@ -1,10 +1,8 @@
-version: "3.9"
-
 services:
   mosquitto:
     image: eclipse-mosquitto
     hostname: mosquitto
-    container_name: mosquitto
+    container_name: stock-tracker-mosquitto
     restart: unless-stopped
     ports:
       - "1883:1883"
