@@ -4,6 +4,7 @@ node Detection {
         portout update_products_OUT
     }
     component MQTTBrocker
+    component CameraService
 }
 node Database {
     database PostgresDatabase
@@ -15,9 +16,6 @@ node Database {
         portout send_update_mail_OUT
         portout send_error_mail_OUT
     }
-}
-node Camera {
-    component CameraService
 }
 
 node Mail {
