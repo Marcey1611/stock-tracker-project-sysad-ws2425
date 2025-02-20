@@ -14,6 +14,8 @@ services:
       - DETECTION_MODEL=./app/models/detection/yolo11n.pt
       - DEVICE_TO_RUN_MODEL=cuda # cuda or cpu#
       - SERVER_IP=192.168.1.191
+      - MQTT_USERNAME=sysAdmin
+      - MQTT_PASSWORD=sysAd2024
 
   .common_nvidia:
     extends: .common
