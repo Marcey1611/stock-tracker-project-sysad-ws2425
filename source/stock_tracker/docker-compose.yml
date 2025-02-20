@@ -1,5 +1,3 @@
-
-
 services:
   stock-tracker:
     build:
@@ -10,10 +8,4 @@ services:
       - "40105:40105"
     environment:
       - DATABASE_SERVICE_URL="http://localhost:8001/update_app"
-    networks:
-      - stockTrackerDockerNetwork
-
-networks:
-  stockTrackerDockerNetwork:
-    external: true
 

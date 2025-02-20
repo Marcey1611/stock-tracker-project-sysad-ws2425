@@ -8,7 +8,7 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_SERVICE_URL= http://dataBaseServiceContainer:8000
-      - MQTT_BROKER_URL=stocktracker-mosquitto
+      - MQTT_BROKER_URL=stock-tracker-mosquitto
       - MQTT_BROKER_PORT=1883
       - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11n.pt
       - DETECTION_MODEL=./app/models/detection/yolo11n.pt
