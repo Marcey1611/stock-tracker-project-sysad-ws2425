@@ -1,7 +1,7 @@
 @startuml
 
 package app {
-class main.py
+class main
 }
 
 package app.service.capture{
