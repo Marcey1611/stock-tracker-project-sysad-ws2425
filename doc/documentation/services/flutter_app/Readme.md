@@ -52,6 +52,9 @@ The website and the app update automatically so that the inventory data is alway
 
 The application is now ready for use and always displays the latest inventory in the database.
 
+To open the StockTracker website, you need the IP address of the server running the Docker container. For example, if the IP address is 192.168.1.100 and the container is running on port 40105, you can access the website in the browser using the following URL:
+                'http://192.168.1.100:40105'  
+
 
 **Using the app**
 
@@ -132,4 +135,4 @@ The app and website cannot be run locally or checked for errors.
 
 Functions that rely on API requests or Flutter-specific components cannot be validated.
 
-For detailed installation instructions, see: [Insert link to installation instructions here]
+For detailed installation instructions, see: [Install Instructions](../../../../source/stock_tracker/install_flutter/install_instructions.md)
