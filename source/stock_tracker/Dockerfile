@@ -28,7 +28,7 @@ COPY --from=build /app/build/web /usr/share/nginx/html
 # own Nginx-Konfiguration 
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 8081
+EXPOSE 40105
 
 # start Nginx-Webserver  
 CMD ["nginx","-g", "daemon off;"]

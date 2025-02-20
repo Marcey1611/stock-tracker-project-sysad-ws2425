@@ -8,7 +8,7 @@ from service.tracking.tracking_service import handle_disappeared_objects, update
 
 logger = logging.getLogger(__name__)
 TOLERANCE = 10
-ADD_REMOVE_THRESHOLD = .5 * 30
+ADD_REMOVE_THRESHOLD = 10
 
 file_location = "../../."+os.getenv('DETECTION_MODEL')
 device = os.getenv('DEVICE_TO_RUN_MODEL')
