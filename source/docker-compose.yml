@@ -1,47 +1,25 @@
 version: "3.9"
 services:
-  stock_tracker_postgres_db:
-    build: ./database
-    container_name: databaseContainer
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydatabase
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5433:5432"
+  db:
+    extends:
+      file: ./database/docker-compose.yml
+      service: db
     networks:
       - stockTrackerDockerNetwork
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   database-service:
-    build: ./databaseService
-    container_name: dataBaseServiceContainer
+    extends:
+      file: ./database_service/docker-compose.yml
+      service: database-service
     networks:
       - stockTrackerDockerNetwork
-    ports:
-      - "8001:8000"
-    environment:
-      - DATABASE_URL=postgresql://myuser:mypassword@databaseContainer:5432/mydatabase
-      - MAILING_SERVICE_URL=http://mailing-service:8000/
     depends_on:
-      stock_tracker_postgres_db:
+      db:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/healthcheck || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   detection-service:
     extends:
-      file: ./detectionService/docker-compose.yml
+      file: ./detection_service/docker-compose.yml
       service: detection-service
     networks:
       - stockTrackerDockerNetwork
@@ -50,49 +28,32 @@ services:
         condition: service_healthy
 
   stock-tracker:
-    container_name: stock_tracker_container
-    build: ./stock_tracker
+    extends:
+      file: ./stock_tracker/docker-compose.yml
+      service: stock-tracker
     networks:
       - stockTrackerDockerNetwork
-    ports:
-      - "40105:40105"
-    environment:
-      - DATABASE_SERVICE_URL="http://localhost:8001/update_app"
     depends_on:
       database-service:
         condition: service_healthy
 
   mailing-service:
-    build: ./mailingService
-    container_name: mailingServiceContainer
+    extends:
+      file: ./mailing_service/docker-compose.yml
+      service: mailing-service
     networks:
       - stockTrackerDockerNetwork
-    ports:
-      - "8002:8000"
-    environment:
-      - SMTP_SERVER=smtp.gmail.com
-      - SMTP_PORT=587
-      - SMTP_MAIL=sysad.stock.tracker@gmail.com
-      - SMTP_PASS=tihs holh clyi dlai
-      - RECV_MAIL=sysad.project.ws2425@gmail.com
 
   mosquitto:
-    image: eclipse-mosquitto
-    hostname: stocktracker-mosquitto
-    container_name: stocktracker-mosquitto
+    extends:
+      file: ./mqtt_broker/docker-compose.yml
+      service: mosquitto
     networks:
       - stockTrackerDockerNetwork
-    restart: unless-stopped
-    ports:
-      - "1883:1883"
-      - "9001:9001"
-    volumes:
-      - ./mqttBroker/mosquitto:/etc/mosquitto
-      - ./mqttBroker/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
 volumes:
   pgdata:
-
+  
 networks:
   stockTrackerDockerNetwork:
     driver: bridge
