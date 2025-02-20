@@ -1,0 +1,20 @@
+@startuml
+actor User
+participant "StockTrackerApp" as App
+participant "HomePage" as Home
+participant "StockDataTableWidget" as DataTable
+participant "ApiService" as API
+participant "ApiConfig" as Config
+participant "Server" as Server
+
+User -> App: Startet App
+App -> Home: Lädt HomePage
+Home -> DataTable: Lädt StockDataTableWidget
+DataTable -> API: Ruft getDataFromApi()
+API -> Config: Ruft getBaseUrl()
+Config -> API: Gibt API-URL zurück
+API -> Server: Sendet HTTP GET Anfrage
+Server -> API: Antwort mit JSON-Daten
+API -> DataTable: Übergibt verarbeitete Daten
+DataTable -> Home: Zeigt Daten in UI an
+@enduml
