@@ -6,7 +6,7 @@ from ultralytics import YOLO
 logger = logging.getLogger(__name__)
 
 file_location = "../../."+os.getenv('HUMAN_CHECK_MODEL')
-device = os.getenv('DEVICE_TO_RUN_MODELDEVICE_TO_RUN_MODEL')
+device = os.getenv('DEVICE_TO_RUN_MODEL')
 model = YOLO(file_location).to(device)
 
 

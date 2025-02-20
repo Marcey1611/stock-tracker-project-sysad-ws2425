@@ -14,7 +14,7 @@ resolutions = [
     (640, 480)     # SD
 ]
 
-frame_interval = 0.5  # 2 FPS = 1 Frame alle 0.5 Sekunden
+frame_interval = 0.33  # 2 FPS = 1 Frame alle 0.5 Sekunden
 
 def frame_loop(client:mqtt.Client,topic:str):
     last_frame_time = time.monotonic()
@@ -49,7 +49,7 @@ def frame_loop(client:mqtt.Client,topic:str):
 
 
 def init_cam(camera:cv2.VideoCapture):
-    desired_fps = .5
+    desired_fps = 5
     set_resolution(camera)
     camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'YUYV'))
     camera.set(cv2.CAP_PROP_FPS, desired_fps)

@@ -12,7 +12,8 @@ services:
       - MQTT_BROKER_PORT=1883
       - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11n.pt
       - DETECTION_MODEL=./app/models/detection/yolo11n.pt
-      - DEVICE_TO_RUN_MODEL=cuda # cuda or cpu
+      - DEVICE_TO_RUN_MODEL=cuda # cuda or cpu#
+      - SERVER_IP=192.168.1.191
 
   .common_nvidia:
     extends: .common
