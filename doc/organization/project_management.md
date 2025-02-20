@@ -1,23 +1,23 @@
-# Projektmanagement
+# Project Management
 
-## Branching-Strategie
-Wir haben eine **Feature-Branch-Strategie** mit einem **Dev-Branch** genutzt. Neue Features wurden in separaten Feature-Branches entwickelt und nach erfolgreichem Code-Review in den Dev-Branch gemergt.
+## Branching Strategy
+We used a **feature branch strategy** with a **development branch (Dev-Branch)**. New features were developed in separate feature branches and merged into the Dev-Branch after a successful code review.
 
-## Agile Vorgehensweise
-Wir haben mit **Scrum** gearbeitet und unsere Aufgaben in **Jira** verwaltet. Unsere Sprint-Struktur sah folgendermaßen aus:
+## Agile Approach
+We worked with **Scrum** and managed our tasks in **Jira**. Our sprint structure was as follows:
 
-- **Sprints:** Wöchentliche Sprints
-- **Sprint Planning:** Jeden Samstag
-- **Sprint Review:** Jeden Samstag
-- **Tickets:** Aufgaben wurden als Jira-Tickets erstellt und priorisiert
+- **Sprints:** Weekly sprints  
+- **Sprint Planning:** Every Saturday  
+- **Sprint Review:** Every Saturday  
+- **Tickets:** Tasks were created as Jira tickets and prioritized  
 
-## Code-Review-Prozess
-Jeder Merge Request (MR) musste mindestens von einer anderen Person aus dem Team reviewed werden, bevor er in den Dev-Branch gemergt wurde. So stellten wir sicher, dass der Code qualitativ hochwertig und konsistent bleibt.
+## Code Review Process
+Each merge request (MR) had to be reviewed by at least one other team member before being merged into the Dev-Branch. This ensured that the code remained high quality and consistent.
 
-## Kommunikation
-- Wöchentliche Meetings am Samstag und Mittwoch zur Planung und Review
-- Außerdem tauschten wir uns auch regelmäßig wenn wir uns an der HS sahen zu aktuellen Problemen und oder Themen aus.
+## Communication
+- Weekly meetings on **Saturday and Wednesday** for planning and review  
+- Additionally, we regularly exchanged updates in person at the university regarding current issues and topics  
 
-## Verbesserungspotenzial
-Für zukünftige Projekte könnte die Einführung von **Automated Testing** und einer **CI/CD-Pipeline** sinnvoll sein, um den Entwicklungsprozess weiter zu optimieren.
+## Potential Improvements
+For future projects, introducing **automated testing** and a **CI/CD pipeline** could be beneficial to further optimize the development process.
 
