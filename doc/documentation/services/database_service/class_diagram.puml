@@ -1,8 +1,12 @@
 @startuml DatabaseService
 
++class Main {
+    +app : FastAPI
+}
+
 package api {
     package boundary {
-        +class API {
+        +class Api {
             +api_router : APIRouter
             +api_bf : ApiBf
             +app : FastAPI
@@ -16,7 +20,7 @@ package api {
     package control {
         +class ApiBf {
             +database_service : DatabaseService
-            
+
             +__init__()
             +handle_update_products_request(request: Request) : Response
             +handle_app_request() : AppResponse
@@ -50,7 +54,7 @@ package database {
         +get_session() : SessionLocal
     }
 
-    +class DatabaseTableModells {
+    package database_table_modells {
         +class Products {
             +id : int
             +type_id : int
@@ -64,62 +68,60 @@ package database {
             +picture : str
         }
     }
+    
+    Products --|> DatabaseProvider.base
+    OverallPicture --|> DatabaseProvider.base
 }
 
 package entities {
-    +class Models {
-        +class Product {
-            +name : str
-            +amount : int
-            +picture : str
-        }
-
-        +class Request {
-            +products : dict
-            +overall_picture
-            
-        }
-
-        +class Response {
-            status_code : int
-        }
-
-        +class MailResponse {
-            +id : int
-            +name : str
-            +amount : int
-            +changed_amount : int
-        }
-
-        +class AppResponse {
-            +prodcucts : dict
-            +overall_picture : str
-        }
-
-        Product --|> BaseModel
-        Request --|> BaseModel
-        Response --|> BaseModel
-        MailResponse --|> BaseModel
-        AppResponse --|> BaseModel
+    +class Product {
+        +name : str
+        +amount : int
+        +picture : str
     }
-}
 
-+class Main {
-    +app : FastAPI
+    +class Request {
+        +products : dict
+        +overall_picture
+
+    }
+
+    +class Response {
+        status_code : int
+    }
+
+    +class MailResponse {
+        +id : int
+        +name : str
+        +amount : int
+        +changed_amount : int
+    }
+
+    +class AppResponse {
+        +prodcucts : dict
+        +overall_picture : str
+    }
+
+    Product --|> BaseModel
+    Request --|> BaseModel
+    Response --|> BaseModel
+    MailResponse --|> BaseModel
+    AppResponse --|> BaseModel
 }
 
 Main ..> Api
-
-Api ..> ApiBf
-Api ..> Models
+Api --> ApiBf
+Api ..> entities
 
 ApiBf ..> DatabaseService
 ApiBf ..> MailingTrigger
-ApiBf ..> Models
+ApiBf --> entities
 
 DatabaseService ..> DatabaseProvider
-DatabaseService ..> Models
+DatabaseService --> Products
+DatabaseService --> OverallPicture
+DatabaseService --> entities
 
-DatabaseProvider ..> DatabaseTableModells
+DatabaseProvider ..> database_table_modells
 
 @enduml
