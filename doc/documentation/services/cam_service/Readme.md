@@ -1,0 +1,42 @@
+# cam_service
+
+The CamService is designed to capture images using a camera and seamlessly transmit them via the [MQTT Brocker](https://google.com) to the 
+[detction_service](https://google.com). for further processing.
+
+
+## [Docker Compose File](../../../../source/cam_service/docker-compose.yml)
+```yaml
+version: "3.9"
+services:
+  cam-service:
+    build: .
+    devices:
+      - "/dev/video2:/dev/video0"
+    environment:
+      - MQTT_BROKER_URL=192.168.1.191
+      - MQTT_BROKER_PORT=1883
+      - MQTT_USERNAME=sysAdmin
+      - MQTT_PASSWORD=sysAd2024
+```
+
+### Recommended Environment Variables:
+
+ - **devices**:
+   - `/dev/video2:/dev/video0` => Should be the camera with which you want to capture images.
+
+ - **environment**:
+   - `MQTT_BROKER_URL` => The IP of the Server where [MQTTBrocker](https://google.com) is running.
+   - `MQTT_BROKER_PORT` => The PORT of the Server where the [MQTTBrocker](https://google.com) can be reached.
+   - `MQTT_USERNAME` => The username for the MQTT-Broker. If not needed remove it.
+   - `MQTT_PASSWORD` => The password for the MQTT-Broker. If not needed remove it.
+
+
+## Docker File
+
+The Dockercontainer is based on the `python3.12-slim` image.
+<br>
+
+### Python Libraries 
+The Python Libraries ar installed using the [requiremnets.txt](../../../../source/cam_service/requirements.txt):
+ - `paho-mqtt` is used for the MQTT-communication. 
+ - `opencv-python-headless` is used to capture images.

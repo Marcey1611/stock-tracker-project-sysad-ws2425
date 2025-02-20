@@ -1,6 +1,6 @@
 import logging
-from service.mqtt.mqt_client import init_mqtt_client,try_connecting
-from service.camera.camera import frame_loop
+from service.mqtt.mqtt_client import init_mqtt_client,try_connecting
+from service.capture.camera import frame_loop
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -11,7 +11,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-client = init_mqtt_client()
+init_mqtt_client()
 logger.info(f"Init MQTT-Client")
 while True:
     connected = False

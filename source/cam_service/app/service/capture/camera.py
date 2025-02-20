@@ -15,13 +15,11 @@ resolutions = [
     (640, 480)     # SD
 ]
 
-frame_interval = 0.5  # 2 FPS = 1 Frame alle 0.5 Sekunden
 
 def frame_loop():
-    from service.mqtt.mqt_client import is_client_connected, publish_image
-    last_frame_time = time.monotonic()
+    from service.mqtt.mqtt_client import is_client_connected, publish_image
 
-    camera = cv2.VideoCapture(0)
+    camera = cv2.VideoCapture(0,cv2.CAP_V4L2)
     if camera.isOpened():
         logger.info(f"Camera {0} opend.")
     else:
@@ -30,7 +28,7 @@ def frame_loop():
     init_cam(camera)
 
     while is_client_connected():
-        success, frame ,last_frame_time = capture_image(camera,last_frame_time)
+        success, frame = capture_image(camera)
         if success:
             _, buffer = cv2.imencode('.jpeg', frame, [cv2.IMWRITE_WEBP_QUALITY, 80])
             publish_image(buffer.tobytes())
@@ -40,8 +38,8 @@ def frame_loop():
 
 def init_cam(camera:cv2.VideoCapture):
     set_resolution(camera)
-    camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'YUYV'))
-    camera.set(cv2.CAP_PROP_FPS, frame_interval)
+    camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+    camera.set(cv2.CAP_PROP_FPS,10)
     actual_fps = camera.get(cv2.CAP_PROP_FPS)
     logger.debug(f"Kamera-FPS: {actual_fps}")
 
@@ -59,17 +57,10 @@ def set_resolution(camera:cv2.VideoCapture):
             print(f"Camera resolution: {actual_width}x{actual_height}")
             break
 
-def capture_image(camera:cv2.VideoCapture,last_frame_time):
-    current_time = time.monotonic()
-    elapsed_time = current_time - last_frame_time
-
-    if elapsed_time < frame_interval:
-        time.sleep(frame_interval - elapsed_time)
-
-    last_frame_time = time.monotonic()
+def capture_image(camera:cv2.VideoCapture):
 
     success, frame = camera.read()
     if not success:
         logger.error("Fehler: Kamera liefert kein Bild")
-        return False, None, 0
-    return True, frame, last_frame_time
+        return False, None
+    return True, frame

@@ -3,18 +3,17 @@ import sys
 import uuid
 import logging
 import time
-
 import paho.mqtt.client as mqtt
 
-from service.camera.camera import frame_loop
+from service.capture.camera import frame_loop
 
 logger = logging.getLogger(__name__)
 
 custom_uuid = uuid.uuid4()
 broker=os.getenv('MQTT_BROKER_URL')
 port=int(os.getenv('MQTT_BROKER_PORT'))
-username = "sysAdmin"
-password = "sysAd2024"
+username = os.getenv('MQTT_USERNAME')
+password =os.getenv('MQTT_PASSWORD')
 topic ="camera/"+custom_uuid.__str__()+"/image"
 logger.debug(f"Broker {broker} // Port {port}")
 
@@ -36,7 +35,8 @@ def init_mqtt_client():
         sys.exit()
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
-    client.username_pw_set(username, password)
+    if username is not None and password is not None:
+        client.username_pw_set(username, password)
 
 def try_connecting():
     try:
