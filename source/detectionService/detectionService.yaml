@@ -5,7 +5,7 @@ info:
 servers:
   - url: http://detectionService/
 paths:
-  /feed:
+  /video/feed:
     get:
       summary: Access to the Live-Video-Feed
       description: Returns the Live-Videostream
@@ -23,7 +23,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /track:
+  /video/track:
     get:
       summary: Access to the YOLO-Detektionsstream
       description: Returns the Realtime-YOLO-Detektion.
