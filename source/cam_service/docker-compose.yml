@@ -5,7 +5,7 @@ services:
     devices:
       - "/dev/video2:/dev/video0"
     environment:
-      - MQTT_BROKER_URL=192.168.2.15
+      - MQTT_BROKER_URL=192.168.1.192
       - MQTT_BROKER_PORT=1883
       - MQTT_USERNAME=sysAdmin
       - MQTT_PASSWORD=sysAd2024
