@@ -1,0 +1,40 @@
+@startuml
+
+package app {
+class main
+}
+
+package app.service.capture{
+class camera{
+  Array[img_resulution] resulutions
+  + frame_loop()
+  + init_cam()
+  + set_resolution()
+  + capture_image()
+  }
+  main ..> camera
+  camera ..> app.service.mqtt.mqtt_client
+
+}
+
+package app.service.mqtt{
+class mqtt_client{
+  + String url
+  + String username
+  + String password
+  + String topic
+  + String uuid
+  + MqttClient client
+
+  + on_connect()
+  + on_disconnect()
+  + on_message()
+  + init_mqtt_clinet()
+  + try_connecting()
+  + is_client_connected()
+  + publish_image()
+  }
+  main ..> mqtt_client
+}
+
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+
+participant "Database Service" as Database
+participant "Api" as API
+participant "MailPreparingServiceBa" as MailPreparingService
+participant "MailSendingServiceBa" as MailSendingService
+participant "Gmail" as Gmail
+
+Database -> API: POST /send_update_mail
+API -> MailPreparingService: Validated and Unpacked update mail data
+MailPreparingService -> MailPreparingService: Prepare and save update mail data
+MailPreparingService -> MailSendingService: Update mailing data all 2 minutes
+MailSendingService -> Gmail: Send update mail
+Gmail --> MailSendingService: Update mail sent confirmation
+MailSendingService --> MailPreparingService: Successfully sent update mail
+MailPreparingService --> API: Successfully sent update mail 
+API --> Database: JSONResponse (update mail sent)
+
+Database -> API: POST /send_error_mail
+API -> MailPreparingService: Validated and Unpacked error mail data
+MailPreparingService -> MailPreparingService: Prepare error mail
+MailPreparingService -> MailSendingService: Prepared error mail
+MailSendingService -> Gmail: Send error mail
+Gmail --> MailSendingService: Error mail sent confirmation
+MailSendingService --> MailPreparingService: Successfully sent error mail
+MailPreparingService --> API: Successfully sent error mail
+API --> Database: JSONResponse (error mail sent)
+
+@enduml

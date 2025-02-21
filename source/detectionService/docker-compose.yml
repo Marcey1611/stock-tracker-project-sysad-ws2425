@@ -1,0 +1,32 @@
+services:
+  detection-service:
+    extends: .common_nvidia
+
+  .common:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_SERVICE_URL= http://dataBaseServiceContainer:8000
+      - MQTT_BROKER_URL=stock-tracker-mosquitto
+      - MQTT_BROKER_PORT=1883
+      - MQTT_USERNAME=sysAdmin
+      - MQTT_PASSWORD=sysAd2024
+      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11n.pt
+      - DETECTION_MODEL=./app/models/detection/yolo11x.pt
+      - DEVICE_TO_RUN_MODEL=cuda
+      - SERVER_IP=192.168.1.192
+
+
+  .common_nvidia:
+    extends: .common
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES= all
+      - NVIDIA_DRIVER_CAPABILITIES= compute,video,utility,graphics

@@ -1,0 +1,127 @@
+@startuml DatabaseService
+
++class Main {
+    +app : FastAPI
+}
+
+package api {
+    package boundary {
+        +class Api {
+            +api_router : APIRouter
+            +api_bf : ApiBf
+            +app : FastAPI
+
+            +update_products(request: Request) : Response
+            +update_app() : AppResponse
+            +healthcheck() : Object
+        }
+    }
+
+    package control {
+        +class ApiBf {
+            +database_service : DatabaseService
+
+            +__init__()
+            +handle_update_products_request(request: Request) : Response
+            +handle_app_request() : AppResponse
+        }
+
+        +class MailingTrigger {
+            +trigger_mailing_service(action: str, udated_products_dict: dict)
+            +generate_mailing_json(update_products_dict: dict) : list
+        }
+    }
+}
+
+package bm {
+    +class DatabaseService {
+        +database_provider : DatabaseProvider
+
+        +__init__()
+        +update_products(request: Request) : dict
+        +intitalize_products(request: Request)
+        +update_products_amount(request: Request) : dict
+        +get_products() : AppResponse
+    }
+}
+
+package database {
+    +class DatabaseProvider {
+        +base : declarative_base
+
+        +__init__()
+        +init_db()
+        +get_session() : SessionLocal
+    }
+
+    package database_table_modells {
+        +class Products {
+            +id : int
+            +type_id : int
+            +name : str
+            +picture : str
+            +amount : int
+        }
+
+        +class OverallPicture {
+            +id : int
+            +picture : str
+        }
+    }
+    
+    Products --|> DatabaseProvider.base
+    OverallPicture --|> DatabaseProvider.base
+}
+
+package entities {
+    +class Product {
+        +name : str
+        +amount : int
+        +picture : str
+    }
+
+    +class Request {
+        +products : dict
+        +overall_picture
+
+    }
+
+    +class Response {
+        status_code : int
+    }
+
+    +class MailResponse {
+        +id : int
+        +name : str
+        +amount : int
+        +changed_amount : int
+    }
+
+    +class AppResponse {
+        +prodcucts : dict
+        +overall_picture : str
+    }
+
+    Product --|> BaseModel
+    Request --|> BaseModel
+    Response --|> BaseModel
+    MailResponse --|> BaseModel
+    AppResponse --|> BaseModel
+}
+
+Main ..> Api
+Api --> ApiBf
+Api ..> entities
+
+ApiBf ..> DatabaseService
+ApiBf ..> MailingTrigger
+ApiBf --> entities
+
+DatabaseService ..> DatabaseProvider
+DatabaseService --> Products
+DatabaseService --> OverallPicture
+DatabaseService --> entities
+
+DatabaseProvider ..> database_table_modells
+
+@enduml

@@ -1,0 +1,44 @@
+@startuml
+class ApiConfig {
+  +static String getBaseUrl()
+}
+
+class ApiService {
+  +Future<List<dynamic>> getDataFromApi()
+}
+
+class StockDataTableWidget {
+  +State createState()
+}
+
+class StockDataTableWidgetState {
+  -List<dynamic> stockData
+  -bool isLoading
+  -dynamic overallPicture
+  -Timer? _timer
+  +void _fetchStockData()
+}
+
+class HomePage {
+  +State createState()
+}
+
+class HomePageState {
+  -int _selectedIndex
+  +void _onItemTapped(int index)
+}
+
+class StockTrackerApp {
+  +Widget build(BuildContext context)
+}
+
+class Server {
+}
+
+ApiConfig <-- ApiService : "verwendet"
+ApiService <-- StockDataTableWidgetState : "nutzt API-Daten"
+StockDataTableWidget <-- StockDataTableWidgetState : "erstellt State"
+HomePage <-- HomePageState : "erstellt State"
+StockTrackerApp --> HomePage : "lädt HomePage"
+ApiService --> Server : "kommuniziert mit"
+@enduml

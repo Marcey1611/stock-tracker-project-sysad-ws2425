@@ -1,0 +1,6 @@
+Der Datensatz basiert auf dem freiburg-groceries-djizd Datensatz aus dem die 15 klassen entfernt wurden.
+Das Original finden sie unter:
+https://universe.roboflow.com/daojingtutorial/freiburg-groceries-djizd/dataset/2
+Da die zip zu groß ist um diese auf gitlab hochzuladen können Sie uns unter np-223996@rwu.de erreichen. Wir schicken ihnen dann den Datensatz.
+Sie können Ihn auch hier herunterladen:
+https://preyer-cloud.duckdns.org/s/d9ZCHHFLgjX3NWM

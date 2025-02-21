@@ -27,8 +27,8 @@ source/**/dist/
 source/**/downloads/
 source/**/eggs/
 source/**/.eggs/
-source/**/lib/
-source/**/lib64/
+# source/**/lib/
+# source/**/lib64/
 source/**/parts/
 source/**/sdist/
 source/**/var/
@@ -101,7 +101,7 @@ source/**/celerybeat-schedule
 source/**/*.sage.py
 
 # Environments
-source/**/.env
+# source/**/.env Because we need the .env file in the repo
 source/**/.venv
 source/**/env/
 source/**/venv/
@@ -159,7 +159,7 @@ doc/**/*-converted-to.*
 # doc/**/*.pdf
 
 ## Generated if empty string is given at "Please type another file name for output:"
-doc/**/*.pdf
+# doc/**/*.pdf
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 doc/**/*.bbl
@@ -394,3 +394,9 @@ doc/**/*-tags.tex
 
 # standalone packages
 doc/**/*.sta
+
+# mac generated files for meta data
+.DS_Store
+
+# IDEA files generated files
+.idea
