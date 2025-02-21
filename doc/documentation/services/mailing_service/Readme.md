@@ -1,6 +1,6 @@
 # Description of the Mailing Service
 
-The Mailing Service is responsible for sending automated emails based on the information provided by the DatabaseServices [mailing trigger](../../../../source/databaseService/app/api/control/mailingTrigger.py). Therefore the service contains an api which is specified in the [api spec](./api_specification.yml). In the same directory as the api spec you can find an [class diagram](./class_diagram.puml) and a [sequence diagram](./sequence_diagram.puml). It is accessed via REST interfaces and performs the following functions.
+The Mailing Service is responsible for sending automated emails based on the information provided by the DatabaseServices [mailing trigger](../../../../source/databaseService/app/api/control/mailing_trigger.py). Therefore the service contains an api which is specified in the [api spec](./api_specification.yml). In the same directory as the api spec you can find an [class diagram](./class_diagram.puml) and a [sequence diagram](./sequence_diagram.puml). It is accessed via REST interfaces and performs the following functions.
 
 ## Functions of the Mailing Service
 
