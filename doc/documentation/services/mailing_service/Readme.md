@@ -24,7 +24,7 @@ The Mailing Service is modular in design. Its main components include:
 
 Futhermore there are some additional components:
 - **[Exception Handler](../../../../source/mailingService/app/api/boundary/exception_handler.py):** A simple FastAPI exception handler which handle the two custom exceptions and all other exceptions and comunicates these exceptions to the outside.
-- **[Action Enum](../../../../source/mailingService/app/entity/enums/):** Enum with the values CHANGED and DELETED which seperates the the two different types of emails sent by this service.
+- **[Action Enum](../../../../source/mailingService/app/entity/enums/action.py):** Enum with the values CHANGED and DELETED which seperates the the two different types of emails sent by this service.
 - **[Internal Error Exception](../../../../source/mailingService/app/entity/exceptions/internal_error_exception.py):** Custom exception for errors at the client side.
 - **[Models for the mailing data](../../../../source/mailingService/app/entity/models/mail_data.py):** Two models, one for the update and one for the error mails. Among other things, these models are used for validation which is possible because of the use of FastAPI.
 
