@@ -38,5 +38,5 @@ The Dockercontainer is based on the `python3.12-slim` image.
 
 ### Python Libraries 
 The Python Libraries are installed using the [requirements.txt](../../../../source/cam_service/requirements.txt):
- - `paho-mqtt` is used for the MQTT-communication. 
- - `opencv-python-headless` is used to capture images.
+ - `paho-mqtt` is used for the MQTT communication. [link](https://github.com/eclipse-paho/paho.mqtt.python)
+ - `opencv-python-headless` is used to capture images.[link](https://github.com/opencv/opencv-python)

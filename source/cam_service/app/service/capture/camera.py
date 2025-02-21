@@ -37,7 +37,7 @@ def frame_loop():
 def init_cam(camera:cv2.VideoCapture):
     set_resolution(camera)
     camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
-    camera.set(cv2.CAP_PROP_FPS,10)
+    camera.set(cv2.CAP_PROP_FPS,5)
     actual_fps = camera.get(cv2.CAP_PROP_FPS)
     logger.debug(f"Kamera-FPS: {actual_fps}")
 

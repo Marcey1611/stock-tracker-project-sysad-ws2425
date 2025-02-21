@@ -1,22 +1,21 @@
-import copy
-from typing import Dict
+# HTTP Requests
 
-from api import api_rest_client_database
-from entities.http.product import Product
-from entities.detection.track_manager import TrackerManager
-from entities.http.database_models import DatabaseUpdateRequest
-from service.detection.frame_codings import encode_frame
-from service.detection.frame_drawings import draw_bounding_box
+## [http_request_service.py](../../../../../../../source/detectionService/app/service/http_request/http_request_service.py)
 
-
+### init_database
+```python
 def init_database(frame,names):
     all_products: Dict[int, Product] = {}
     for index, name in enumerate(names.values()):
         all_products[index] = Product(name=name,amount=0,picture=None)
     http_database_request = DatabaseUpdateRequest(overall_picture=encode_frame(frame), products=all_products)
     return api_rest_client_database.update_database_products(http_database_request)
+```
+When the first MQTT-Message arrives, the detection service then triggers this method to tell the [Database Service](../../../../database_service/Readme.md) which object it can detect.
+To have an image in the [App/Web](../../../../flutter_app/Readme.md) before there is something to update, an overall picture is [encoded](../detection/Readme.md) and added.
 
-
+### generate_http_request
+```python
 def generate_http_request(trackers: TrackerManager, annotated_frame, frame):
     http_database_request = DatabaseUpdateRequest(overall_picture=encode_frame(annotated_frame), products={})
     if frame is None:
@@ -24,7 +23,13 @@ def generate_http_request(trackers: TrackerManager, annotated_frame, frame):
     else:
         http_database_request.products = generate_products(trackers, frame)
         api_rest_client_database.update_database_products(http_database_request)
+```
+This method does the [Database Service](../../../../database_service/Readme.md) call over the [api_rest_client_database](../../api/Readme.md) file .
+Before it generates a [DatabaseUpdateRequest](../../entities/http/Readme.md).
+Additionally, the overall picture will be [encoded](../detection/Readme.md) base64.
 
+### generate_products
+```python
 def generate_products(trackers: TrackerManager, frame):
     from service.detection.frame_detecting import model_cls_names
     tmp_detected_objects = copy.deepcopy(trackers.detected_objects)
@@ -45,3 +50,8 @@ def generate_products(trackers: TrackerManager, frame):
         all_products[item.get_cls_id()] = Product(name=product_name, amount=product_amount,
                                                   picture=product_picture)
     return all_products
+```
+In this methode all detected objects are transformed into products.
+While doing so, it generates a product-class-frame which contains all bounding boxes from all Products with the same product id.
+The bounding boxes are drawn by the [draw_bounding_box](../detection/Readme.md) method.
+At the end, the frame will be base64 [encoded](../detection/Readme.md).

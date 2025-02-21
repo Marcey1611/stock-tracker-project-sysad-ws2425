@@ -1,5 +1,5 @@
 fastapi
-uvicorn[standard]           # ASGI-Server für FastAPI
+uvicorn[standard]
 ultralytics
 lap
 paho-mqtt

@@ -1,7 +1,5 @@
-import base64
 import logging
 import os
-import cv2
 from ultralytics import YOLO
 from entities.detection.track_manager import TrackerManager
 from service.tracking.tracking_service import handle_disappeared_objects, update_database, update_object_tracking
@@ -24,8 +22,6 @@ def frame_detection(frame, trackers:TrackerManager):
     handle_disappeared_objects(current_track_ids,trackers)
 
     update_database(trackers,annotated_frame,frame)
-
-    trackers.previous_detected_objects = trackers.detected_objects.copy()
 
     trackers.previous_detected_objects = trackers.detected_objects.copy()
     return annotated_frame
