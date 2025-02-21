@@ -1,5 +1,4 @@
 @startuml
-
 entity "Camera" as Camera
 participant "Camera-Service" as CameraService
 participant "MQTT-Brocker" as MQTTBrocker
@@ -9,13 +8,12 @@ database "Database" as Database
 participant "Flutter-App" as FlutterApp
 participant "Mailing-Service" as MailingService
 
-Camera -> CameraService: Input view
-CameraService -> MQTTBrocker: Camera view
-MQTTBrocker -> DetectionService: Camera view
-DetectionService -> DatabaseService: Send product updates all 10 seconds
+Camera -> CameraService: Frames
+CameraService -> MQTTBrocker: Frames
+MQTTBrocker -> DetectionService: Frames
+DetectionService -> DatabaseService: Send product updates all 15 seconds
+DetectionService -> DatabaseService: Or send product updates if detected
 DatabaseService -> Database: Saves and updates products data
 DatabaseService -> MailingService: Forwards updates to MailingService
-FlutterApp -> DatabaseService: Gets updates all 30 seconds 
-
-
+FlutterApp -> DatabaseService: Requests updates all 10 seconds
 @enduml
