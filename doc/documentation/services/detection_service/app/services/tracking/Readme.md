@@ -1,12 +1,8 @@
-import time
-
-from entities.detection.detected_object import DetectedObject
-from entities.detection.track_manager import TrackerManager
-from service.http_request.http_request_service import generate_http_request
-
-TOLERANCE = 10
-ADD_REMOVE_THRESHOLD = .5 * 30
-UPDATE_INTERVALL = 15
+# Tracking
+## [tracking_service.py](../../../../../../../source/detectionService/app/service/tracking/tracking_service.py)
+This file handels updating the [TrackingManager](../../entities/detection/Readme.md). 
+### update_object_tracking
+```python
 def update_object_tracking(results, trackers: TrackerManager):
     boxes = results[0].boxes.xywh.cpu()
     track_ids = results[0].boxes.id.int().cpu().tolist()
@@ -43,8 +39,15 @@ def update_object_tracking(results, trackers: TrackerManager):
             if len(trackers.track_history[track_id]) > 30:
                 trackers.track_history[track_id].pop(0)
     return current_track_ids
+```
+ChatGPT heavily influenced this code.
+It allows us to add the [Detected Products](../../entities/detection/Readme.md) to the 
+[TrackingManager](../../entities/detection/Readme.md) if they stand still.
+Additionally, it saves the bounding box for the [Drawings](../../entities/detection/Readme.md) done later  
 
-
+ChatGPT heavily influences this code.
+### handle_disappeared_objects
+```python
 def handle_disappeared_objects(current_track_ids, trackers: TrackerManager):
     to_remove = []
 
@@ -59,8 +62,12 @@ def handle_disappeared_objects(current_track_ids, trackers: TrackerManager):
 
     for track_id in to_remove:
         del trackers.detected_objects[track_id]
+```
+This Methode does remove disappeared objects.
+If the Object is disappeared longer than the ADD_REMOVE_THRESHOLD allows it to, then the object will be removed from the [trackers.detected_objects](../../entities/detection/Readme.md) dictionary.
 
-
+### update_database
+```python
 def update_database(trackers: TrackerManager, annotated_frame, frame):
     current_time = time.monotonic()
     if len(trackers.detected_objects.items())!=len(trackers.previous_detected_objects.items()) or current_time-trackers.last_update > UPDATE_INTERVALL:
@@ -69,3 +76,7 @@ def update_database(trackers: TrackerManager, annotated_frame, frame):
         else:
             generate_http_request(trackers, annotated_frame, frame)
         trackers.last_update = current_time
+```
+This Code checks if the previously detected objects and the detected objects differ.
+Additionally, it checks if the last update is larger than the UPDATE_INTERVALL.
+If one is the case, it will start triggering the [Request to the database](../http_request/Readme.md).

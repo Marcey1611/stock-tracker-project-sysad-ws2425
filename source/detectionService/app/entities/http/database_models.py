@@ -1,7 +1,7 @@
 from typing import Dict
 from pydantic import BaseModel
 
-from entities.detection.product import Product
+from entities.http.product import Product
 
 
 class DatabaseUpdateRequest(BaseModel):

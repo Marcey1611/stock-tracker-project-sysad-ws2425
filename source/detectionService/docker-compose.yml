@@ -10,12 +10,13 @@ services:
       - DATABASE_SERVICE_URL= http://dataBaseServiceContainer:8000
       - MQTT_BROKER_URL=stock-tracker-mosquitto
       - MQTT_BROKER_PORT=1883
-      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11n.pt
-      - DETECTION_MODEL=./app/models/detection/yolo11n.pt
-      - DEVICE_TO_RUN_MODEL=cuda # cuda or cpu#
-      - SERVER_IP=192.168.1.191
       - MQTT_USERNAME=sysAdmin
       - MQTT_PASSWORD=sysAd2024
+      - HUMAN_CHECK_MODEL=./app/models/humancheck/yolo11n.pt
+      - DETECTION_MODEL=./app/models/detection/yolo11x.pt
+      - DEVICE_TO_RUN_MODEL=cuda
+      - SERVER_IP=192.168.2.15
+
 
   .common_nvidia:
     extends: .common
