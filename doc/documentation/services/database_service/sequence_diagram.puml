@@ -1,0 +1,47 @@
+@startuml DatabaseService
+
+actor "Detection-Service" as DetectionService
+actor "Stock-Tracker-App" as StockTracker
+boundary "API" as Api
+control "Api-Bf" as ApiBf
+participant "Database-Service" as DatabaseService
+database "Database" as Database
+participant "Mailing-Trigger" as MailingTrigger
+boundary "Mailing-Service" as MailingService
+
+DetectionService -> Api: POST /update_products
+Api -> Api: Validate Request
+Api -> ApiBf: Handle Request
+ApiBf -> DatabaseService: Unpack Request-Data
+DatabaseService -> DatabaseService: Determin if Request is init or update
+alt Initialize Products
+  DatabaseService -> Database: Initialize products
+  Database --> DatabaseService: Initialized new product-types
+  Database --> DatabaseService: Safed overall picture
+  DatabaseService -> DatabaseService: Create Mail-Response
+  DatabaseService --> ApiBf: Mail-Response
+else Update Products
+  DatabaseService -> Database: Update products
+  Database --> DatabaseService: Updated products
+  Database --> DatabaseService: Updated overall_picture
+  DatabaseService --> ApiBf: Updated Database successfully
+end
+ApiBf -> MailingTrigger: Mail-Response
+loop 2 times 
+  MailingTrigger -> MailingService: Send Mail 
+  MailingService --> MailingTrigger: response
+end
+MailingTrigger --> ApiBf
+ApiBf --> Api: Prepare response
+Api --> DetectionService: Successfully updated/initialized products
+
+StockTracker -> Api: GET /update_app
+Api -> ApiBf: Handle Request
+ApiBf -> DatabaseService: Get data
+DatabaseService -> Database: Get all Data
+Database --> DatabaseService: Return all Products
+DatabaseService --> ApiBf
+ApiBf --> Api: Prepare response
+Api --> StockTracker: return Products
+
+@enduml

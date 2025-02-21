@@ -1,0 +1,45 @@
+@startuml
+node Detection {
+    component DetectionService {
+        portout update_products_OUT
+    }
+    component MQTTBrocker
+    component CameraService
+}
+node Database {
+    database PostgresDatabase
+    component DatabaseService{
+        portin update_products_IN
+
+        portin update_app_IN
+
+        portout send_update_mail_OUT
+        portout send_error_mail_OUT
+    }
+}
+
+node Mail {
+    component MailService{
+        portin send_update_mail_IN
+        portin send_error_mail_IN
+    }
+}
+node Flutter {
+    component FlutterApp {
+        portout update_app_OUT
+    }
+}
+
+CameraService -left-> MQTTBrocker
+
+MQTTBrocker -left-> DetectionService
+
+update_products_OUT -down-> update_products_IN
+
+update_app_OUT -left-> update_app_IN
+
+send_update_mail_OUT -down-> send_update_mail_IN
+send_error_mail_OUT -down-> send_error_mail_IN
+
+DatabaseService -left-> PostgresDatabase
+@enduml

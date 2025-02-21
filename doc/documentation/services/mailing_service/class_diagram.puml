@@ -1,0 +1,96 @@
+@startuml
+
+package api {
+    package boundary {
+        +class Api {
+            +api_bf : ApiBf
+            +api_router : apiRouter
+
+            +send_update_mail(request : MailUpdateData) : JSONResponse
+            +send_error_mail(request : MailErrorData) : JSONResponse
+        }
+
+        +class ExceptionHandler {
+            +logger : Logger
+
+            +register_exception_handler(fast_api : app) : JSONResponse
+            +response(detail : str, status_code : int) : JSONResponse
+        }
+    }
+
+    package control {
+        +class ApiBf {
+            +logger: Logger
+            +mail_preparing_service : MailPreparingServiceBa
+
+
+            +__init__() : None
+            +prepare_mailing_data(mail_data_list : Request, action : Action) : None
+            +prepare_mailing_data_error(data : Request) : None
+        }
+    }
+}
+
+package bm {
+    +class MailPreparingServiceBa {
+        - logger : Logger
+        - sender_email : str
+        - receiver_email : str
+
+        + __init__() : None
+        + start_scheduled_mail_sending() : None
+        + send_scheduled_mail() : None
+        + prepare_mail(mail_data : object, action : Action) : None
+        + set_mail_data(mail_data_list : list<MailUpdateData>, action : Action) : str, str
+        + set_error_mail_data(error_message : str) : str, str
+        + config_message(subject : str, body : str) : MIMEMultipart
+    }
+    +class MailSendingServiceBa {
+        - logger : Logger
+        - smtp_server : str
+        - smtp_port : int
+        - sender_email : str
+        - receiver_email : str
+        - password : str
+
+        + __init__() : None
+        + send_mail(message : MIMEMultipart) : None
+    }
+}
+
+package entity {
+    +class MailUpdateData {
+        + id : int
+        + name : str
+        + changed_amount : int
+        + amount : int
+    }
+
+    +class MailErrorData {
+        + error_message : str
+    }
+
+    +enum Action {
+        CHANGED
+        ERROR
+    }
+
+    +class InternalErrorException {
+        + __init__(detail : str = "Internal Server Error", status_code : int = 500) : None
+    }
+}
+
++class Main {
+    +app : fast_api
+}
+
+Main ..> ExceptionHandler
+Main ..> Api
+
+Api ..> ApiBf
+
+ApiBf ..> MailPreparingServiceBa
+
+MailPreparingServiceBa ..> MailSendingServiceBa
+
+@enduml

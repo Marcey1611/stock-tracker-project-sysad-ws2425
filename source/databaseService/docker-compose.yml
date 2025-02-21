@@ -1,0 +1,15 @@
+services:
+  database-service:
+    build:
+      context: .
+    container_name: dataBaseServiceContainer
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://myuser:mypassword@databaseContainer:5432/mydatabase
+      - MAILING_SERVICE_URL=http://mailing-service:8000/
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/healthcheck || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

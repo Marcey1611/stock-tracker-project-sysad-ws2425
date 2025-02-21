@@ -1,0 +1,11 @@
+services:
+  stock-tracker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stock_tracker_container
+    ports:
+      - "40105:40105"
+    environment:
+      - DATABASE_SERVICE_URL="http://localhost:8001/update_app"
+

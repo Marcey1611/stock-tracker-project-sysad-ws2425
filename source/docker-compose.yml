@@ -1,0 +1,59 @@
+version: "3.9"
+services:
+  db:
+    extends:
+      file: ./database/docker-compose.yml
+      service: db
+    networks:
+      - stockTrackerDockerNetwork
+
+  database-service:
+    extends:
+      file: ./databaseService/docker-compose.yml
+      service: database-service
+    networks:
+      - stockTrackerDockerNetwork
+    depends_on:
+      db:
+        condition: service_healthy
+
+  detection-service:
+    extends:
+      file: ./detectionService/docker-compose.yml
+      service: detection-service
+    networks:
+      - stockTrackerDockerNetwork
+    depends_on:
+      database-service:
+        condition: service_healthy
+
+  stock-tracker:
+    extends:
+      file: ./stock_tracker/docker-compose.yml
+      service: stock-tracker
+    networks:
+      - stockTrackerDockerNetwork
+    depends_on:
+      database-service:
+        condition: service_healthy
+
+  mailing-service:
+    extends:
+      file: ./mailingService/docker-compose.yml
+      service: mailing-service
+    networks:
+      - stockTrackerDockerNetwork
+
+  mosquitto:
+    extends:
+      file: ./mqttBroker/docker-compose.yml
+      service: mosquitto
+    networks:
+      - stockTrackerDockerNetwork
+
+volumes:
+  pgdata:
+  
+networks:
+  stockTrackerDockerNetwork:
+    driver: bridge
