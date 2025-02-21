@@ -5,7 +5,7 @@ From there, it tries to detect some Object.
 Afterward, it provides a Livestream feed of the incoming images and also a tracked version
 where the detected Objects are marked.
 The Stream with bounding boxes can be reached over `http://detection-service:800/video/track` and the one without under `http://detection-service:800/video/feed`.
-Additionally, it sends the detected Objects to the [Database Service](../database_service/Readme) to store them.
+Additionally, it sends the detected Objects to the [Database Service](../database_service/Readme.md) to store them.
 
 ## [Docker Compose](../../../../source/detectionService/docker-compose.yml)
 ```yaml

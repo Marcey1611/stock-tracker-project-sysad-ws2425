@@ -38,7 +38,7 @@ Before starting the website, the correct IP address of the container must be che
 
 [API Configuration](../../../../source/stock_tracker/lib/api_config.dart): check or replace the IP address for "for web" and "for RealPhone"
 
-[Nginx.conf](../../../../source/stock_tracker/nginx.conf): check or replace the IP address at server_name
+[Nginx.conf](../../../../source/stock_tracker/nginx/nginx.conf): check or replace the IP address at server_name
 
 If the IP address of the server has changed or is different from the previous configuration, these two places must be updated.
 
@@ -135,4 +135,4 @@ The app and website cannot be run locally or checked for errors.
 
 Functions that rely on API requests or Flutter-specific components cannot be validated.
 
-For detailed installation instructions, see: [Install Instructions](../../../../source/stock_tracker/install_flutter/install_instructions.md)
+For detailed installation instructions, see: [Install Instructions](../../../../source/stock_tracker/install_flutter/install_instruction.md)
