@@ -1,3 +1,5 @@
+### Erarbeitet im Rahmen des Hochschulkurses System Administration an der RWU (WiSe 2024/25)
+
 # NOTICE
 This repository should not contain more than 100MB.
 
@@ -115,7 +117,7 @@ As mentioned above the app provides a simple gui (website or smartphone-app), wh
 ## Authors
 - Noah Preyer - 35797 - Cam-Service, Detection-Service, MQTT-Broker - @np-223996
 - Mike Lachmuth - 35968 - Database-Service, Database - @ml-224300
-- Marcel Eichelberger - 35768 - Initial work, Mailing-Service - @me-223965
+- Marcel Eichelberger - 35768 - Initial work, Mailing-Service, Project Management - @me-223965
 - Manuel Walser - 35825 - Stock Tracker App - @mw-224023
 
 ## Problems and solutions
